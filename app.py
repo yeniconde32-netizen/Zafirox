@@ -1,6 +1,5 @@
 import streamlit as st
 import streamlit.components.v1 as components
-import time
 import datetime
 import random
 
@@ -16,20 +15,6 @@ st.markdown("""
     <style>
     .main { background-color: #0e1117; color: white; }
     .stButton>button { width: 100%; border-radius: 8px; font-weight: bold; }
-    .floating-timer {
-        position: fixed;
-        top: 60px;
-        right: 15px;
-        background: rgba(30, 30, 30, 0.95);
-        color: #f59e0b;
-        padding: 8px 14px;
-        border-radius: 8px;
-        font-weight: bold;
-        z-index: 99999;
-        border: 1px solid #f59e0b;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-        font-size: 14px;
-    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -38,50 +23,6 @@ if 'saldo' not in st.session_state:
     st.session_state.saldo = 31.60
 if 'mina_pos' not in st.session_state:
     st.session_state.mina_pos = random.randint(1, 5)
-
-# --- WIDGET FLOTANTE DE TEMPORIZADOR EN TIEMPO REAL (JS) ---
-timer_html = """
-<div id="floating-timer" style="
-    position: fixed;
-    top: 60px;
-    right: 15px;
-    background: rgba(30, 30, 30, 0.95);
-    color: #f59e0b;
-    padding: 8px 14px;
-    border-radius: 8px;
-    font-weight: bold;
-    z-index: 99999;
-    border: 1px solid #f59e0b;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-    font-size: 14px;
-    font-family: Arial, sans-serif;
-">
-    ⏳ Bono Video: <span id="countdown">03:00</span>
-</div>
-
-<script>
-    let totalSeconds = 180; // 3 minutos de cuenta regresiva
-    function updateTimer() {
-        let minutes = Math.floor(totalSeconds / 60);
-        let seconds = totalSeconds % 60;
-        let formattedMinutes = minutes < 10 ? "0" + minutes : minutes;
-        let formattedSeconds = seconds < 10 ? "0" + seconds : seconds;
-        
-        let el = document.getElementById("countdown");
-        if(el) {
-            el.innerText = formattedMinutes + ":" + formattedSeconds;
-        }
-        
-        if (totalSeconds > 0) {
-            totalSeconds--;
-        } else {
-            totalSeconds = 180; // Reinicia el ciclo del bono
-        }
-    }
-    setInterval(updateTimer, 1000);
-</script>
-"""
-components.html(timer_html, height=0)
 
 # --- MENÚ LATERAL (SIDEBAR) ---
 with st.sidebar:
@@ -150,7 +91,7 @@ if opcion == "Minijuego Bloques (Hard)":
     </body>
     </html>
     """
-    components.html(tetris_html, height=280)
+    components.html(tetris_html, height=290)
 
 elif opcion == "Minijuego Snake (Hard)":
     st.title("🐍 Minijuego Snake (Modo Difícil)")
@@ -247,7 +188,7 @@ elif opcion == "Minijuego Snake (Hard)":
     </body>
     </html>
     """
-    components.html(snake_html, height=360)
+    components.html(snake_html, height=370)
 
 elif opcion == "Caza de Minas (Difícil)":
     st.title("💣 Caza de Minas (Modo Difícil)")
@@ -296,10 +237,30 @@ elif opcion == "Sesión de Videos y Monetag":
     st.title("🎬 Videos Publicitarios y Monetag")
     st.write("Mira los videos de bonificación o utiliza tu enlace directo para acumular ganancias automáticamente estilo Terybit.")
     
+    # --- TEMPORIZADOR INTEGRADO Y VISIBLE DENTRO DE LA SECCIÓN DE VIDEO ---
+    timer_video_html = """
+    <div style="background: rgba(30, 30, 30, 0.95); color: #f59e0b; padding: 12px; border-radius: 8px; font-weight: bold; text-align: center; border: 1px solid #f59e0b; margin-bottom: 15px;">
+        ⏳ Bono de Video Activo - Tiempo Restante: <span id="countdown" style="font-size: 18px;">03:00</span>
+    </div>
+    <script>
+        let totalSeconds = 180;
+        function updateTimer() {
+            let minutes = Math.floor(totalSeconds / 60);
+            let seconds = totalSeconds % 60;
+            let formattedMinutes = minutes < 10 ? "0" + minutes : minutes;
+            let formattedSeconds = seconds < 10 ? "0" + seconds : seconds;
+            let el = document.getElementById("countdown");
+            if(el) { el.innerText = formattedMinutes + ":" + formattedSeconds; }
+            if (totalSeconds > 0) { totalSeconds--; } else { totalSeconds = 180; }
+        }
+        setInterval(updateTimer, 1000);
+    </script>
+    """
+    components.html(timer_video_html, height=75)
+    
     st.subheader("📺 Reproductor de Video de Bonificación")
     st.write("Reproduce este video promocional hasta el final para reclamar tu recompensa de saldo:")
     
-    # Incrustar un video de demostración compatible (puedes cambiar el link de YouTube o video mp4)
     video_html = """
     <div style="text-align: center;">
         <iframe width="100%" height="210" src="https://www.youtube.com/embed/tgbNymZ7vqY" 
