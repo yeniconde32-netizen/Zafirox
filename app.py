@@ -16,6 +16,20 @@ st.markdown("""
     <style>
     .main { background-color: #0e1117; color: white; }
     .stButton>button { width: 100%; border-radius: 8px; font-weight: bold; }
+    .floating-timer {
+        position: fixed;
+        top: 60px;
+        right: 15px;
+        background: rgba(30, 30, 30, 0.9);
+        color: #f59e0b;
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-weight: bold;
+        z-index: 99999;
+        border: 1px solid #f59e0b;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        font-size: 14px;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -26,6 +40,21 @@ if 'tiempo_inicio' not in st.session_state:
     st.session_state.tiempo_inicio = time.time()
 if 'mina_pos' not in st.session_state:
     st.session_state.mina_pos = random.randint(1, 5)
+if 'tiempo_sesion_video' not in st.session_state:
+    st.session_state.tiempo_sesion_video = 300  # 5 minutos de cuenta regresiva para el bono de video
+
+# Calcular el tiempo restante de la sesión de video de forma dinámica
+tiempo_transcurrido_total = int(time.time() - st.session_state.tiempo_inicio)
+tiempo_restante_video = max(0, st.session_state.tiempo_sesion_video - (tiempo_transcurrido_total % st.session_state.tiempo_sesion_video))
+minutos_v = tiempo_restante_video // 60
+segundos_v = tiempo_restante_video % 60
+
+# --- WIDGET FLOTANTE DE TEMPORIZADOR REGRESIVO (POR ENCIMA DE TODO) ---
+st.markdown(f"""
+    <div class="floating-timer">
+        ⏳ Bono Video: {minutos_v:02d}:{segundos_v:02d}
+    </div>
+""", unsafe_allow_html=True)
 
 # --- MENÚ LATERAL (SIDEBAR) ---
 with st.sidebar:
@@ -236,8 +265,8 @@ elif opcion == "Caja Misteriosa":
         st.rerun()
 
 elif opcion == "Ganar por Tiempo y Anuncios (Monetag)":
-    st.title("⏱️ Tiempo y Anuncios Monetag")
-    st.write("Monitorea tu actividad y utiliza tu enlace directo de Monetag para registrar visualizaciones.")
+    st.title("⏱️ Sesión de Video y Anuncios Monetag")
+    st.write("Mantén abierta tu sesión y utiliza tu enlace directo de Monetag para acumular bonos por uso estilo Terybit.")
     
     tiempo_transcurrido = int(time.time() - st.session_state.tiempo_inicio)
     st.info(f"⏳ Llevas **{tiempo_transcurrido} segundos** activos en la plataforma.")
