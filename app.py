@@ -18,15 +18,25 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- ESTADO DE LA SESIÓN ---
+# --- GESTIÓN DE USUARIOS Y REFERIDOS DINÁMICOS ---
+query_params = st.query_params
+ref_user = query_params.get("ref", "Invitado")
+
+if 'usuario' not in st.session_state:
+    st.session_state.usuario = ref_user if ref_user != "Lud337" else "Lud337 (Tú)"
+
 if 'saldo' not in st.session_state:
-    st.session_state.saldo = 31.60
+    st.session_state.saldo = 31.60 if ref_user == "Lud337" else 0.00
+
+# Control para evitar recargas automáticas infinitas al reclamar por video
+if 'video_reclamado' not in st.session_state:
+    st.session_state.video_reclamado = False
 
 # --- MENÚ LATERAL (SIDEBAR) ---
 with st.sidebar:
     st.image("https://img.icons8.com/color/96/controller.png", width=60)
     st.title("ZafiroX")
-    st.write("Hola, **Lud337** 👋")
+    st.write(f"Hola, **{st.session_state.usuario}** 👋")
     
     st.markdown("---")
     st.subheader("Menú Principal")
@@ -286,21 +296,48 @@ elif opcion == "Sesión de Videos y Monetag":
     """
     components.html(timer_video_html, height=75)
     
-    st.subheader("📺 Reproductor de Video de Bonificación")
-    st.write("Reproduce este video promocional hasta el final para reclamar tu recompensa de saldo:")
+    st.subheader("📺 Reproductor de Video de Bonificación Automático")
+    st.write("Reproduce este video promocional hasta el final. Al terminar, tu saldo se actualizará solo:")
     
-    video_html = """
+    # Reproductor YouTube con integración JavaScript para detectar el final de la reproducción
+    youtube_auto_html = """
     <div style="text-align: center;">
-        <iframe width="100%" height="210" src="https://www.youtube.com/embed/tgbNymZ7vqY" 
-        title="Video Patrocinado" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border-radius: 8px;">
-        </iframe>
+        <div id="player" style="border-radius: 8px; overflow: hidden; display:inline-block;"></div>
     </div>
+    <script>
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        var player;
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                height: '210',
+                width: '100%',
+                videoId: 'tgbNymZ7vqY',
+                events: {
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        function onPlayerStateChange(event) {
+            // Estado 0 significa que el video terminó (Ended)
+            if (event.data === YT.PlayerState.ENDED) {
+                // Redirige la página agregando un indicador de recompensa en la URL
+                window.parent.location.href = window.parent.location.href.split('?')[0] + "?recompensa=video";
+            }
+        }
+    </script>
     """
-    components.html(video_html, height=230)
+    components.html(youtube_auto_html, height=230)
     
-    if st.button("🎁 Reclamar Bono por Ver Video"):
+    # Validar si el usuario terminó de ver el video mediante el parámetro automático
+    if query_params.get("recompensa") == "video" and not st.session_state.video_reclamado:
         st.session_state.saldo += 1.50
-        st.success("¡Video completado con éxito! +1.50 💎 añadidos a tu cuenta.")
+        st.session_state.video_reclamado = True
+        st.success("🎉 ¡Video completado hasta el final! +1.50 💎 añadidos automáticamente.")
         st.rerun()
         
     st.markdown("---")
@@ -326,7 +363,7 @@ elif opcion == "Sesión de Videos y Monetag":
 elif opcion == "Invitar Amigos":
     st.title("👥 Invitar Amigos con Recompensa")
     st.write("Comparte tu enlace de referido personalizado. Ganas un bono automático cada vez que un invitado se registra.")
-    st.code("https://zafirox.streamlit.app/?ref=Lud337", language="text")
+    st.code(f"https://zafirox.streamlit.app/?ref={st.session_state.usuario}", language="text")
     st.success("Recompensa activa: 5.00 💎 por cada amigo verificado.")
 
 elif opcion == "Ranking Semanal Top 4":
