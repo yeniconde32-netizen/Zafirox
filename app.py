@@ -1,151 +1,202 @@
 import streamlit as st
+import sqlite3
+import time
 import random
 
-# Configuración de la página
-st.set_page_config(page_title="ZafiroX - Minijuegos y Recompensas", page_icon="💎", layout="centered")
+# --- CONFIGURACI脫N DE LA BASE DE DATOS ---
+def init_db():
+    conn = sqlite3.connect("zafirox_users.db", check_same_thread=False)
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS usuarios (
+            username TEXT PRIMARY KEY,
+            saldo REAL,
+            retiros_solicitados REAL
+        )
+    '''''')
+    # Verificar si existe el usuario Lud337, si no, crearlo con saldo inicial
+    cursor.execute("SELECT * FROM usuarios WHERE username = ?", ("Lud337",))
+    if not cursor.fetchone():
+        cursor.execute("INSERT INTO usuarios (saldo, retiros_solicitados, username) VALUES (?, ?, ?)", (27.40, 0.0, "Lud337"))
+    conn.commit()
+    return conn, cursor
 
-# Inicializar base de datos simulada en memoria
-if "users" not in st.session_state:
-    st.session_state.users = {
-        "demo": {"password": "123", "balance": 150.0, "referrals": 0}
-    }
+conn, cursor = init_db()
 
-if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
-    st.session_state.username = ""
+def get_saldo(username):
+    cursor.execute("SELECT saldo FROM usuarios WHERE username = ?", (username,))
+    row = cursor.fetchone()
+    return row[0] if row else 0.0
 
-# --- PANTALLA DE AUTENTICACIÓN ---
-if not st.session_state.logged_in:
-    st.title("💎 ZafiroX App")
-    st.subheader("¡Juega, acumula gemas y gana dinero real!")
-    
-    tab1, tab2 = st.tabs(["Iniciar Sesión", "Registrarse"])
-    
-    with tab1:
-        login_user = st.text_input("Usuario", key="login_u")
-        login_pass = st.text_input("Contraseña", type="password", key="login_p")
-        if st.button("Entrar"):
-            if login_user in st.session_state.users and st.session_state.users[login_user]["password"] == login_pass:
-                st.session_state.logged_in = True
-                st.session_state.username = login_user
-                st.rerun()
-            else:
-                st.error("Usuario o contraseña incorrectos.")
-                
-    with tab2:
-        reg_user = st.text_input("Elige un Usuario", key="reg_u")
-        reg_pass = st.text_input("Elige una Contraseña", type="password", key="reg_p")
-        if st.button("Crear Cuenta"):
-            if reg_user in st.session_state.users:
-                st.warning("El usuario ya existe.")
-            elif reg_user == "":
-                st.warning("Escribe un nombre válido.")
-            else:
-                st.session_state.users[reg_user] = {"password": reg_pass, "balance": 10.0, "referrals": 0}
-                st.success("¡Cuenta creada con éxito! Ya puedes iniciar sesión.")
+def update_saldo(username, nuevo_saldo):
+    cursor.execute("UPDATE usuarios SET saldo = ? WHERE username = ?", (nuevo_saldo, username))
+    conn.commit()
 
-# --- APLICACIÓN PRINCIPAL ---
-else:
-    user_data = st.session_state.users[st.session_state.username]
-    
-    # Barra lateral de navegación
-    st.sidebar.title(f"Hola, {st.session_state.username} 👋")
-    st.sidebar.metric(label="Tu Saldo (Monedas)", value=f"{user_data['balance']:.2f} 💎")
-    
-    menu = st.sidebar.selectbox("Menú", [
-        "🎁 Caja Misteriosa", 
-        "💎 Caza de Gemas (Nuevo)", 
-        "🎡 Ruleta de la Suerte", 
-        "📺 Ver Videos Premiados", 
-        "👥 Invitar Amigos", 
-        "💸 Solicitar Retiro", 
-        "🚪 Cerrar Sesión"
-    ])
-    
-    if menu == "🎁 Caja Misteriosa":
-        st.title("🎁 Abre Cajas y Gana")
-        st.write("Haz clic en el botón para abrir una caja misteriosa y descubrir monedas al instante.")
-        
-        if st.button("Abrir Caja Misteriosa 🚀", use_container_width=True):
-            premio = round(random.uniform(1.0, 10.0), 2)
-            user_data["balance"] += premio
-            st.success(f"¡Felicidades! Encontraste **{premio} monedas**.")
+# --- ESTADO DE SESI脫N ---
+if "usuario_activo" not in st.session_state:
+    st.session_state.usuario_activo = "Lud337"
+
+usuario = st.session_state.usuario_activo
+saldo_actual = get_saldo(usuario)
+
+# --- MEN脷 LATERAL ---
+st.sidebar.title(f"Hola, {usuario} 馃憢")
+st.sidebar.markdown(f"**Tu Saldo (Monedas):**")
+st.sidebar.markdown(f"# 馃拵 {saldo_actual:.2f}")
+
+menu_seleccionado = st.sidebar.selectbox(
+    "Men煤",
+    [
+        "Ruleta de la Suerte",
+        "Caja Misteriosa",
+        "Caza de Gemas (Nuevo)",
+        "Ver Videos Premiados",
+        "Invitar Amigos",
+        "Solicitar Retiro",
+    ],
+)
+
+# --- VISTA: VER VIDEOS PREMIADOS ---
+if menu_seleccionado == "Ver Videos Premiados":
+    st.subheader("馃摵 Ver Videos Premiados")
+    st.write("Mira el contenido patrocinado y completa el contador para recibir tus recompensas autom谩ticas en tu saldo.")
+
+    st.info("馃挕 Haz clic en el bot贸n inferior para iniciar el video publicitario patrocinado.")
+
+    if "viendo_video" not in st.session_state:
+        st.session_state.viendo_video = False
+
+    if not st.session_state.viendo_video:
+        if st.button("鈻讹笍 Iniciar Video Premiado"):
+            st.session_state.viendo_video = True
             st.rerun()
 
-    elif menu == "💎 Caza de Gemas (Nuevo)":
-        st.title("💎 Caza de Gemas Exclusiva")
-        st.write("Elige uno de los 3 cofres ocultos. ¡Uno de ellos esconde una gema de alto valor!")
-        
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            if st.button("Cofre A 📦", use_container_width=True):
-                premio = random.choice([0.5, 5.0, 15.0])
-                user_data["balance"] += premio
-                st.success(f"¡Cofre A abierto! Ganaste **{premio} monedas**.")
-                st.rerun()
-        with col2:
-            if st.button("Cofre B 📦", use_container_width=True):
-                premio = random.choice([1.0, 8.0, 20.0])
-                user_data["balance"] += premio
-                st.success(f"¡Cofre B abierto! Ganaste **{premio} monedas**.")
-                st.rerun()
-        with col3:
-            if st.button("Cofre C 📦", use_container_width=True):
-                premio = random.choice([2.0, 10.0, 25.0])
-                user_data["balance"] += premio
-                st.success(f"¡Cofre C abierto! Ganaste **{premio} monedas**.")
-                st.rerun()
+    if st.session_state.viendo_video:
+        barra_progreso = st.progress(0)
+        estado_texto = st.empty()
 
-    elif menu == "🎡 Ruleta de la Suerte":
-        st.title("🎡 Ruleta ZafiroX")
-        st.write("¡Gira la ruleta y prueba tu suerte para acumular más saldo al instante!")
-        
-        if st.button("Girar Ruleta 🎯", use_container_width=True):
-            premio = random.choice([2.0, 5.0, 10.0, 50.0])
-            user_data["balance"] += premio
-            if premio >= 50.0:
-                st.balloons()
-                st.success(f"🎉 ¡WOOW! ¡Premio gordo de **{premio} monedas**!")
-            else:
-                st.success(f"¡Has ganado **{premio} monedas**!")
-            st.rerun()
+        tiempo_total = 10  # Segundos del anuncio
+        for segundos in range(tiempo_total):
+            porcentaje = int(((segundos + 1) / tiempo_total) * 100)
+            barra_progreso.progress(porcentaje)
+            estado_texto.text(f"Reproduciendo anuncio publicitario masivo... {tiempo_total - segundos} segundos restantes")
+            time.sleep(1)
 
-    elif menu == "📺 Ver Videos Premiados":
-        st.title("📺 Zona de Anuncios y Videos")
-        st.write("Haz clic para simular la visualización de un video publicitario y reclamar tu recompensa directa.")
-        
-        if st.button("▶️ Reclamar Video Premiado", use_container_width=True):
-            premio_video = 5.0
-            user_data["balance"] += premio_video
-            st.success(f"¡Video completado! Has ganado **{premio_video} monedas**.")
-            st.rerun()
+        barra_progreso.empty()
+        estado_texto.empty()
 
-    elif menu == "👥 Invitar Amigos":
-        st.title("👥 Programa de Referidos")
-        st.write("Comparte tu enlace único. Ganas comisiones automáticas por cada amigo que se registre.")
-        
-        codigo_referido = f"https://zafirox.streamlit.app/?ref={st.session_state.username}"
-        st.text_input("Tu enlace de invitación:", value=codigo_referido)
-        st.metric("Amigos invitados", user_data["referrals"])
+        # Otorgar recompensa
+        recompensa = 2.50
+        nuevo_saldo = get_saldo(usuario) + recompensa
+        update_saldo(usuario, nuevo_saldo)
+        st.session_state.viendo_video = False
 
-    elif menu == "💸 Solicitar Retiro":
-        st.title("💸 Retirar Fondos")
-        st.write("Transfiere tus monedas a tu cuenta cuando alcances el mínimo de retiro (Mínimo: 500 monedas).")
-        
-        metodo = st.selectbox("Método de Pago", ["Nequi", "Daviplata", "PayPal"])
-        cuenta_destino = st.text_input(f"Número de celular o correo ({metodo})")
-        
-        if st.button("Solicitar Retiro"):
-            if user_data["balance"] >= 500:
-                if cuenta_destino:
-                    user_data["balance"] -= 500
-                    st.success(f"¡Solicitud enviada a {cuenta_destino}! Procesaremos tu pago en 24-48 horas.")
-                else:
-                    st.warning("Por favor ingresa los datos de tu cuenta de destino.")
-            else:
-                st.error("No tienes el saldo suficiente para retirar. ¡Sigue jugando!")
-
-    elif menu == "🚪 Cerrar Sesión":
-        st.session_state.logged_in = False
-        st.session_state.username = ""
+        st.success(f"隆Felicidades {usuario}! Has ganado 馃拵 {recompensa:.2f} monedas.")
         st.rerun()
+
+# --- VISTA: RULETA DE LA SUERTE ---
+elif menu_seleccionado == "Ruleta de la Suerte":
+    st.subheader("馃帯 Ruleta de la Suerte")
+    st.write("隆Gira la ruleta por un costo de 1.00 馃拵 y gana recompensas incre铆bles!")
+    
+    if st.button("Girar Ruleta (Costo: 1.00 馃拵)"):
+        saldo_actual = get_saldo(usuario)
+        if saldo_actual >= 1.00:
+            # Descontar costo y dar premio aleatorio
+            premio = random.choice([0.50, 1.50, 3.00, 5.00, 10.00])
+            nuevo_saldo = saldo_actual - 1.00 + premio
+            update_saldo(usuario, nuevo_saldo)
+            st.success(f"隆La ruleta gir贸 y ganaste 馃拵 {premio:.2f} monedas!")
+            st.rerun()
+        else:
+            st.error("No tienes suficientes monedas para girar la ruleta.")
+
+# --- VISTA: CAJA MISTERIOSA ---
+elif menu_seleccionado == "Caja Misteriosa":
+    st.subheader("馃巵 Caja Misteriosa")
+    st.write("Abre una caja secreta patrocinada. Algunas tienen bonos sorpresa y otras est谩n vac铆as.")
+    if st.button("Abrir Caja Misteriosa"):
+        premio_caja = random.choice([0.0, 2.0, 4.0, 8.0])
+        nuevo_saldo = get_saldo(usuario) + premio_caja
+        update_saldo(usuario, nuevo_saldo)
+        if premio_caja > 0:
+            st.success(f"隆Sorpresa! La caja conten铆a 馃拵 {premio_caja:.2f} monedas.")
+        else:
+            st.warning("Oh no, la caja estaba vac铆a. 隆Sigue intentando con los videos premiados!")
+        st.rerun()
+
+# --- VISTA: CAZA DE GEMAS ---
+elif menu_seleccionado == "Caza de Gemas (Nuevo)":
+    st.subheader("馃拵 Caza de Gemas (Nuevo)")
+    st.write("Selecciona una de las 3 rocas ocultas para encontrar gemas ocultas.")
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        if st.button("Roca A"):
+            gema = random.choice([1.0, 3.0])
+            update_saldo(usuario, get_saldo(usuario) + gema)
+            st.success(f"隆Encontraste 馃拵 {gema} en la Roca A!")
+            st.rerun()
+    with col2:
+        if st.button("Roca B"):
+            gema = random.choice([0.5, 5.0])
+            update_saldo(usuario, get_saldo(usuario) + gema)
+            st.success(f"隆Encontraste 馃拵 {gema} en la Roca B!")
+            st.rerun()
+    with col3:
+        if st.button("Roca C"):
+            gema = random.choice([2.0, 4.0])
+            update_saldo(usuario, get_saldo(usuario) + gema)
+            st.success(f"隆Encontraste 馃拵 {gema} en la Roca C!")
+            st.rerun()
+
+# --- VISTA: INVITAR AMIGOS ---
+elif menu_seleccionado == "Invitar Amigos":
+    st.subheader("馃懃 Invitar Amigos")
+    st.write("Comparte tu enlace de referido para ganar 5.00 monedas por cada amigo que se registre en ZafiroX.")
+    st.code(f"https://zafirox-minijuegos.streamlit.app/?ref={usuario}")
+    st.info("Cada visualizaci贸n de video de tus referidos te otorga una comisi贸n del 10%.")
+
+# --- VISTA: SOLICITAR RETIRO (CUENTAS REALES) ---
+elif menu_seleccionado == "Solicitar Retiro":
+    st.subheader("馃捀 Solicitar Retiro a Cuentas Reales")
+    st.write("Convierte tus monedas acumuladas en dinero real y ret铆ralo a tu m茅todo de pago preferido.")
+    
+    saldo_disp = get_saldo(usuario)
+    tasa_conversion = 0.10  # 1 Moneda/Diamante = $0.10 USD (o moneda local)
+    dinero_estimado = saldo_disp * tasa_conversion
+
+    st.markdown(f"### Saldo Disponible: **馃拵 {saldo_disp:.2f} monedas**")
+    st.markdown(f"### Equivalente en Dinero Real: **$ {dinero_estimado:.2f} USD**")
+    
+    st.markdown("---")
+    
+    metodo_pago = st.selectbox("Selecciona tu M茅todo de Retiro", ["PayPal", "Nequi", "Daviplata", "PSE (Transferencia Bancaria)"])
+    
+    # Campos din谩micos seg煤n el m茅todo
+    cuenta_destino = ""
+    if metodo_pago == "PayPal":
+        cuenta_destino = st.text_input("Correo electr贸nico asociado a PayPal")
+    elif metodo_pago in ["Nequi", "Daviplata"]:
+        cuenta_destino = st.text_input(f"N煤mero de celular registrado en {metodo_pago}")
+    else:
+        banco = st.selectbox("Selecciona tu Banco", ["Bancolombia", "Davivienda", "BBVA", "Banco de Bogot谩", "Nu Colombia"])
+        tipo_cuenta = st.selectbox("Tipo de Cuenta", ["Ahorros", "Corriente"])
+        num_cuenta = st.text_input("N煤mero de Cuenta Bancaria")
+        cuenta_destino = f"{banco} - {tipo_cuenta} - {num_cuenta}"
+
+    minimo_retiro = 20.00  # M铆nimo en monedas
+
+    if st.button("Confirmar Solicitud de Retiro"):
+        if saldo_disp < minimo_retiro:
+            st.error(f"鉂� Saldo insuficiente. El m铆nimo requerido para retirar es de **{minimo_retiro} monedas** (Tienes {saldo_disp:.2f}).")
+        elif not cuenta_destino.strip():
+            st.error(f"鉂� Por favor ingresa los datos correctos para tu cuenta de {metodo_pago}.")
+        else:
+            # Procesar retiro (descontar del saldo)
+            nuevo_saldo_post_retiro = saldo_disp - minimo_retiro
+            update_saldo(usuario, nuevo_saldo_post_retiro)
+            
+            st.success(f"馃帀 隆Solicitud de retiro enviada con 茅xito!")
+            st.info(f"Se ha procesado el env铆o de **$ {minimo_retiro * tasa_conversion:.2f} USD** hacia tu cuenta de **{metodo_pago}** ({cuenta_destino}). El dinero se ver谩 reflejado en un plazo de 24 a 48 horas h谩biles.")
+            st.rerun()
