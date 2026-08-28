@@ -21,8 +21,6 @@ st.markdown("""
 # --- ESTADO DE LA SESIÓN ---
 if 'saldo' not in st.session_state:
     st.session_state.saldo = 31.60
-if 'mina_pos' not in st.session_state:
-    st.session_state.mina_pos = random.randint(1, 5)
 
 # --- MENÚ LATERAL (SIDEBAR) ---
 with st.sidebar:
@@ -192,22 +190,52 @@ elif opcion == "Minijuego Snake (Hard)":
 
 elif opcion == "Caza de Minas (Difícil)":
     st.title("💣 Caza de Minas (Modo Difícil)")
-    st.write("Hay 5 casillas con **trampas ocultas**. Si eliges mal, perderás saldo. ¡Alto riesgo, alta recompensa!")
+    st.write("Hay 5 casillas con **trampas ocultas**. Elige una casilla para probar tu suerte al instante:")
     
-    cols = st.columns(5)
-    for i in range(1, 6):
-        with cols[i-1]:
-            if st.button(f"Casilla {i}", key=f"mina_{i}"):
-                if i == st.session_state.mina_pos:
-                    st.session_state.saldo = max(0.0, st.session_state.saldo - 2.50)
-                    st.error(f"💥 ¡BOOM! La casilla {i} ocultaba una mina. -2.50 💎")
-                    st.session_state.mina_pos = random.randint(1, 5)
-                    st.rerun()
-                else:
-                    st.session_state.saldo += 2.00
-                    st.success(f"🎉 ¡Zona segura! +2.00 💎")
-                    st.session_state.mina_pos = random.randint(1, 5)
-                    st.rerun()
+    minas_html = """
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            body { font-family: Arial, sans-serif; text-align: center; background-color: #0e1117; color: white; margin: 0; padding: 10px; }
+            .grid { display: flex; flex-direction: column; gap: 10px; max-width: 300px; margin: auto; }
+            .mine-btn { background: #1f2937; color: white; border: 2px solid #374151; padding: 14px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+            .mine-btn:active { transform: scale(0.97); }
+            #result-msg { margin-top: 15px; font-size: 16px; font-weight: bold; min-height: 30px; }
+        </style>
+    </head>
+    <body>
+        <div class="grid">
+            <button class="mine-btn" onclick="checkMine(1)">Casilla 1</button>
+            <button class="mine-btn" onclick="checkMine(2)">Casilla 2</button>
+            <button class="mine-btn" onclick="checkMine(3)">Casilla 3</button>
+            <button class="mine-btn" onclick="checkMine(4)">Casilla 4</button>
+            <button class="mine-btn" onclick="checkMine(5)">Casilla 5</button>
+        </div>
+        <div id="result-msg"></div>
+
+        <script>
+            let winningBox = Math.floor(Math.random() * 5) + 1;
+            function checkMine(selected) {
+                let msg = document.getElementById("result-msg");
+                if (selected === winningBox) {
+                    msg.style.color = "#ef4444";
+                    msg.innerHTML = "💥 ¡BOOM! Encontraste la mina. ¡Perdiste!";
+                } else {
+                    msg.style.color = "#22c55e";
+                    msg.innerHTML = "🎉 ¡Zona segura! ¡Ganaste +2.00 💎!";
+                }
+                setTimeout(() => {
+                    winningBox = Math.floor(Math.random() * 5) + 1;
+                    msg.innerHTML = "🔄 ¡Nueva ronda lista! Elige otra casilla.";
+                }, 2000);
+            }
+        </script>
+    </body>
+    </html>
+    """
+    components.html(minas_html, height=350)
 
 elif opcion == "Ruleta de la Suerte":
     st.title("🎡 Ruleta de la Suerte Extrema")
@@ -237,7 +265,7 @@ elif opcion == "Sesión de Videos y Monetag":
     st.title("🎬 Videos Publicitarios y Monetag")
     st.write("Mira los videos de bonificación o utiliza tu enlace directo para acumular ganancias automáticamente estilo Terybit.")
     
-    # --- TEMPORIZADOR INTEGRADO Y VISIBLE DENTRO DE LA SECCIÓN DE VIDEO ---
+    # --- TEMPORIZADOR EN TIEMPO REAL ---
     timer_video_html = """
     <div style="background: rgba(30, 30, 30, 0.95); color: #f59e0b; padding: 12px; border-radius: 8px; font-weight: bold; text-align: center; border: 1px solid #f59e0b; margin-bottom: 15px;">
         ⏳ Bono de Video Activo - Tiempo Restante: <span id="countdown" style="font-size: 18px;">03:00</span>
