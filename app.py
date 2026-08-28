@@ -32,17 +32,16 @@ if 'video_reclamado' not in st.session_state:
 
 query_params = st.query_params
 
-# --- PANTALLA DE LOGIN / REGISTRO SI NO HA INICIADO SESIÓN ---
+# --- PANTALLA DE LOGIN / REGISTRO ---
 if st.session_state.usuario_actual is None:
     st.title("💎 ZafiroX - Acceso de Usuarios")
-    st.write("Inicia sesión con tu cuenta o regístrate para guardar tu saldo de forma segura.")
+    st.write("Inicia sesión o regístrate para gestionar tu saldo al estilo Tery Bit.")
     
     tab1, tab2 = st.tabs(["Iniciar Sesión", "Registrarse"])
     
     with tab1:
-        # Usamos nombres que eviten que el navegador sugiera correos electrónicos personales
-        user_login = st.text_input("Identificador de Usuario", key="login_user", placeholder="Ingresa tu usuario")
-        pass_login = st.text_input("Contraseña de Acceso", type="password", key="login_pass", placeholder="Ingresa tu contraseña")
+        user_login = st.text_input("Usuario", key="login_user", placeholder="Tu nombre de usuario")
+        pass_login = st.text_input("Contraseña", type="password", key="login_pass", placeholder="Tu contraseña")
         
         if st.button("Entrar a ZafiroX"):
             if user_login in st.session_state.usuarios_db and st.session_state.usuarios_db[user_login]["password"] == pass_login:
@@ -53,27 +52,27 @@ if st.session_state.usuario_actual is None:
                 st.error("Usuario o contraseña incorrectos.")
                 
     with tab2:
-        user_reg = st.text_input("Crear Nuevo Usuario", key="reg_user", placeholder="Elige un usuario")
-        pass_reg = st.text_input("Crear Contraseña", type="password", key="reg_pass", placeholder="Elige una contraseña")
+        user_reg = st.text_input("Nuevo Usuario", key="reg_user", placeholder="Elige un usuario")
+        pass_reg = st.text_input("Nueva Contraseña", type="password", key="reg_pass", placeholder="Elige una contraseña")
         if st.button("Crear Cuenta"):
             if user_reg and pass_reg:
                 if user_reg in st.session_state.usuarios_db:
-                    st.error("El usuario ya existe. Prueba con otro.")
+                    st.error("El usuario ya existe.")
                 else:
                     st.session_state.usuarios_db[user_reg] = {"password": pass_reg, "saldo": 0.00}
                     st.session_state.usuario_actual = user_reg
                     st.success(f"¡Cuenta creada con éxito! Bienvenido, {user_reg}.")
                     st.rerun()
             else:
-                st.warning("Completa todos los campos para registrarte.")
+                st.warning("Completa todos los campos.")
     
     st.stop()
 
-# Sincronizamos el saldo con la base de datos temporal del usuario actual
+# Sincronizamos el usuario activo
 usuario = st.session_state.usuario_actual
 saldo_actual = st.session_state.usuarios_db[usuario]["saldo"]
 
-# --- MENÚ LATERAL (SIDEBAR) ---
+# --- MENÚ LATERAL ---
 with st.sidebar:
     st.image("https://img.icons8.com/color/96/controller.png", width=60)
     st.title("ZafiroX")
@@ -105,15 +104,14 @@ with st.sidebar:
     st.write("💎 **Tu Saldo Actual:**")
     st.metric(label="", value=f"{saldo_actual:.2f} 💎")
 
-# Función auxiliar para actualizar saldo de forma segura
 def actualizar_saldo(cantidad):
     st.session_state.usuarios_db[usuario]["saldo"] = max(0.0, st.session_state.usuarios_db[usuario]["saldo"] + cantidad)
 
-# --- CONTENIDO DE LAS SECCIONES ---
+# --- CONTENIDO DE SECCIONES ---
 
 if opcion == "Minijuego Bloques (Hard)":
     st.title("🧩 Minijuego de Bloques (Modo Difícil)")
-    st.write("¡Velocidad alta estilo Arcade! Pon a prueba tus reflejos para acumular puntos.")
+    st.write("¡Velocidad alta estilo Arcade inspirada en Tery Bit!")
     
     tetris_html = """
     <!DOCTYPE html>
@@ -152,7 +150,7 @@ if opcion == "Minijuego Bloques (Hard)":
 
 elif opcion == "Minijuego Snake (Hard)":
     st.title("🐍 Minijuego Snake (Modo Difícil)")
-    st.write("¡La serpiente se mueve a alta velocidad y el margen de error es mínimo!")
+    st.write("¡Controla la serpiente a alta velocidad y evita chocar!")
     
     snake_html = """
     <!DOCTYPE html>
@@ -184,13 +182,10 @@ elif opcion == "Minijuego Snake (Hard)":
         <script>
             const canvas = document.getElementById("snakeCanvas");
             const ctx = canvas.getContext("2d");
-            
-            let score = 0;
-            let box = 10;
+            let score = 0, box = 10;
             let snake = [{x: 100, y: 100}];
             let food = {x: Math.floor(Math.random() * 19) * box, y: Math.floor(Math.random() * 19) * box};
-            let d = "RIGHT";
-            let nextD = "RIGHT";
+            let d = "RIGHT", nextD = "RIGHT";
 
             function changeDir(direction) {
                 if (direction === 'UP' && d !== 'DOWN') nextD = 'UP';
@@ -202,19 +197,15 @@ elif opcion == "Minijuego Snake (Hard)":
             function draw() {
                 ctx.fillStyle = "#111";
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-
                 for (let i = 0; i < snake.length; i++) {
                     ctx.fillStyle = (i === 0) ? "#ef4444" : "#991b1b";
                     ctx.fillRect(snake[i].x, snake[i].y, box, box);
                 }
-
                 ctx.fillStyle = "#22c55e";
                 ctx.fillRect(food.x, food.y, box, box);
 
                 d = nextD;
-                let snakeX = snake[0].x;
-                let snakeY = snake[0].y;
-
+                let snakeX = snake[0].x, snakeY = snake[0].y;
                 if (d === 'LEFT') snakeX -= box;
                 if (d === 'UP') snakeY -= box;
                 if (d === 'RIGHT') snakeX += box;
@@ -229,18 +220,14 @@ elif opcion == "Minijuego Snake (Hard)":
                 }
 
                 if (snakeX < 0 || snakeX >= canvas.width || snakeY < 0 || snakeY >= canvas.height) {
-                    snake = [{x: 100, y: 100}];
-                    score = 0;
+                    snake = [{x: 100, y: 100}]; score = 0;
                     document.getElementById("snake-score").innerText = score;
-                    d = "RIGHT";
-                    nextD = "RIGHT";
+                    d = "RIGHT"; nextD = "RIGHT";
                     return;
                 }
-
                 snake.unshift({x: snakeX, y: snakeY});
             }
-
-            let game = setInterval(draw, 80);
+            setInterval(draw, 80);
         </script>
     </body>
     </html>
@@ -249,7 +236,7 @@ elif opcion == "Minijuego Snake (Hard)":
 
 elif opcion == "Caza de Minas (Difícil)":
     st.title("💣 Caza de Minas (Modo Difícil)")
-    st.write("Hay 5 casillas con **trampas ocultas**. Elige una casilla para probar tu suerte al instante:")
+    st.write("¡Elige una casilla con cuidado! 4 están a salvo y 1 esconde la trampa mortal.")
     
     minas_html = """
     <!DOCTYPE html>
@@ -258,10 +245,10 @@ elif opcion == "Caza de Minas (Difícil)":
         <meta charset="UTF-8">
         <style>
             body { font-family: Arial, sans-serif; text-align: center; background-color: #0e1117; color: white; margin: 0; padding: 10px; }
-            .grid { display: flex; flex-direction: column; gap: 10px; max-width: 300px; margin: auto; }
-            .mine-btn { background: #1f2937; color: white; border: 2px solid #374151; padding: 14px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+            .grid { display: flex; flex-direction: column; gap: 8px; max-width: 300px; margin: auto; }
+            .mine-btn { background: #1f2937; color: white; border: 2px solid #374151; padding: 12px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; }
             .mine-btn:active { transform: scale(0.97); }
-            #result-msg { margin-top: 15px; font-size: 16px; font-weight: bold; min-height: 30px; }
+            #result-msg { margin-top: 12px; font-size: 15px; font-weight: bold; min-height: 25px; }
         </style>
     </head>
     <body>
@@ -273,17 +260,16 @@ elif opcion == "Caza de Minas (Difícil)":
             <button class="mine-btn" onclick="checkMine(5)">Casilla 5</button>
         </div>
         <div id="result-msg"></div>
-
         <script>
             let winningBox = Math.floor(Math.random() * 5) + 1;
             function checkMine(selected) {
                 let msg = document.getElementById("result-msg");
                 if (selected === winningBox) {
                     msg.style.color = "#ef4444";
-                    msg.innerHTML = "💥 ¡BOOM! Encontraste la mina. ¡Perdiste!";
+                    msg.innerHTML = "💥 ¡BOOM! Era la mina. ¡Perdiste!";
                 } else {
                     msg.style.color = "#22c55e";
-                    msg.innerHTML = "🎉 ¡Zona segura! ¡Ganaste +2.00 💎!";
+                    msg.innerHTML = "🎉 ¡Zona segura! ¡Sobreviviste a la ronda!";
                 }
                 setTimeout(() => {
                     winningBox = Math.floor(Math.random() * 5) + 1;
@@ -294,23 +280,23 @@ elif opcion == "Caza de Minas (Difícil)":
     </body>
     </html>
     """
-    st.components.v1.html(minas_html, height=350)
+    st.components.v1.html(minas_html, height=330)
 
 elif opcion == "Ruleta de la Suerte":
     st.title("🎡 Ruleta de la Suerte Extrema")
-    st.write("Gira la ruleta bajo tu propio riesgo: puedes duplicar tus gemas o perderlas.")
+    st.write("Gira la ruleta y pon a prueba tu suerte.")
     if st.button("¡Girar con Riesgo!"):
         resultado = random.choice([4.00, -2.00, 8.00, -3.00, 15.00])
         actualizar_saldo(resultado)
         if resultado > 0:
             st.success(f"🎉 ¡Ganaste {resultado} 💎!")
         else:
-            st.error(f"⚠️ ¡Cayó penalización! Perdiste {abs(resultado)} 💎.")
+            st.error(f"⚠️ ¡Penalización! Perdiste {abs(resultado)} 💎.")
         st.rerun()
 
 elif opcion == "Caja Misteriosa":
     st.title("📦 Caja Misteriosa de Alto Riesgo")
-    st.write("Una caja cerrada que esconde premios jugosos o sorpresas amargas.")
+    st.write("Abre la caja para descubrir tu premio o sorpresa.")
     if st.button("Abrir Caja"):
         premio = random.choice([3.50, -1.50, 6.00])
         actualizar_saldo(premio)
@@ -322,7 +308,7 @@ elif opcion == "Caja Misteriosa":
 
 elif opcion == "Sesión de Videos y Monetag":
     st.title("🎬 Videos Publicitarios y Monetag")
-    st.write("Mira los videos de bonificación o utiliza tu enlace directo para acumular ganancias automáticamente.")
+    st.write("Mira los videos de bonificación o utiliza tu enlace directo.")
     
     timer_video_html = """
     <div style="background: rgba(30, 30, 30, 0.95); color: #f59e0b; padding: 12px; border-radius: 8px; font-weight: bold; text-align: center; border: 1px solid #f59e0b; margin-bottom: 15px;">
@@ -333,19 +319,14 @@ elif opcion == "Sesión de Videos y Monetag":
         function updateTimer() {
             let minutes = Math.floor(totalSeconds / 60);
             let seconds = totalSeconds % 60;
-            let formattedMinutes = minutes < 10 ? "0" + minutes : minutes;
-            let formattedSeconds = seconds < 10 ? "0" + seconds : seconds;
             let el = document.getElementById("countdown");
-            if(el) { el.innerText = formattedMinutes + ":" + formattedSeconds; }
+            if(el) { el.innerText = (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds); }
             if (totalSeconds > 0) { totalSeconds--; } else { totalSeconds = 180; }
         }
         setInterval(updateTimer, 1000);
     </script>
     """
     st.components.v1.html(timer_video_html, height=75)
-    
-    st.subheader("📺 Reproductor de Video de Bonificación Automático")
-    st.write("Reproduce este video promocional hasta el final. Al terminar, tu saldo se actualizará solo:")
     
     youtube_auto_html = """
     <div style="text-align: center;">
@@ -356,19 +337,13 @@ elif opcion == "Sesión de Videos y Monetag":
         tag.src = "https://www.youtube.com/iframe_api";
         var firstScriptTag = document.getElementsByTagName('script')[0];
         firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
         var player;
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('player', {
-                height: '210',
-                width: '100%',
-                videoId: 'tgbNymZ7vqY',
-                events: {
-                    'onStateChange': onPlayerStateChange
-                }
+                height: '210', width: '100%', videoId: 'tgbNymZ7vqY',
+                events: { 'onStateChange': onPlayerStateChange }
             });
         }
-
         function onPlayerStateChange(event) {
             if (event.data === YT.PlayerState.ENDED) {
                 window.parent.location.href = window.parent.location.href.split('?')[0] + "?recompensa=video";
@@ -381,12 +356,11 @@ elif opcion == "Sesión de Videos y Monetag":
     if query_params.get("recompensa") == "video" and not st.session_state.video_reclamado:
         actualizar_saldo(1.50)
         st.session_state.video_reclamado = True
-        st.success("🎉 ¡Video completado hasta el final! +1.50 💎 añadidos automáticamente.")
+        st.success("🎉 ¡Video completado! +1.50 💎 añadidos.")
         st.rerun()
         
     st.markdown("---")
     st.subheader("🚀 Enlace Directo Monetag")
-    st.write("Pega tu enlace publicitario directo para generar vistas adicionales:")
     enlace_monetag = st.text_input("Tu enlace directo de Monetag:", value="https://www.profitablecpmrate.com/tu_codigo_aqui")
     
     st.markdown(f"""
@@ -401,24 +375,17 @@ elif opcion == "Sesión de Videos y Monetag":
     
     if st.button("Confirmar visualización de enlace"):
         actualizar_saldo(1.00)
-        st.success("¡Visualización de enlace acreditada! +1.00 💎")
+        st.success("¡Visualización acreditada! +1.00 💎")
         st.rerun()
 
 elif opcion == "Invitar Amigos":
     st.title("👥 Invitar Amigos con Recompensa")
-    st.write("Comparte tu enlace de referido personalizado. Ganas un bono automático cada vez que un invitado se registra.")
     st.code(f"https://zafirox.streamlit.app/?ref={usuario}", language="text")
-    st.success("Recompensa activa: 5.00 💎 por cada amigo verificado.")
+    st.success("Recompensa activa: 5.00 💎 por cada amigo invitado.")
 
 elif opcion == "Ranking Semanal Top 4":
     st.title("🏆 Competencia Semanal de Puntajes")
-    st.write("¡Los **4 mejores jugadores** de la semana se llevan premios directos a su cuenta!")
-    
-    ahora = datetime.datetime.now()
-    proximo_domingo = ahora + datetime.timedelta(days=(6 - ahora.weekday()) % 7)
-    tiempo_restante = proximo_domingo - ahora
-    
-    st.warning(f"⏰ **Cierre del ranking en:** {tiempo_restante.days} días y {tiempo_restante.seconds // 3600} horas.")
+    st.warning("⏰ **Cierre del ranking en:** 2 días y 0 horas.")
     
     st.markdown(f"""
     | Puesto | Usuario | Puntuación | Premio Semanal |
@@ -435,17 +402,10 @@ elif opcion == "Solicitar Retiro y Conversor":
     
     tasa_conversion = 4000 
     valor_cop = saldo_actual * tasa_conversion
-    
     st.info(f"💱 **Conversor automático:** Tus {saldo_actual:.2f} 💎 equivalen a **${valor_cop:,.0f} COP**.")
     
     st.markdown("---")
-    st.subheader("Métodos de Retiro Disponibles")
-    
-    metodo = st.selectbox(
-        "Selecciona tu método de pago:",
-        ["Nequi", "DaviPlata", "PayPal", "PSE"]
-    )
-    
+    metodo = st.selectbox("Selecciona tu método de pago:", ["Nequi", "DaviPlata", "PayPal", "PSE"])
     cuenta_destino = st.text_input(f"Número de celular / Cuenta o Correo para {metodo}")
     monto_retiro = st.number_input("Monto en 💎 a retirar", min_value=5.0, max_value=float(max(5.0, saldo_actual)), value=5.0)
     
@@ -455,6 +415,6 @@ elif opcion == "Solicitar Retiro y Conversor":
     if st.button("📤 Enviar Solicitud de Retiro"):
         if cuenta_destino and saldo_actual >= monto_retiro:
             actualizar_saldo(-monto_retiro)
-            st.success(f"¡Retiro de ${monto_cop_retiro:,.0f} COP solicitado con éxito por {metodo} ({cuenta_destino}) para la cuenta de {usuario}!")
+            st.success(f"¡Retiro de ${monto_cop_retiro:,.0f} COP solicitado con éxito por {metodo} ({cuenta_destino})!")
         else:
-            st.error("Por favor completa los datos de destino o verifica que tu saldo sea suficiente para este retiro.")
+            st.error("Completa los datos de destino o verifica que tu saldo sea suficiente.")
