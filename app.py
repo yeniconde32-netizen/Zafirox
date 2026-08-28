@@ -59,7 +59,7 @@ with st.sidebar:
 
 if opcion == "Minijuego Bloques (Hard)":
     st.title("🧩 Minijuego de Bloques (Modo Difícil)")
-    st.write("¡Velocidad alta! Las piezas caen rápido y cada error resta puntos.")
+    st.write("¡Velocidad alta estilo Arcade! Pon a prueba tus reflejos para acumular puntos.")
     
     tetris_html = """
     <!DOCTYPE html>
@@ -77,15 +77,15 @@ if opcion == "Minijuego Bloques (Hard)":
             <h3>🔥 Arcade Extremo</h3>
             <p>Puntuación: <span id="score">10</span></p>
             <canvas id="canvas" width="200" height="150" style="background:#111; display:block; margin: 0 auto; border-radius: 5px;"></canvas>
-            <button onclick="actionBlock()">⚡ Mover / Girar Bloque</button>
+            <button onclick="actionBlock()">⚡ Acción / Colocar Pieza</button>
         </div>
         <script>
             let score = 10;
             function actionBlock() {
-                if(Math.random() > 0.4) {
-                    score += 8;
+                if(Math.random() > 0.45) {
+                    score += 10;
                 } else {
-                    score = Math.max(0, score - 5);
+                    score = Math.max(0, score - 8);
                 }
                 document.getElementById('score').innerText = score;
             }
@@ -97,7 +97,7 @@ if opcion == "Minijuego Bloques (Hard)":
 
 elif opcion == "Minijuego Snake (Hard)":
     st.title("🐍 Minijuego Snake (Modo Difícil)")
-    st.write("¡La serpiente se vuelve más rápida y el margen de error es mínimo!")
+    st.write("¡La serpiente se mueve a alta velocidad y el margen de error es mínimo!")
     
     snake_html = """
     <!DOCTYPE html>
@@ -185,7 +185,7 @@ elif opcion == "Minijuego Snake (Hard)":
                 snake.unshift({x: snakeX, y: snakeY});
             }
 
-            let game = setInterval(draw, 80); // Velocidad alta difícil
+            let game = setInterval(draw, 70); // Alta velocidad
         </script>
     </body>
     </html>
@@ -194,50 +194,50 @@ elif opcion == "Minijuego Snake (Hard)":
 
 elif opcion == "Caza de Minas (Difícil)":
     st.title("💣 Caza de Minas (Modo Difícil)")
-    st.write("Hay 5 casillas y **múltiples minas mortales**. Si caes en una mina, pierdes saldo de verdad. ¡Elige con inteligencia!")
+    st.write("Hay 5 casillas con **trampas ocultas**. Si eliges mal, perderás saldo. ¡Alto riesgo, alta recompensa!")
     
     cols = st.columns(5)
     for i in range(1, 6):
         with cols[i-1]:
             if st.button(f"Casilla {i}"):
                 if i == st.session_state.mina_pos:
-                    st.session_state.saldo -= 2.00
-                    st.error(f"💥 ¡BOOM! La casilla {i} era una mina. -2.00 💎")
-                    st.session_state.mina_pos = random.randint(1, 5) # Cambia de posición
+                    st.session_state.saldo = max(0.0, st.session_state.saldo - 2.50)
+                    st.error(f"💥 ¡BOOM! La casilla {i} ocultaba una mina. -2.50 💎")
+                    st.session_state.mina_pos = random.randint(1, 5)
                     st.rerun()
                 else:
-                    st.session_state.saldo += 1.50
-                    st.success(f"🎉 ¡Salvado! +1.50 💎")
+                    st.session_state.saldo += 2.00
+                    st.success(f"🎉 ¡Zona segura! +2.00 💎")
                     st.session_state.mina_pos = random.randint(1, 5)
                     st.rerun()
 
 elif opcion == "Ruleta de la Suerte":
-    st.title("🎡 Ruleta de la Suerte (Alta Volatilidad)")
-    st.write("¡Riesgo alto! Puedes ganar un gran premio o perder en el intento.")
-    if st.button("¡Girar Ruleta con Riesgo!"):
-        resultado = random.choice([3.00, -1.00, 5.00, -2.00, 10.00])
-        st.session_state.saldo += resultado
+    st.title("🎡 Ruleta de la Suerte Extrema")
+    st.write("Gira la ruleta bajo tu propio riesgo: puedes duplicar tus gemas o perderlas.")
+    if st.button("¡Girar con Riesgo!"):
+        resultado = random.choice([4.00, -2.00, 8.00, -3.00, 15.00])
+        st.session_state.saldo = max(0.0, st.session_state.saldo + resultado)
         if resultado > 0:
             st.success(f"🎉 ¡Ganaste {resultado} 💎!")
         else:
-            st.error(f"⚠️ ¡Mala suerte! Perdiste {abs(resultado)} 💎.")
+            st.error(f"⚠️ ¡Cayó penalización! Perdiste {abs(resultado)} 💎.")
         st.rerun()
 
 elif opcion == "Caja Misteriosa":
     st.title("📦 Caja Misteriosa de Alto Riesgo")
-    st.write("Contiene recompensas sorpresa o trampas ocultas.")
-    if st.button("Abrir Caja Misteriosa"):
-        premio = random.choice([2.50, -0.75, 4.00])
-        st.session_state.saldo += premio
+    st.write("Una caja cerrada que esconde premios jugosos o sorpresas amargas.")
+    if st.button("Abrir Caja"):
+        premio = random.choice([3.50, -1.50, 6.00])
+        st.session_state.saldo = max(0.0, st.session_state.saldo + premio)
         if premio > 0:
-            st.success(f"🎁 ¡Encontraste {premio} 💎!")
+            st.success(f"🎁 ¡Descubriste {premio} 💎!")
         else:
             st.error(f"💀 ¡Era una trampa! Perdiste {abs(premio)} 💎.")
         st.rerun()
 
 elif opcion == "Ganar por Tiempo y Anuncios (Monetag)":
     st.title("⏱️ Tiempo y Anuncios Monetag")
-    st.write("Monitorea tu tiempo activo y utiliza tu enlace directo real de Monetag para monetizar.")
+    st.write("Monitorea tu actividad y utiliza tu enlace directo de Monetag para registrar visualizaciones.")
     
     tiempo_transcurrido = int(time.time() - st.session_state.tiempo_inicio)
     st.info(f"⏳ Llevas **{tiempo_transcurrido} segundos** activos en la plataforma.")
@@ -247,36 +247,35 @@ elif opcion == "Ganar por Tiempo y Anuncios (Monetag)":
         st.success("¡Bono por tiempo reclamado! +0.50 💎")
         
     st.markdown("---")
-    st.subheader("📺 Enlace de Monetag (Configurable)")
-    st.write("Pega aquí tu enlace directo exacto de Monetag (reemplazando el de prueba) para que los usuarios abran tu publicidad correctamente:")
+    st.subheader("📺 Enlace Directo de Monetag")
+    st.write("Pega aquí tu enlace directo exacto que te otorga Monetag para que los usuarios abran tu publicidad de forma correcta:")
     
-    # Campo para que pegue su enlace real o use uno por defecto funcional
-    enlace_monetag = st.text_input("Tu enlace directo de Monetag:", value="https://www.profitablecpmrate.com/xxxxxx")
+    enlace_monetag = st.text_input("Tu enlace directo de Monetag:", value="https://www.profitablecpmrate.com/tu_codigo_aqui")
     
     st.markdown(f"""
         <div style="text-align: center; margin: 15px 0;">
             <a href="{enlace_monetag}" target="_blank">
                 <button style="background-color: #f59e0b; color: white; padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%;">
-                    🚀 Ver Anuncio Monetag (Abrir enlace de pago)
+                    🚀 Ver Anuncio Monetag (Abrir enlace publicitario)
                 </button>
             </a>
         </div>
     """, unsafe_allow_html=True)
     
-    if st.button("Confirmar visualización de anuncio"):
+    if st.button("Confirmar visualización"):
         st.session_state.saldo += 1.00
-        st.success("¡Anuncio acreditado para ti y el dueño! +1.00 💎")
+        st.success("¡Visualización registrada y acreditada! +1.00 💎")
         st.rerun()
 
 elif opcion == "Invitar Amigos":
     st.title("👥 Invitar Amigos con Recompensa")
-    st.write("Comparte tu enlace de registro. Ganas bonos automáticos cuando tus amigos se registran y quedan fijos.")
+    st.write("Comparte tu enlace de referido personalizado. Ganas un bono automático cada vez que un invitado se registra.")
     st.code("https://zafirox.streamlit.app/?ref=Lud337", language="text")
-    st.success("Recompensa activa: 5.00 💎 por cada amigo registrado.")
+    st.success("Recompensa activa: 5.00 💎 por cada amigo verificado.")
 
 elif opcion == "Ranking Semanal Top 4":
-    st.title("🏆 Competencia Semanal Difícil")
-    st.write("¡Los **4 primeros puestos** por actividades extremas se llevan dinero real cada semana!")
+    st.title("🏆 Competencia Semanal de Puntajes")
+    st.write("¡Los **4 mejores jugadores** de la semana se llevan premios directos a su cuenta!")
     
     ahora = datetime.datetime.now()
     proximo_domingo = ahora + datetime.timedelta(days=(6 - ahora.weekday()) % 7)
@@ -287,15 +286,15 @@ elif opcion == "Ranking Semanal Top 4":
     st.markdown("""
     | Puesto | Usuario | Puntuación | Premio Semanal |
     | :---: | :--- | :---: | :---: |
-    | 🥇 **1°** | **Lud337 (Tú)** | 1,450 pts | $50.000 COP / USDT |
-    | 🥈 **2°** | Carlos_99 | 1,320 pts | $30.000 COP / USDT |
-    | 🥉 **3°** | SofiGamer | 1,100 pts | $20.000 COP / USDT |
-    | 🏅 **4°** | AndresX | 950 pts | $10.000 COP / USDT |
+    | 🥇 **1°** | **Lud337 (Tú)** | 1,650 pts | $50.000 COP |
+    | 🥈 **2°** | Carlos_99 | 1,420 pts | $30.000 COP |
+    | 🥉 **3°** | SofiGamer | 1,200 pts | $20.000 COP |
+    | 🏅 **4°** | AndresX | 990 pts | $10.000 COP |
     """)
 
 elif opcion == "Solicitar Retiro y Conversor":
     st.title("💰 Conversor de Dinero y Retiro Real")
-    st.write(f"Tu saldo actual es de **{st.session_state.saldo:.2f} 💎**.")
+    st.write(f"Tu saldo disponible es de **{st.session_state.saldo:.2f} 💎**.")
     
     tasa_conversion = 4000 
     valor_cop = st.session_state.saldo * tasa_conversion
@@ -319,6 +318,6 @@ elif opcion == "Solicitar Retiro y Conversor":
     if st.button("📤 Enviar Solicitud de Retiro"):
         if cuenta_destino and st.session_state.saldo >= monto_retiro:
             st.session_state.saldo -= monto_retiro
-            st.success(f"¡Retiro de ${monto_cop_retiro:,.0f} COP procesado con éxito a través de {metodo} ({cuenta_destino})!")
+            st.success(f"¡Retiro de ${monto_cop_retiro:,.0f} COP solicitado con éxito por {metodo} ({cuenta_destino})!")
         else:
-            st.error("Por favor completa los datos de destino o verifica que tu saldo sea suficiente.")
+            st.error("Por favor completa los datos de destino o verifica que tu saldo sea suficiente para este retiro.")
