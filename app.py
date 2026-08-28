@@ -64,12 +64,12 @@ else:
     
     if menu == "🎁 Caja Misteriosa":
         st.title("🎁 Abre Cajas y Gana")
-        st.write("Haz clic en el botón para abrir una caja misteriosa y descubrir monedas de forma aleatoria.")
+        st.write("Haz clic en el botón para abrir una caja misteriosa y descubrir monedas al instante.")
         
         if st.button("Abrir Caja Misteriosa 🚀", use_container_width=True):
             premio = round(random.uniform(1.0, 10.0), 2)
             user_data["balance"] += premio
-            st.success(f"¡Felicidades! Encontraste **{premio} monedas** en la caja.")
+            st.success(f"¡Felicidades! Encontraste **{premio} monedas**.")
             st.rerun()
 
     elif menu == "💎 Caza de Gemas (Nuevo)":
@@ -81,51 +81,48 @@ else:
             if st.button("Cofre A 📦", use_container_width=True):
                 premio = random.choice([0.5, 5.0, 15.0])
                 user_data["balance"] += premio
-                st.info(f"El cofre A tenía **{premio} monedas**.")
+                st.success(f"¡Cofre A abierto! Ganaste **{premio} monedas**.")
                 st.rerun()
         with col2:
             if st.button("Cofre B 📦", use_container_width=True):
                 premio = random.choice([1.0, 8.0, 20.0])
                 user_data["balance"] += premio
-                st.info(f"El cofre B tenía **{premio} monedas**.")
+                st.success(f"¡Cofre B abierto! Ganaste **{premio} monedas**.")
                 st.rerun()
         with col3:
             if st.button("Cofre C 📦", use_container_width=True):
                 premio = random.choice([2.0, 10.0, 25.0])
                 user_data["balance"] += premio
-                st.info(f"El cofre C tenía **{premio} monedas**.")
+                st.success(f"¡Cofre C abierto! Ganaste **{premio} monedas**.")
                 st.rerun()
 
     elif menu == "🎡 Ruleta de la Suerte":
         st.title("🎡 Ruleta ZafiroX")
-        st.write("¡Gira la ruleta y prueba tu suerte para acumular más saldo diario!")
+        st.write("¡Gira la ruleta y prueba tu suerte para acumular más saldo al instante!")
         
         if st.button("Girar Ruleta 🎯", use_container_width=True):
             premio = random.choice([2.0, 5.0, 10.0, 50.0])
             user_data["balance"] += premio
             if premio >= 50.0:
                 st.balloons()
-                st.success(f"🎉 ¡WOOW! ¡Ganaste el premio gordo de **{premio} monedas**!")
+                st.success(f"🎉 ¡WOOW! ¡Premio gordo de **{premio} monedas**!")
             else:
-                st.success(f"¡Has ganado **{premio} monedas** con la ruleta!")
+                st.success(f"¡Has ganado **{premio} monedas**!")
             st.rerun()
 
     elif menu == "📺 Ver Videos Premiados":
         st.title("📺 Zona de Anuncios y Videos")
-        st.write("Mira videos patrocinados completos para obtener recompensas seguras directamente a tu saldo.")
+        st.write("Haz clic para simular la visualización de un video publicitario y reclamar tu recompensa directa.")
         
-        if st.button("▶️ Ver video publicitario (Simulado)", use_container_width=True):
-            with st.spinner("Cargando video publicitario..."):
-                import time
-                time.sleep(2)
+        if st.button("▶️ Reclamar Video Premiado", use_container_width=True):
             premio_video = 5.0
             user_data["balance"] += premio_video
-            st.success(f"¡Video completado con éxito! Has ganado **{premio_video} monedas**.")
+            st.success(f"¡Video completado! Has ganado **{premio_video} monedas**.")
             st.rerun()
 
     elif menu == "👥 Invitar Amigos":
         st.title("👥 Programa de Referidos")
-        st.write("Comparte tu enlace único. Ganas comisiones automáticas por cada amigo que juegue.")
+        st.write("Comparte tu enlace único. Ganas comisiones automáticas por cada amigo que se registre.")
         
         codigo_referido = f"https://zafirox.streamlit.app/?ref={st.session_state.username}"
         st.text_input("Tu enlace de invitación:", value=codigo_referido)
@@ -142,11 +139,11 @@ else:
             if user_data["balance"] >= 500:
                 if cuenta_destino:
                     user_data["balance"] -= 500
-                    st.success(f"¡Solicitud de retiro enviada con éxito a {cuenta_destino}! Procesaremos tu pago en 24-48 horas.")
+                    st.success(f"¡Solicitud enviada a {cuenta_destino}! Procesaremos tu pago en 24-48 horas.")
                 else:
                     st.warning("Por favor ingresa los datos de tu cuenta de destino.")
             else:
-                st.error("No tienes el saldo suficiente para retirar. ¡Sigue jugando y viendo videos!")
+                st.error("No tienes el saldo suficiente para retirar. ¡Sigue jugando!")
 
     elif menu == "🚪 Cerrar Sesión":
         st.session_state.logged_in = False
