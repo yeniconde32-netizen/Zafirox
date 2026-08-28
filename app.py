@@ -1,6 +1,6 @@
 import streamlit as st
 
-# Barra lateral con el perfil y menú desplegable
+# Barra lateral con perfil y menú desplegable
 with st.sidebar:
     st.markdown("### Hola, Lud337 👋")
     st.markdown("Tu Saldo (Monedas)")
@@ -8,7 +8,6 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("### Menú")
     
-    # Selector de opciones del menú (selectbox)
     menu_opcion = st.selectbox(
         "Selecciona una sección",
         [
@@ -23,16 +22,30 @@ with st.sidebar:
         label_visibility="collapsed"
     )
 
-# Lógica principal según la opción elegida en el menú
-if "Ruleta de la Suerte" in menu_opcion:
+monetag_url = "https://omg10.com/4/11676106"
+
+# Lógica detallada para cada opción del menú
+if "Caza de Gemas" in menu_opcion:
+    st.title("💎 Caza de Gemas")
+    st.write("¡Encuentra la gema oculta y gana monedas extra!")
+    if st.button("Buscar Gema"):
+        st.success("¡Encontraste 5.00 💎!")
+
+elif "Ruleta de la Suerte" in menu_opcion:
     st.title("🎡 Ruleta de la Suerte")
-    st.write("¡Gira la ruleta y gana más monedas!")
+    st.write("¡Gira la ruleta para duplicar tus recompensas!")
+    if st.button("Girar Ruleta"):
+        st.info("¡Ganaste 2.00 💎!")
+
+elif "Caja Misteriosa" in menu_opcion:
+    st.title("🎁 Caja Misteriosa")
+    st.write("Abre la caja para descubrir tu premio sorpresa.")
+    if st.button("Abrir Caja"):
+        st.warning("¡Premio de 10.00 💎 desbloqueado!")
 
 elif "Ver Videos Premiados" in menu_opcion:
     st.title("📺 Ver Videos Premiados")
-    st.write("Apóyanos haciendo clic en el siguiente botón:")
-    
-    monetag_url = "https://omg10.com/4/11676106"
+    st.write("Apóyanos haciendo clic en el botón para ver el contenido patrocinado:")
     st.markdown(
         f"""
         <a href="{monetag_url}" target="_blank" style="
@@ -50,15 +63,16 @@ elif "Ver Videos Premiados" in menu_opcion:
         unsafe_allow_html=True
     )
 
-elif "Solicitar Retiro" in menu_opcion:
-    st.title("💵 Solicitar Retiro")
-    st.write("Tus métodos de retiro disponibles (PayPal, Nequi, Daviplata, PSE).")
-
 elif "Invitar Amigos" in menu_opcion:
     st.title("👥 Invitar Amigos")
-    st.write("Tu enlace de referencia:")
+    st.write("Comparte tu enlace de referencia con tus amigos:")
     st.code("https://zafirox-minijuegos.streamlit.app/?ref=Lud337")
 
+elif "Solicitar Retiro" in menu_opcion:
+    st.title("💵 Solicitar Retiro")
+    st.write("Métodos disponibles: PayPal, Nequi, Daviplata, PSE.")
+    st.info("Tu saldo actual es de 27.40 💎. Acumula el mínimo para retirar.")
+
 else:
-    st.title(menu_opcion)
-    st.write("Sección cargada correctamente.")
+    st.title("🚪 Cerrar Sesión")
+    st.write("Has cerrado sesión correctamente.")
