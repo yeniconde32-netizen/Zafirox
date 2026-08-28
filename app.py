@@ -1,254 +1,218 @@
 import streamlit as st
-import random
 import streamlit.components.v1 as components
 
-st.set_page_config(page_title="ZafiroX - Minijuegos y Recompensas", layout="centered")
+# Configuración de la página
+st.set_page_config(
+    page_title="ZafiroX - Minijuegos y Recompensas",
+    page_icon="💎",
+    layout="centered"
+)
 
+# --- ESTILOS CSS PERSONALIZADOS ---
+st.markdown("""
+    <style>
+    .main {
+        background-color: #0e1117;
+        color: white;
+    }
+    .saldo-box {
+        background-color: #1a1c23;
+        padding: 15px;
+        border-radius: 10px;
+        border: 1px solid #333;
+        margin-bottom: 20px;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# --- ESTADO DE LA SESIÓN (SALDO) ---
+if 'saldo' not in st.session_state:
+    st.session_state.saldo = 27.40
+
+# --- MENÚ LATERAL (SIDEBAR) ---
 with st.sidebar:
-    st.markdown("### Hola, Lud337 👋")
-    st.markdown("Tu Saldo (Monedas)")
-    st.markdown("## **27.40 💎**")
+    st.image("https://img.icons8.com/color/96/controller.png", width=60)
+    st.title("ZafiroX")
+    st.write("Hola, **Lud337** 👋")
+    
     st.markdown("---")
-    st.markdown("### Menú")
+    st.subheader("Menú")
     
-    menu_opcion = st.selectbox(
-        "Selecciona una sección",
+    opcion = st.selectbox(
+        "Selecciona una sección:",
         [
-            "🎁 Caja Misteriosa",
-            "💎 Caza de Gemas",
-            "🎡 Ruleta de la Suerte",
-            "🧩 Minijuego Retro",
-            "🐍 Minijuego Snake",
-            "📺 Ver Videos Premiados",
-            "🎬 Sesión de Video con Reto",
-            "👥 Invitar Amigos",
-            "💵 Solicitar Retiro",
-            "🚪 Cerrar Sesión"
-        ],
-        label_visibility="collapsed"
+            "Minijuego Bloques",
+            "Minijuego Snake",
+            "Caza de Gemas",
+            "Ruleta de la Suerte",
+            "Ver Videos Premiados",
+            "Sesión de Video con Reto",
+            "Invitar Amigos",
+            "Solicitar Retiro"
+        ]
     )
-
-monetag_url = "https://omg10.com/4/11676106"
-
-if menu_opcion == "💎 Caza de Gemas":
-    st.markdown("# 💎 Caza de Gemas (Nivel Difícil)")
-    st.markdown("### ¡Encuentra la única gema entre 9 opciones y gana 15.00 💎!")
-    st.warning("⚠️ ¡Cuidado con las trampas de rocas vacías!")
-
-    if "gema_secreta" not in st.session_state:
-        st.session_state.gema_secreta = random.randint(0, 8)
-
-    cols = st.columns(3)
-    for i in range(9):
-        with cols[i % 3]:
-            if st.button(f"🪨 Roca {i+1}", key=f"roca_{i}"):
-                if i == st.session_state.gema_secreta:
-                    st.balloons()
-                    st.success("¡Increíble! ¡Encontraste la Gema oculta! +15.00 💎")
-                    st.session_state.gema_secreta = random.randint(0, 8)
-                else:
-                    st.error("❌ ¡Era solo una roca vacía! Perdiste este turno.")
-
-    if st.button("🔄 Reiniciar Tablero"):
-        st.session_state.gema_secreta = random.randint(0, 8)
-        st.rerun()
-
-elif menu_opcion == "🎡 Ruleta de la Suerte":
-    st.markdown("# 🎡 Ruleta de la Suerte")
-    st.markdown("### ¡Gira la ruleta gigante para multiplicar tus recompensas!")
     
-    st.markdown(
-        """
-        <div style="text-align: center;">
-            <img src="https://i.ibb.co/2M0gQ6z/ruleta-icono.png" width="320" style="border-radius: 50%; box-shadow: 0 8px 16px rgba(0,0,0,0.2); margin: 15px 0;">
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    st.markdown("---")
+    st.write("💎 **Tu Saldo (Monedas):**")
+    st.metric(label="", value=f"{st.session_state.saldo:.2f} 💎")
 
-    if st.button("🎲 ¡GIRAR LA RULETA AHORA!", use_container_width=True):
-        premios = [2.00, 5.00, 10.00, 0.00, 20.00, 1.00]
-        premio = random.choice(premios)
-        if premio > 0:
-            st.success(f"🎉 ¡Felicidades! La ruleta se detuvo en {premio} 💎")
-        else:
-            st.error("😢 ¡Mala suerte! Cayó en cero.")
+# --- CONTENIDO PRINCIPAL SEGÚN EL MENÚ ---
 
-elif menu_opcion == "🧩 Minijuego Retro":
-    st.markdown("# 🧩 Minijuego de Bloques")
-    st.markdown("### ¡Rompe líneas y acumula puntos de bonificación!")
+if opcion == "Minijuego Bloques":
+    st.title("🧩 Minijuego de Bloques")
+    st.write("¡Rompe líneas y acumula puntos de bonificación!")
     
-    components.html(
-        """
-        <div style="text-align:center; background:#111; padding:20px; border-radius:12px; color:white; font-family:sans-serif;">
+    tetris_html = """
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            body { font-family: Arial, sans-serif; text-align: center; background-color: #0e1117; color: white; margin: 0; padding: 10px; }
+            #game-container { max-width: 320px; margin: auto; background: #1e1e1e; padding: 15px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+            button { background: #7c3aed; color: white; border: none; padding: 10px 20px; font-size: 16px; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+            button:hover { background: #6d28d9; }
+        </style>
+    </head>
+    <body>
+        <div id="game-container">
             <h3>🕹️ Área de Juego Arcade</h3>
             <p>Haz clic para acelerar y sumar puntos.</p>
-            <div id="score" style="font-size:24px; color:#00ffcc; margin:15px 0;">Puntuación: 0</div>
-            <button onclick="addScore()" style="padding:12px 24px; background:#6C63FF; color:white; border:none; border-radius:8px; font-size:16px; font-weight:bold; cursor:pointer;">🎮 Jugar / Sumar Puntos</button>
+            <p>Puntuación: <span id="score">15</span></p>
+            <canvas id="canvas" width="200" height="150" style="background:#111; display:block; margin: 0 auto; border-radius: 5px;"></canvas>
+            <button onclick="addPoint()">🎮 Jugar / Sumar Puntos</button>
         </div>
+
         <script>
-            let s = 0;
-            function addScore() {
-                s += Math.floor(Math.random() * 50) + 10;
-                document.getElementById('score').innerText = 'Puntuación: ' + s;
+            let score = 15;
+            function addPoint() {
+                score += 5;
+                document.getElementById('score').innerText = score;
             }
         </script>
-        """,
-        height=260
-    )
+    </body>
+    </html>
+    """
+    components.html(tetris_html, height=360)
 
-elif menu_opcion == "🐍 Minijuego Snake":
-    st.markdown("# 🐍 Minijuego Snake Retro")
-    st.markdown("### ¡Controla la serpiente, come gemas y acumula puntos!")
+elif opcion == "Minijuego Snake":
+    st.title("🐍 Minijuego Snake")
+    st.write("¡Controla a la culebra y evita chocar!")
     
-    components.html(
-        """
-        <div style="text-align:center; background:#18181b; padding:15px; border-radius:12px; color:white; font-family:sans-serif; max-width:320px; margin:auto;">
-            <h3>🐍 Culebrita ZafiroX</h3>
-            <canvas id="snakeCanvas" width="280" height="280" style="background:#000; border-radius:8px; border:2px solid #6C63FF;"></canvas>
-            <div id="snakeScore" style="font-size:18px; color:#00ffcc; margin:10px 0;">Puntuación: 0</div>
-            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:5px; max-width:180px; margin:0 auto;">
-                <div></div>
-                <button onclick="changeDir('UP')" style="padding:10px; background:#6C63FF; color:white; border:none; border-radius:5px; font-weight:bold;">⬆️</button>
-                <div></div>
-                <button onclick="changeDir('LEFT')" style="padding:10px; background:#6C63FF; color:white; border:none; border-radius:5px; font-weight:bold;">⬅️</button>
-                <button onclick="changeDir('DOWN')" style="padding:10px; background:#6C63FF; color:white; border:none; border-radius:5px; font-weight:bold;">⬇️</button>
-                <button onclick="changeDir('RIGHT')" style="padding:10px; background:#6C63FF; color:white; border:none; border-radius:5px; font-weight:bold;">➡️</button>
+    snake_html = """
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            body { font-family: Arial, sans-serif; text-align: center; background-color: #0e1117; color: white; margin: 0; padding: 10px; }
+            .controls { display: grid; grid-template-columns: repeat(3, 50px); gap: 5px; justify-content: center; margin-top: 10px; }
+            button { background: #22c55e; color: white; border: none; padding: 12px; font-size: 16px; border-radius: 5px; cursor: pointer; }
+            button:hover { background: #16a34a; }
+            .empty { background: transparent; border: none; cursor: default; }
+        </style>
+    </head>
+    <body>
+        <div style="max-width: 300px; margin: auto;">
+            <p>Puntuación: <span id="snake-score">0</span></p>
+            <canvas id="snakeCanvas" width="200" height="200" style="background: #111; border: 2px solid #22c55e; border-radius: 5px;"></canvas>
+            
+            <div class="controls">
+                <button class="empty"></button>
+                <button onclick="dir('UP')">⬆️</button>
+                <button class="empty"></button>
+                <button onclick="dir('LEFT')">⬅️</button>
+                <button onclick="dir('DOWN')">⬇️</button>
+                <button onclick="dir('RIGHT')">➡️</button>
             </div>
         </div>
+
         <script>
             const canvas = document.getElementById("snakeCanvas");
             const ctx = canvas.getContext("2d");
-            let box = 20;
-            let snake = [
-                {x: 6 * box, y: 6 * box},
-                {x: 5 * box, y: 6 * box},
-                {x: 4 * box, y: 6 * box}
-            ];
-            let food = {
-                x: Math.floor(Math.random() * 12 + 1) * box,
-                y: Math.floor(Math.random() * 12 + 1) * box
-            };
             let score = 0;
-            let d = "RIGHT";
+            let snake = [{x: 100, y: 100}];
+            let dx = 10, dy = 0;
 
-            function changeDir(dir) {
-                if(dir == "LEFT" && d != "RIGHT") d = "LEFT";
-                else if(dir == "UP" && d != "DOWN") d = "UP";
-                else if(dir == "RIGHT" && d != "LEFT") d = "RIGHT";
-                else if(dir == "DOWN" && d != "UP") d = "DOWN";
+            function dir(direction) {
+                if (direction === 'UP' && dy === 0) { dx = 0; dy = -10; score += 1; }
+                if (direction === 'DOWN' && dy === 0) { dx = 0; dy = 10; score += 1; }
+                if (direction === 'LEFT' && dx === 0) { dx = -10; dy = 0; score += 1; }
+                if (direction === 'RIGHT' && dx === 0) { dx = 10; dy = 0; score += 1; }
+                document.getElementById("snake-score").innerText = score;
             }
 
-            function draw() {
-                ctx.fillStyle = "#000";
-                ctx.fillRect(0, 0, 280, 280);
-
-                for(let i = 0; i < snake.length; i++) {
-                    ctx.fillStyle = i == 0 ? "#00ffcc" : "#6C63FF";
-                    ctx.fillRect(snake[i].x, snake[i].y, box, box);
-                }
-
-                ctx.fillStyle = "#ff416c";
-                ctx.fillRect(food.x, food.y, box, box);
-
-                let snakeX = snake[0].x;
-                let snakeY = snake[0].y;
-
-                if(d == "LEFT") snakeX -= box;
-                if(d == "UP") snakeY -= box;
-                if(d == "RIGHT") snakeX += box;
-                if(d == "DOWN") snakeY += box;
-
-                if(snakeX == food.x && snakeY == food.y) {
-                    score += 5;
-                    document.getElementById("snakeScore").innerText = "Puntuación: " + score;
-                    food = {
-                        x: Math.floor(Math.random() * 12 + 1) * box,
-                        y: Math.floor(Math.random() * 12 + 1) * box
-                    };
-                } else {
+            function main() {
+                setTimeout(() => {
+                    ctx.fillStyle = "#111";
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    ctx.fillStyle = "#22c55e";
+                    snake.forEach(part => {
+                        ctx.fillRect(part.x, part.y, 10, 10);
+                    });
+                    
+                    let head = {x: (snake[0].x + dx + canvas.width) % canvas.width, y: (snake[0].y + dy + canvas.height) % canvas.height};
+                    snake.unshift(head);
                     snake.pop();
-                }
-
-                let newHead = {x: snakeX, y: snakeY};
-
-                if(snakeX < 0 || snakeX >= 280 || snakeY < 0 || snakeY >= 280 || collision(newHead, snake)) {
-                    clearInterval(game);
-                    alert("¡Juego terminado! Puntuación final: " + score);
-                    return;
-                }
-
-                snake.unshift(newHead);
+                    
+                    main();
+                }, 150);
             }
-
-            function collision(head, array) {
-                for(let i = 0; i < array.length; i++) {
-                    if(head.x == array[i].x && head.y == array[i].y) return true;
-                }
-                return false;
-            }
-
-            let game = setInterval(draw, 220);
+            main();
         </script>
-        """,
-        height=450
-    )
+    </body>
+    </html>
+    """
+    components.html(snake_html, height=380)
 
-elif menu_opcion == "📺 Ver Videos Premiados":
-    st.markdown("# 📺 Ver Videos y Anuncios Patrocinados")
-    st.markdown("### Haz clic en el botón para ver el anuncio publicitario y registrar tu actividad:")
-    
-    st.markdown(
-        f"""
-        <div style="text-align: center; margin: 30px 0;">
-            <a href="{monetag_url}" target="_blank" style="
-                display: block;
-                padding: 1.2em;
-                color: white;
-                background: linear-gradient(135deg, #FF416C, #FF4B2B);
-                text-align: center;
-                text-decoration: none;
-                font-weight: bold;
-                font-size: 1.2em;
-                border-radius: 12px;
-                box-shadow: 0 6px 12px rgba(255,65,108,0.3);
-            ">🎬 VER ANUNCIO PUBLICITARIO (Reclamar 5.00 💎)</a>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+elif opcion == "Caza de Gemas":
+    st.title("💎 Caza de Gemas")
+    st.write("¡Haz clic en las gemas que aparecen para ganar recompensas!")
+    if st.button("Buscar Gema Misteriosa"):
+        st.session_state.saldo += 0.50
+        st.success("¡Encontraste una gema! +0.50 💎")
+        st.rerun()
 
-elif menu_opcion == "🎬 Sesión de Video con Reto":
-    st.markdown("# 🎬 Sesión de Video Interactiva")
-    st.markdown("### Demuestra que viste el contenido respondiendo el reto:")
+elif opcion == "Ruleta de la Suerte":
+    st.title("🎡 Ruleta de la Suerte")
+    st.write("¡Gira la ruleta una vez al día para ganar premios aleatorios!")
+    if st.button("Girar Ruleta"):
+        st.session_state.saldo += 1.00
+        st.success("¡Ganaste 1.00 💎 en la ruleta!")
+        st.rerun()
+
+elif opcion == "Ver Videos Premiados":
+    st.title("📺 Ver Videos Premiados")
+    st.write("Mira los videos disponibles para sumar puntos a tu saldo.")
+    if st.button("Simular Visualización de Video"):
+        st.session_state.saldo += 0.20
+        st.success("¡Video visto con éxito! +0.20 💎")
+        st.rerun()
+
+elif opcion == "Sesión de Video con Reto":
+    st.title("🎬 Sesión de Video con Reto")
+    st.write("Completa el reto del video para desbloquear bonificaciones especiales.")
+    if st.button("Completar Reto"):
+        st.session_state.saldo += 2.00
+        st.success("¡Reto completado! +2.00 💎")
+        st.rerun()
+
+elif opcion == "Invitar Amigos":
+    st.title("👥 Invitar Amigos")
+    st.write("Comparte tu enlace de invitación para ganar un porcentaje de las ganancias de tus amigos.")
+    st.code("https://zafirox.streamlit.app/?ref=Lud337", language="text")
+
+elif opcion == "Solicitar Retiro":
+    st.title("💰 Solicitar Retiro")
+    st.write(f"Tu saldo actual disponible es de **{st.session_state.saldo:.2f} 💎**.")
+    metodo = st.selectbox("Método de retiro", ["PayPal", "Binance (USDT)", "Transferencia Bancaria"])
+    monto = st.number_input("Monto a retirar", min_value=5.0, max_value=float(st.session_state.saldo), value=5.0)
     
-    st.video("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
-    
-    st.markdown("---")
-    respuesta = st.radio("¿De qué color era el objeto principal al minuto 1:00?", ["Rojo", "Azul", "Verde", "No lo vi"])
-    
-    if st.button("Validar y Reclamar Bono"):
-        if respuesta == "Azul":
-            st.success("✅ ¡Respuesta correcta! +5.00 💎 sumados a tu cuenta.")
+    if st.button("Procesar Retiro"):
+        if st.session_state.saldo >= monto:
+            st.session_state.saldo -= monto
+            st.success(f"¡Solicitud de retiro de {monto:.2f} 💎 enviada con éxito mediante {metodo}!")
+            st.rerun()
         else:
-            st.error("❌ Respuesta incorrecta o no has visto el video completo. ¡Inténtalo de nuevo!")
-
-elif menu_opcion == "🎁 Caja Misteriosa":
-    st.markdown("# 🎁 Caja Misteriosa")
-    st.markdown("### Abre la caja para descubrir tu premio sorpresa.")
-    if st.button("📦 Abrir Caja"):
-        st.success("¡Premio de 10.00 💎 desbloqueado con éxito!")
-
-elif menu_opcion == "👥 Invitar Amigos":
-    st.markdown("# 👥 Invitar Amigos")
-    st.markdown("### Comparte tu enlace de referencia:")
-    st.code("https://zafirox-minijuegos.streamlit.app/?ref=Lud337")
-
-elif menu_opcion == "💵 Solicitar Retiro":
-    st.markdown("# 💵 Solicitar Retiro")
-    st.markdown("### Métodos disponibles: PayPal, Nequi, Daviplata, PSE")
-    st.info("Tu saldo actual es de 27.40 💎. ¡Sigue completando retos para alcanzar el mínimo!")
-
-else:
-    st.markdown("# 🚪 Cerrar Sesión")
-    st.markdown("Has cerrado sesión correctamente.")
+            st.error("No tienes suficiente saldo.")
