@@ -10,7 +10,7 @@ st.set_page_config(
     layout="centered"
 )
 
-# --- ESTILOS CSS PERSONALIZADOS ---
+# --- ESTILOS CSS ---
 st.markdown("""
     <style>
     .main { background-color: #0e1117; color: white; }
@@ -37,14 +37,14 @@ with st.sidebar:
         "Selecciona una sección:",
         [
             "Minijuego Bloques",
-            "Minijuego Snake",
+            "Minijuego Snake (Funcional)",
             "Caza de Minas",
             "Ruleta de la Suerte",
             "Caja Misteriosa",
-            "Ganar por Tiempo y Anuncios",
+            "Ganar por Tiempo y Anuncios (Monetag)",
             "Invitar Amigos",
             "Ranking Semanal Top 4",
-            "Solicitar Retiro"
+            "Solicitar Retiro y Conversor"
         ]
     )
     
@@ -56,7 +56,7 @@ with st.sidebar:
 
 if opcion == "Minijuego Bloques":
     st.title("🧩 Minijuego de Bloques")
-    st.write("¡Rompe líneas y acumula puntos de bonificación en tiempo real!")
+    st.write("¡Rompe líneas y acumula puntos de bonificación!")
     
     tetris_html = """
     <!DOCTYPE html>
@@ -67,7 +67,6 @@ if opcion == "Minijuego Bloques":
             body { font-family: Arial, sans-serif; text-align: center; background-color: #0e1117; color: white; margin: 0; padding: 10px; }
             #game-container { max-width: 320px; margin: auto; background: #1e1e1e; padding: 15px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
             button { background: #7c3aed; color: white; border: none; padding: 10px 20px; font-size: 16px; border-radius: 5px; cursor: pointer; margin-top: 10px; width: 100%; }
-            button:hover { background: #6d28d9; }
         </style>
     </head>
     <body>
@@ -89,9 +88,9 @@ if opcion == "Minijuego Bloques":
     """
     components.html(tetris_html, height=350)
 
-elif opcion == "Minijuego Snake":
-    st.title("🐍 Minijuego Snake")
-    st.write("¡Controla a la culebra con los 4 botones direccionales independientes!")
+elif opcion == "Minijuego Snake (Funcional)":
+    st.title("🐍 Minijuego Snake Real")
+    st.write("¡La serpiente gira correctamente con los controles en pantalla!")
     
     snake_html = """
     <!DOCTYPE html>
@@ -100,59 +99,94 @@ elif opcion == "Minijuego Snake":
         <meta charset="UTF-8">
         <style>
             body { font-family: Arial, sans-serif; text-align: center; background-color: #0e1117; color: white; margin: 0; padding: 5px; }
-            .controls { display: grid; grid-template-columns: repeat(3, 55px); gap: 5px; justify-content: center; margin-top: 10px; }
-            button { background: #22c55e; color: white; border: none; padding: 12px; font-size: 18px; border-radius: 6px; cursor: pointer; }
-            button:hover { background: #16a34a; }
-            .empty { background: transparent; border: none; cursor: default; }
+            .controls { display: grid; grid-template-columns: repeat(3, 60px); gap: 6px; justify-content: center; margin-top: 12px; }
+            button { background: #22c55e; color: white; border: none; padding: 14px; font-size: 20px; border-radius: 8px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+            button:active { background: #16a34a; transform: scale(0.95); }
+            .empty { background: transparent; border: none; cursor: default; box-shadow: none; }
         </style>
     </head>
     <body>
         <div style="max-width: 300px; margin: auto;">
-            <p>Puntuación: <span id="snake-score">0</span></p>
-            <canvas id="snakeCanvas" width="200" height="200" style="background: #111; border: 2px solid #22c55e; border-radius: 5px;"></canvas>
+            <p>Puntuación: <span id="snake-score" style="color: #22c55e; font-weight: bold; font-size: 18px;">0</span></p>
+            <canvas id="snakeCanvas" width="220" height="220" style="background: #111; border: 2px solid #22c55e; border-radius: 8px; display: block; margin: 0 auto;"></canvas>
             
             <div class="controls">
                 <button class="empty"></button>
-                <button onclick="dir('UP')">⬆️</button>
+                <button onclick="changeDir('UP')">⬆️</button>
                 <button class="empty"></button>
-                <button onclick="dir('LEFT')">⬅️</button>
-                <button onclick="dir('DOWN')">⬇️</button>
-                <button onclick="dir('RIGHT')">➡️</button>
+                <button onclick="changeDir('LEFT')">⬅️</button>
+                <button onclick="changeDir('DOWN')">⬇️</button>
+                <button onclick="changeDir('RIGHT')">➡️</button>
             </div>
         </div>
         <script>
             const canvas = document.getElementById("snakeCanvas");
             const ctx = canvas.getContext("2d");
+            
             let score = 0;
+            let box = 10;
             let snake = [{x: 100, y: 100}];
-            let dx = 10, dy = 0;
+            let food = {x: Math.floor(Math.random() * 20) * box, y: Math.floor(Math.random() * 20) * box};
+            let d = "RIGHT";
+            let nextD = "RIGHT";
 
-            function dir(direction) {
-                if (direction === 'UP' && dy === 0) { dx = 0; dy = -10; score += 2; }
-                if (direction === 'DOWN' && dy === 0) { dx = 0; dy = 10; score += 2; }
-                if (direction === 'LEFT' && dx === 0) { dx = -10; dy = 0; score += 2; }
-                if (direction === 'RIGHT' && dx === 0) { dx = 10; dy = 0; score += 2; }
-                document.getElementById("snake-score").innerText = score;
+            function changeDir(direction) {
+                if (direction === 'UP' && d !== 'DOWN') nextD = 'UP';
+                if (direction === 'DOWN' && d !== 'UP') nextD = 'DOWN';
+                if (direction === 'LEFT' && d !== 'RIGHT') nextD = 'LEFT';
+                if (direction === 'RIGHT' && d !== 'LEFT') nextD = 'RIGHT';
             }
 
-            function main() {
-                setTimeout(() => {
-                    ctx.fillStyle = "#111";
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    ctx.fillStyle = "#22c55e";
-                    snake.forEach(part => { ctx.fillRect(part.x, part.y, 10, 10); });
-                    let head = {x: (snake[0].x + dx + canvas.width) % canvas.width, y: (snake[0].y + dy + canvas.height) % canvas.height};
-                    snake.unshift(head);
+            function draw() {
+                ctx.fillStyle = "#111";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                for (let i = 0; i < snake.length; i++) {
+                    ctx.fillStyle = (i === 0) ? "#22c55e" : "#15803d";
+                    ctx.fillRect(snake[i].x, snake[i].y, box, box);
+                }
+
+                ctx.fillStyle = "#ef4444";
+                ctx.fillRect(food.x, food.y, box, box);
+
+                d = nextD;
+                let snakeX = snake[0].x;
+                let snakeY = snake[0].y;
+
+                if (d === 'LEFT') snakeX -= box;
+                if (d === 'UP') snakeY -= box;
+                if (d === 'RIGHT') snakeX += box;
+                if (d === 'DOWN') snakeY += box;
+
+                if (snakeX === food.x && snakeY === food.y) {
+                    score += 5;
+                    document.getElementById("snake-score").innerText = score;
+                    food = {x: Math.floor(Math.random() * 21) * box, y: Math.floor(Math.random() * 21) * box};
+                } else {
                     snake.pop();
-                    main();
-                }, 150);
+                }
+
+                let newHead = {x: snakeX, y: snakeY};
+                
+                // Atravesar paredes o reiniciar si choca
+                if (snakeX < 0 || snakeX >= canvas.width || snakeY < 0 || snakeY >= canvas.height) {
+                    snake = [{x: 100, y: 100}];
+                    score = 0;
+                    document.getElementById("snake-score").innerText = score;
+                    d = "RIGHT";
+                    nextD = "RIGHT";
+                    return;
+                }
+
+                snake.unshift(newHead);
             }
-            main();
+
+            let game = setInterval(draw, 120);
         </script>
     </body>
     </html>
     """
-    components.html(snake_html, height=380)
+    components.html(snake_html, height=410)
 
 elif opcion == "Caza de Minas":
     st.title("💣 Caza de Minas")
@@ -190,44 +224,53 @@ elif opcion == "Caja Misteriosa":
         st.success("¡Encontraste una recompensa oculta de 1.25 💎!")
         st.rerun()
 
-elif opcion == "Ganar por Tiempo y Anuncios":
-    st.title("⏱️ Ganancia por Tiempo y Anuncios")
-    st.write("Monitorea tu tiempo en la línea y mira anuncios cortos para sumar saldo extra.")
+elif opcion == "Ganar por Tiempo y Anuncios (Monetag)":
+    st.title("⏱️ Tiempo y Anuncios Monetag")
+    st.write("Monitorea tu tiempo activo y visualiza anuncios de Monetag integrados para monetizar la app.")
     
     tiempo_transcurrido = int(time.time() - st.session_state.tiempo_inicio)
     st.info(f"⏳ Llevas **{tiempo_transcurrido} segundos** activos en la aplicación.")
     
-    if st.button("Reclamar Bono por Tiempo (Cada 60s)"):
-        if tiempo_transcurrido >= 10: # Ajustable para prueba rápida
-            st.session_state.saldo += 0.50
-            st.success("¡Bono por tiempo reclamado con éxito! +0.50 💎")
-        else:
-            st.warning("Aún no ha pasado el tiempo suficiente para este bono.")
-            
+    if st.button("Reclamar Bono por Tiempo Activo"):
+        st.session_state.saldo += 0.50
+        st.success("¡Bono por tiempo reclamado! +0.50 💎")
+        
     st.markdown("---")
-    st.subheader("📺 Anuncios Cortos (Monetización Dueño)")
-    st.write("Mira este espacio publicitario corto para apoyar la app y recibir recompensas inmediatas:")
-    if st.button("Ver Anuncio Corto Patrocinado"):
-        st.session_state.saldo += 0.80
-        st.success("¡Anuncio completado! +0.80 💎 sumados a tu cuenta.")
+    st.subheader("📺 Anuncio Monetag (Directo)")
+    st.write("Haz clic en el botón de abajo para activar el enlace/anuncio de Monetag y registrar tu visualización:")
+    
+    # Integración real del enlace de anuncio o script de Monetag
+    monetag_url = "https://your_monetag_ad_link_here.com" # Reemplaza con tu enlace directo de Monetag
+    st.markdown(f"""
+        <div style="text-align: center; margin: 20px 0;">
+            <a href="{monetag_url}" target="_blank">
+                <button style="background-color: #f59e0b; color: white; padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%;">
+                    🚀 Ver Anuncio Patrocinado (Monetag)
+                </button>
+            </a>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    if st.button("Ya vi el anuncio, acreditar recompensa"):
+        st.session_state.saldo += 1.00
+        st.success("¡Recompensa de anuncio acreditada con éxito! +1.00 💎")
         st.rerun()
 
 elif opcion == "Invitar Amigos":
     st.title("👥 Invitar Amigos con Recompensa")
-    st.write("Comparte tu enlace de registro. Ganas bonos automáticos cuando tus amigos se registran y quedan fijos en la plataforma.")
+    st.write("Comparte tu enlace de registro. Ganas bonos automáticos cuando tus amigos se registran y quedan fijos.")
     st.code("https://zafirox.streamlit.app/?ref=Lud337", language="text")
-    st.success("Recompensa activa: 5.00 💎 por cada amigo registrado y activo.")
+    st.success("Recompensa activa: 5.00 💎 por cada amigo registrado.")
 
 elif opcion == "Ranking Semanal Top 4":
     st.title("🏆 Competencia Semanal")
-    st.write("¡Los **4 primeros puestos** por actividades, misiones y tiempo en la app se llevan premios en dinero real cada semana!")
+    st.write("¡Los **4 primeros puestos** por actividades y misiones se llevan premios en dinero real cada semana!")
     
-    # Temporizador regresivo semanal simulado
     ahora = datetime.datetime.now()
     proximo_domingo = ahora + datetime.timedelta(days=(6 - ahora.weekday()) % 7)
     tiempo_restante = proximo_domingo - ahora
     
-    st.warning(f"⏰ **Tiempo restante para el cierre del ranking:** {tiempo_restante.days} días y {tiempo_restante.seconds // 3600} horas.")
+    st.warning(f"⏰ **Cierre del ranking en:** {tiempo_restante.days} días y {tiempo_restante.seconds // 3600} horas.")
     
     st.markdown("""
     | Puesto | Usuario | Puntuación | Premio Semanal |
@@ -238,21 +281,34 @@ elif opcion == "Ranking Semanal Top 4":
     | 🏅 **4°** | AndresX | 950 pts | $10.000 COP / USDT |
     """)
 
-elif opcion == "Solicitar Retiro":
-    st.title("💰 Solicitar Retiro de Dinero Real")
-    st.write(f"Tu saldo actual disponible es de **{st.session_state.saldo:.2f} 💎**.")
+elif opcion == "Solicitar Retiro y Conversor":
+    st.title("💰 Conversor de Dinero y Retiro Real")
+    st.write(f"Tu saldo actual es de **{st.session_state.saldo:.2f} 💎**.")
+    
+    # --- CONVERSOR DE DINERO ---
+    # Tasa de conversión: 1 Diamante = $4,000 COP (o el valor que prefieras configurar)
+    tasa_conversion = 4000 
+    valor_cop = st.session_state.saldo * tasa_conversion
+    
+    st.info(f"💱 **Conversor automático:** Tus {st.session_state.saldo:.2f} 💎 equivalen a **${valor_cop:,.0f} COP** (Aprox. ${st.session_state.saldo * 1.0:.2f} USD).")
+    
+    st.markdown("---")
+    st.subheader("Métodos de Retiro Disponibles")
     
     metodo = st.selectbox(
-        "Selecciona tu método de pago preferido:",
+        "Selecciona tu método de pago:",
         ["Nequi", "DaviPlata", "PayPal", "PSE"]
     )
     
-    cuenta_destino = st.text_input(f"Número de cuenta / Celular o Correo para {metodo}")
+    cuenta_destino = st.text_input(f"Número de celular / Cuenta o Correo para {metodo}")
     monto_retiro = st.number_input("Monto en 💎 a retirar", min_value=5.0, max_value=float(max(5.0, st.session_state.saldo)), value=5.0)
+    
+    monto_cop_retiro = monto_retiro * tasa_conversion
+    st.write(f"Monto a recibir: **${monto_cop_retiro:,.0f} COP**")
     
     if st.button("📤 Enviar Solicitud de Retiro"):
         if cuenta_destino and st.session_state.saldo >= monto_retiro:
             st.session_state.saldo -= monto_retiro
-            st.success(f"¡Retiro de {monto_retiro:.2f} 💎 procesado con éxito a través de {metodo} ({cuenta_destino})!")
+            st.success(f"¡Retiro de ${monto_cop_retiro:,.0f} COP procesado con éxito a través de {metodo} ({cuenta_destino})!")
         else:
-            st.error("Por favor completa los datos de destino o verifica que tengas saldo suficiente.")
+            st.error("Por favor completa los datos de destino o verifica que tu saldo sea suficiente.")
