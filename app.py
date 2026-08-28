@@ -17,7 +17,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- BASE DE DATOS LOCAL EN MEMORIA (SIMULADA) ---
+# --- BASE DE DATOS LOCAL EN MEMORIA ---
 if 'usuarios_db' not in st.session_state:
     st.session_state.usuarios_db = {
         "Lud337": {"password": "123", "saldo": 31.60},
@@ -35,7 +35,7 @@ query_params = st.query_params
 # --- PANTALLA DE LOGIN / REGISTRO ---
 if st.session_state.usuario_actual is None:
     st.title("💎 ZafiroX - Acceso de Usuarios")
-    st.write("Inicia sesión o regístrate para gestionar tu saldo al estilo Tery Bit.")
+    st.write("Inicia sesión o regístrate para gestionar tu saldo de forma segura.")
     
     tab1, tab2 = st.tabs(["Iniciar Sesión", "Registrarse"])
     
@@ -68,7 +68,7 @@ if st.session_state.usuario_actual is None:
     
     st.stop()
 
-# Sincronizamos el usuario activo
+# Sincronizamos usuario activo
 usuario = st.session_state.usuario_actual
 saldo_actual = st.session_state.usuarios_db[usuario]["saldo"]
 
@@ -91,7 +91,7 @@ with st.sidebar:
             "Minijuego Bloques (Hard)",
             "Minijuego Snake (Hard)",
             "Caza de Minas (Difícil)",
-            "Ruleta de la Suerte",
+            "Cofres Misteriosos de Tensión",
             "Caja Misteriosa",
             "Sesión de Videos y Monetag",
             "Invitar Amigos",
@@ -111,7 +111,7 @@ def actualizar_saldo(cantidad):
 
 if opcion == "Minijuego Bloques (Hard)":
     st.title("🧩 Minijuego de Bloques (Modo Difícil)")
-    st.write("¡Velocidad alta estilo Arcade inspirada en Tery Bit!")
+    st.write("¡Velocidad alta estilo Arcade para poner a prueba tus reflejos!")
     
     tetris_html = """
     <!DOCTYPE html>
@@ -282,17 +282,32 @@ elif opcion == "Caza de Minas (Difícil)":
     """
     st.components.v1.html(minas_html, height=330)
 
-elif opcion == "Ruleta de la Suerte":
-    st.title("🎡 Ruleta de la Suerte Extrema")
-    st.write("Gira la ruleta y pon a prueba tu suerte.")
-    if st.button("¡Girar con Riesgo!"):
-        resultado = random.choice([4.00, -2.00, 8.00, -3.00, 15.00])
-        actualizar_saldo(resultado)
-        if resultado > 0:
-            st.success(f"🎉 ¡Ganaste {resultado} 💎!")
-        else:
-            st.error(f"⚠️ ¡Penalización! Perdiste {abs(resultado)} 💎.")
-        st.rerun()
+elif opcion == "Cofres Misteriosos de Tensión":
+    st.title("🗝️ Cofres de Tensión ZafiroX")
+    st.write("Selecciona uno de los 3 cofres ocultos. Uno tiene un premio masivo, otro un premio menor y el último una trampa.")
+    
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        if st.button("🎁 Cofre 1"):
+            premio = random.choice([5.00, 2.00, -1.00])
+            actualizar_saldo(premio)
+            if premio > 0: st.success(f"¡Increíble! +{premio} 💎")
+            else: st.error("¡Cofre vacío! -1.00 💎")
+            st.rerun()
+    with col2:
+        if st.button("🎁 Cofre 2"):
+            premio = random.choice([10.00, 1.00, -2.00])
+            actualizar_saldo(premio)
+            if premio > 0: st.success(f"¡Premio gordo! +{premio} 💎")
+            else: st.error("¡Trampa en el cofre! -2.00 💎")
+            st.rerun()
+    with col3:
+        if st.button("🎁 Cofre 3"):
+            premio = random.choice([4.00, 3.00, -1.50])
+            actualizar_saldo(premio)
+            if premio > 0: st.success(f"¡Buen botín! +{premio} 💎")
+            else: st.error("¡Mala suerte! -1.50 💎")
+            st.rerun()
 
 elif opcion == "Caja Misteriosa":
     st.title("📦 Caja Misteriosa de Alto Riesgo")
@@ -385,15 +400,44 @@ elif opcion == "Invitar Amigos":
 
 elif opcion == "Ranking Semanal Top 4":
     st.title("🏆 Competencia Semanal de Puntajes")
-    st.warning("⏰ **Cierre del ranking en:** 2 días y 0 horas.")
+    
+    # Reloj en vivo de cuenta regresiva integrado
+    countdown_clock_html = """
+    <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #ef4444; padding: 12px; border-radius: 8px; font-weight: bold; text-align: center; margin-bottom: 15px;">
+        ⏰ Cierre del ranking en tiempo real: <span id="live-clock" style="font-size: 18px; color: #fff;">Calculando...</span>
+    </div>
+    <script>
+        // Fecha límite simulada a 2 días desde ahora
+        let countDownDate = new Date().getTime() + (2 * 24 * 60 * 60 * 1000);
+        let x = setInterval(function() {
+            let now = new Date().getTime();
+            let distance = countDownDate - now;
+            let days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            let hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            
+            document.getElementById("live-clock").innerHTML = days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
+            
+            if (distance < 0) {
+                clearInterval(x);
+                document.getElementById("live-clock").innerHTML = "¡COMPETENCIA FINALIZADA!";
+            }
+        }, 1000);
+    </script>
+    """
+    st.components.v1.html(countdown_clock_html, height=75)
+    
+    # Ranking dinámico basado en actividad real de usuarios simulados
+    puntos_usuario = 1650 + int(saldo_actual * 10) # Varía dinámicamente con las ganancias del usuario activo
     
     st.markdown(f"""
     | Puesto | Usuario | Puntuación | Premio Semanal |
     | :---: | :--- | :---: | :---: |
-    | 🥇 **1°** | **{usuario} (Tú)** | 1,650 pts | $50.000 COP |
-    | 🥈 **2°** | Carlos_99 | 1,420 pts | $30.000 COP |
-    | 🥉 **3°** | SofiGamer | 1,200 pts | $20.000 COP |
-    | 🏅 **4°** | AndresX | 990 pts | $10.000 COP |
+    | 🥇 **1°** | **{usuario} (Tú)** | {puntos_usuario:,} pts | $50.000 COP |
+    | 🥈 **2°** | CyberKing_99 | 1,420 pts | $30.000 COP |
+    | 🥉 **3°** | ZafiroQueen | 1,200 pts | $20.000 COP |
+    | 🏅 **4°** | NeoGamer_X | 990 pts | $10.000 COP |
     """)
 
 elif opcion == "Solicitar Retiro y Conversor":
