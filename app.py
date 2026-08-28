@@ -50,29 +50,29 @@ if "usuario_activo" not in st.session_state:
 usuario = st.session_state.usuario_activo
 saldo_actual = get_saldo(usuario)
 
-# --- MENÚ LATERAL CON ESTILO VISUAL ---
-st.sidebar.title(f"🎮 ZafiroX Hub")
+# --- MENÚ LATERAL ---
+st.sidebar.title("🎮 ZafiroX Hub")
 st.sidebar.markdown(f"**Usuario:** {usuario} 👋")
-st.sidebar.markdown(f"### Tu Saldo:")
+st.sidebar.markdown("### Tu Saldo:")
 st.sidebar.markdown(f"# 💎 {saldo_actual:.2f}")
 st.sidebar.markdown("---")
 
 menu_seleccionado = st.sidebar.selectbox(
     "Menú Principal",
     [
-        "🎰 Tragamonedas Zafiro",
-        "🎴 Memoria de Gemas",
-        "⛏️ Caza de Gemas",
-        "🎡 Ruleta de la Suerte",
-        "🎁 Caja Misteriosa",
-        "📺 Ver Videos Premiados",
-        "👥 Invitar Amigos",
-        "💸 Solicitar Retiro",
+        "Tragamonedas Zafiro",
+        "Memoria de Gemas",
+        "Caza de Gemas",
+        "Ruleta de la Suerte",
+        "Caja Misteriosa",
+        "Ver Videos Premiados",
+        "Invitar Amigos",
+        "Solicitar Retiro",
     ],
 )
 
 # --- JUEGO 1: TRAGAMONEDAS ZAFIRO ---
-if menu_seleccionado == "🎰 Tragamonedas Zafiro":
+if menu_seleccionado == "Tragamonedas Zafiro":
   st.title("🎰 Tragamonedas Zafiro")
   st.write(
       "¡Gira los rodillos mágicos! Si logras alinear símbolos iguales, ganas"
@@ -101,18 +101,16 @@ if menu_seleccionado == "🎰 Tragamonedas Zafiro":
 
       premio = 0.0
       if r1 == r2 == r3:
-        premio = 15.0  # ¡Jackpot!
+        premio = 15.0
         st.success(
-            f"🎉 ¡JACKPOT! ¡Los tres símbolos coincidieron! Ganaste 💎 {premio}"
-            " monedas."
+            f"🎉 ¡JACKPOT! ¡Tres símbolos iguales! Ganaste 💎 {premio} monedas."
         )
       elif r1 == r2 or r2 == r3 or r1 == r3:
-        premio = 3.0  # Par ganador
-        st.success(f"✨ ¡Bien! Dos símbolos iguales. Ganaste 💎 {premio} monedas.")
+        premio = 3.0
+        st.success(f"✨ ¡Dos símbolos iguales! Ganaste 💎 {premio} monedas.")
       else:
         st.warning(
-            "😢 Casi lo logras, prueba suerte otra vez con los videos"
-            " premiados."
+            "😢 Casi lo logras. ¡Sigue intentando con los videos premiados!"
         )
 
       nuevo_saldo = saldo_disp - 1.50 + premio
@@ -126,54 +124,54 @@ if menu_seleccionado == "🎰 Tragamonedas Zafiro":
       )
 
 # --- JUEGO 2: MEMORIA DE GEMAS ---
-elif menu_seleccionado == "🎴 Memoria de Gemas":
+elif menu_seleccionado == "Memoria de Gemas":
   st.title("🎴 Memoria de Gemas")
   st.write(
-      "Elige una de las 3 cartas ocultas. Encuentra la carta dorada para triplicar"
-      " tu apuesta."
+      "Elige una de las 3 cartas ocultas. Encuentra la carta ganadora para"
+      " triplicar tu apuesta."
   )
-
   st.info("🎟️ Costo de participación: **1.00 💎**")
 
-  c1, c2, c3 = st.columns(3)
   saldo_disp = get_saldo(usuario)
-
   if saldo_disp >= 1.00:
+    c1, c2, c3 = st.columns(3)
+    ganadora = random.randint(1, 3)
+
     with c1:
       if st.button("🎴 Carta 1"):
-        resultado_memoria(usuario, 1)
+        if 1 == ganadora:
+          update_saldo(usuario, saldo_disp - 1.0 + 4.0)
+          st.success("🎉 ¡Adivinaste la carta 1! Ganaste 💎 4.00 monedas.")
+        else:
+          update_saldo(usuario, saldo_disp - 1.0)
+          st.error(f"❌ Era la carta #{ganadora}. Perdiste 1.00 moneda.")
+        time.sleep(1)
+        st.rerun()
     with c2:
       if st.button("🎴 Carta 2"):
-        resultado_memoria(usuario, 2)
+        if 2 == ganadora:
+          update_saldo(usuario, saldo_disp - 1.0 + 4.0)
+          st.success("🎉 ¡Adivinaste la carta 2! Ganaste 💎 4.00 monedas.")
+        else:
+          update_saldo(usuario, saldo_disp - 1.0)
+          st.error(f"❌ Era la carta #{ganadora}. Perdiste 1.00 moneda.")
+        time.sleep(1)
+        st.rerun()
     with c3:
       if st.button("🎴 Carta 3"):
-        resultado_memoria(usuario, 3)
+        if 3 == ganadora:
+          update_saldo(usuario, saldo_disp - 1.0 + 4.0)
+          st.success("🎉 ¡Adivinaste la carta 3! Ganaste 💎 4.00 monedas.")
+        else:
+          update_saldo(usuario, saldo_disp - 1.0)
+          st.error(f"❌ Era la carta #{ganadora}. Perdiste 1.00 moneda.")
+        time.sleep(1)
+        st.rerun()
   else:
     st.error("❌ Saldo insuficiente para jugar a la Memoria de Gemas.")
 
-
-def resultado_memoria(user, eleccion):
-  ganadora = random.randint(1, 3)
-  saldo_actual = get_saldo(user)
-  if eleccion == ganadora:
-    premio = 4.0
-    update_saldo(user, saldo_actual - 1.0 + premio)
-    st.success(
-        f"🎉 ¡Adivinaste la carta ganadora (#{ganadora})! Ganaste 💎 {premio}"
-        " monedas."
-    )
-  else:
-    update_saldo(user, saldo_actual - 1.0)
-    st.error(
-        f"❌ Era la carta #{ganadora}. Perdiste 1.00 moneda. ¡Inténtalo de"
-        " nuevo!"
-    )
-  time.sleep(1)
-  st.rerun()
-
-
 # --- JUEGO 3: CAZA DE GEMAS ---
-elif menu_seleccionado == "⛏️ Caza de Gemas":
+elif menu_seleccionado == "Caza de Gemas":
   st.title("⛏️ Caza de Gemas (Mina Subterránea)")
   st.write(
       "Selecciona una roca misteriosa para extraer gemas ocultas de la mina."
@@ -184,7 +182,7 @@ elif menu_seleccionado == "⛏️ Caza de Gemas":
     if st.button("🪨 Roca A"):
       gema = random.choice([0.5, 2.5, 5.0])
       update_saldo(usuario, get_saldo(usuario) + gema)
-      st.success(f"💎 ¡Exquisitos cristales encontrados! Ganaste {gema} monedas.")
+      st.success(f"💎 ¡Cristales encontrados! Ganaste {gema} monedas.")
       st.rerun()
   with col2:
     if st.button("🪨 Roca B"):
@@ -203,7 +201,7 @@ elif menu_seleccionado == "⛏️ Caza de Gemas":
       st.rerun()
 
 # --- RULETA DE LA SUERTE ---
-elif menu_seleccionado == "🎡 Ruleta de la Suerte":
+elif menu_seleccionado == "Ruleta de la Suerte":
   st.title("🎡 Ruleta de la Suerte")
   st.write("¡Gira la ruleta por un costo de 1.00 💎 y gana premios sorpresa!")
 
@@ -219,7 +217,7 @@ elif menu_seleccionado == "🎡 Ruleta de la Suerte":
       st.error("No tienes suficientes monedas para girar la ruleta.")
 
 # --- CAJA MISTERIOSA ---
-elif menu_seleccionado == "🎁 Caja Misteriosa":
+elif menu_seleccionado == "Caja Misteriosa":
   st.title("🎁 Caja Misteriosa")
   st.write(
       "Abre una caja secreta patrocinada. Algunas tienen bonos sorpresa y"
@@ -239,7 +237,7 @@ elif menu_seleccionado == "🎁 Caja Misteriosa":
     st.rerun()
 
 # --- VIDEOS PREMIADOS ---
-elif menu_seleccionado == "📺 Ver Videos Premiados":
+elif menu_seleccionado == "Ver Videos Premiados":
   st.title("📺 Ver Videos Premiados")
   st.write(
       "Mira el contenido patrocinado y completa el contador para recibir"
@@ -291,7 +289,7 @@ elif menu_seleccionado == "Invitar Amigos":
   st.code(f"https://zafirox-minijuegos.streamlit.app/?ref={usuario}")
 
 # --- SOLICITAR RETIRO ---
-elif menu_seleccionado == "💸 Solicitar Retiro":
+elif menu_seleccionado == "Solicitar Retiro":
   st.title("💸 Solicitar Retiro a Cuentas Reales")
   st.write(
       "Convierte tus monedas acumuladas en dinero real y retíralo a tu método de"
