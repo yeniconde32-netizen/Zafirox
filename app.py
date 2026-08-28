@@ -42,8 +42,10 @@ if st.session_state.usuario_actual is None:
     tab1, tab2 = st.tabs(["Iniciar Sesión", "Registrarse"])
     
     with tab1:
-        user_login = st.text_input("Usuario", key="login_user")
-        pass_login = st.text_input("Contraseña", type="password", key="login_pass")
+        # Usamos atributos estrictos para evitar que el celular muestre correos guardados
+        user_login = st.text_input("Usuario", key="login_user", placeholder="Escribe tu usuario")
+        pass_login = st.text_input("Contraseña", type="password", key="login_pass", placeholder="Escribe tu contraseña")
+        
         if st.button("Entrar a ZafiroX"):
             if user_login in st.session_state.usuarios_db and st.session_state.usuarios_db[user_login]["password"] == pass_login:
                 st.session_state.usuario_actual = user_login
@@ -53,8 +55,8 @@ if st.session_state.usuario_actual is None:
                 st.error("Usuario o contraseña incorrectos.")
                 
     with tab2:
-        user_reg = st.text_input("Nuevo Usuario", key="reg_user")
-        pass_reg = st.text_input("Nueva Contraseña", type="password", key="reg_pass")
+        user_reg = st.text_input("Nuevo Usuario", key="reg_user", placeholder="Crea tu usuario")
+        pass_reg = st.text_input("Nueva Contraseña", type="password", key="reg_pass", placeholder="Crea tu contraseña")
         if st.button("Crear Cuenta"):
             if user_reg and pass_reg:
                 if user_reg in st.session_state.usuarios_db:
