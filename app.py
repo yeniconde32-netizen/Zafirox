@@ -1,5 +1,4 @@
 import streamlit as st
-import streamlit.components.v1 as components
 import datetime
 import random
 
@@ -20,7 +19,6 @@ st.markdown("""
 
 # --- BASE DE DATOS LOCAL EN MEMORIA (SIMULADA) ---
 if 'usuarios_db' not in st.session_state:
-    # Usuarios precargados de ejemplo (Usuario: Contraseña)
     st.session_state.usuarios_db = {
         "Lud337": {"password": "123", "saldo": 31.60},
         "Carlos_99": {"password": "456", "saldo": 10.00}
@@ -42,9 +40,9 @@ if st.session_state.usuario_actual is None:
     tab1, tab2 = st.tabs(["Iniciar Sesión", "Registrarse"])
     
     with tab1:
-        # Usamos atributos estrictos para evitar que el celular muestre correos guardados
-        user_login = st.text_input("Usuario", key="login_user", placeholder="Escribe tu usuario")
-        pass_login = st.text_input("Contraseña", type="password", key="login_pass", placeholder="Escribe tu contraseña")
+        # Usamos nombres que eviten que el navegador sugiera correos electrónicos personales
+        user_login = st.text_input("Identificador de Usuario", key="login_user", placeholder="Ingresa tu usuario")
+        pass_login = st.text_input("Contraseña de Acceso", type="password", key="login_pass", placeholder="Ingresa tu contraseña")
         
         if st.button("Entrar a ZafiroX"):
             if user_login in st.session_state.usuarios_db and st.session_state.usuarios_db[user_login]["password"] == pass_login:
@@ -55,8 +53,8 @@ if st.session_state.usuario_actual is None:
                 st.error("Usuario o contraseña incorrectos.")
                 
     with tab2:
-        user_reg = st.text_input("Nuevo Usuario", key="reg_user", placeholder="Crea tu usuario")
-        pass_reg = st.text_input("Nueva Contraseña", type="password", key="reg_pass", placeholder="Crea tu contraseña")
+        user_reg = st.text_input("Crear Nuevo Usuario", key="reg_user", placeholder="Elige un usuario")
+        pass_reg = st.text_input("Crear Contraseña", type="password", key="reg_pass", placeholder="Elige una contraseña")
         if st.button("Crear Cuenta"):
             if user_reg and pass_reg:
                 if user_reg in st.session_state.usuarios_db:
@@ -69,7 +67,7 @@ if st.session_state.usuario_actual is None:
             else:
                 st.warning("Completa todos los campos para registrarte.")
     
-    st.stop() # Detiene la ejecución aquí hasta que el usuario inicie sesión
+    st.stop()
 
 # Sincronizamos el saldo con la base de datos temporal del usuario actual
 usuario = st.session_state.usuario_actual
@@ -150,7 +148,7 @@ if opcion == "Minijuego Bloques (Hard)":
     </body>
     </html>
     """
-    components.html(tetris_html, height=290)
+    st.components.v1.html(tetris_html, height=290)
 
 elif opcion == "Minijuego Snake (Hard)":
     st.title("🐍 Minijuego Snake (Modo Difícil)")
@@ -247,7 +245,7 @@ elif opcion == "Minijuego Snake (Hard)":
     </body>
     </html>
     """
-    components.html(snake_html, height=370)
+    st.components.v1.html(snake_html, height=370)
 
 elif opcion == "Caza de Minas (Difícil)":
     st.title("💣 Caza de Minas (Modo Difícil)")
@@ -296,7 +294,7 @@ elif opcion == "Caza de Minas (Difícil)":
     </body>
     </html>
     """
-    components.html(minas_html, height=350)
+    st.components.v1.html(minas_html, height=350)
 
 elif opcion == "Ruleta de la Suerte":
     st.title("🎡 Ruleta de la Suerte Extrema")
@@ -344,7 +342,7 @@ elif opcion == "Sesión de Videos y Monetag":
         setInterval(updateTimer, 1000);
     </script>
     """
-    components.html(timer_video_html, height=75)
+    st.components.v1.html(timer_video_html, height=75)
     
     st.subheader("📺 Reproductor de Video de Bonificación Automático")
     st.write("Reproduce este video promocional hasta el final. Al terminar, tu saldo se actualizará solo:")
@@ -378,7 +376,7 @@ elif opcion == "Sesión de Videos y Monetag":
         }
     </script>
     """
-    components.html(youtube_auto_html, height=230)
+    st.components.v1.html(youtube_auto_html, height=230)
     
     if query_params.get("recompensa") == "video" and not st.session_state.video_reclamado:
         actualizar_saldo(1.50)
