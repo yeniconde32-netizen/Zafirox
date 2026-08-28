@@ -20,9 +20,9 @@ st.markdown("""
         position: fixed;
         top: 60px;
         right: 15px;
-        background: rgba(30, 30, 30, 0.9);
+        background: rgba(30, 30, 30, 0.95);
         color: #f59e0b;
-        padding: 8px 12px;
+        padding: 8px 14px;
         border-radius: 8px;
         font-weight: bold;
         z-index: 99999;
@@ -36,25 +36,52 @@ st.markdown("""
 # --- ESTADO DE LA SESIÓN ---
 if 'saldo' not in st.session_state:
     st.session_state.saldo = 31.60
-if 'tiempo_inicio' not in st.session_state:
-    st.session_state.tiempo_inicio = time.time()
 if 'mina_pos' not in st.session_state:
     st.session_state.mina_pos = random.randint(1, 5)
-if 'tiempo_sesion_video' not in st.session_state:
-    st.session_state.tiempo_sesion_video = 300  # 5 minutos de cuenta regresiva para el bono de video
 
-# Calcular el tiempo restante de la sesión de video de forma dinámica
-tiempo_transcurrido_total = int(time.time() - st.session_state.tiempo_inicio)
-tiempo_restante_video = max(0, st.session_state.tiempo_sesion_video - (tiempo_transcurrido_total % st.session_state.tiempo_sesion_video))
-minutos_v = tiempo_restante_video // 60
-segundos_v = tiempo_restante_video % 60
+# --- WIDGET FLOTANTE DE TEMPORIZADOR EN TIEMPO REAL (JS) ---
+timer_html = """
+<div id="floating-timer" style="
+    position: fixed;
+    top: 60px;
+    right: 15px;
+    background: rgba(30, 30, 30, 0.95);
+    color: #f59e0b;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-weight: bold;
+    z-index: 99999;
+    border: 1px solid #f59e0b;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+">
+    ⏳ Bono Video: <span id="countdown">03:00</span>
+</div>
 
-# --- WIDGET FLOTANTE DE TEMPORIZADOR REGRESIVO (POR ENCIMA DE TODO) ---
-st.markdown(f"""
-    <div class="floating-timer">
-        ⏳ Bono Video: {minutos_v:02d}:{segundos_v:02d}
-    </div>
-""", unsafe_allow_html=True)
+<script>
+    let totalSeconds = 180; // 3 minutos de cuenta regresiva
+    function updateTimer() {
+        let minutes = Math.floor(totalSeconds / 60);
+        let seconds = totalSeconds % 60;
+        let formattedMinutes = minutes < 10 ? "0" + minutes : minutes;
+        let formattedSeconds = seconds < 10 ? "0" + seconds : seconds;
+        
+        let el = document.getElementById("countdown");
+        if(el) {
+            el.innerText = formattedMinutes + ":" + formattedSeconds;
+        }
+        
+        if (totalSeconds > 0) {
+            totalSeconds--;
+        } else {
+            totalSeconds = 180; // Reinicia el ciclo del bono
+        }
+    }
+    setInterval(updateTimer, 1000);
+</script>
+"""
+components.html(timer_html, height=0)
 
 # --- MENÚ LATERAL (SIDEBAR) ---
 with st.sidebar:
@@ -73,7 +100,7 @@ with st.sidebar:
             "Caza de Minas (Difícil)",
             "Ruleta de la Suerte",
             "Caja Misteriosa",
-            "Ganar por Tiempo y Anuncios (Monetag)",
+            "Sesión de Videos y Monetag",
             "Invitar Amigos",
             "Ranking Semanal Top 4",
             "Solicitar Retiro y Conversor"
@@ -98,23 +125,24 @@ if opcion == "Minijuego Bloques (Hard)":
         <style>
             body { font-family: Arial, sans-serif; text-align: center; background-color: #0e1117; color: white; margin: 0; padding: 10px; }
             #game-container { max-width: 320px; margin: auto; background: #1e1e1e; padding: 15px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-            button { background: #ef4444; color: white; border: none; padding: 10px 20px; font-size: 16px; border-radius: 5px; cursor: pointer; margin-top: 10px; width: 100%; font-weight: bold; }
+            button { background: #ef4444; color: white; border: none; padding: 12px 20px; font-size: 16px; border-radius: 5px; cursor: pointer; margin-top: 10px; width: 100%; font-weight: bold; }
+            button:active { transform: scale(0.95); }
         </style>
     </head>
     <body>
         <div id="game-container">
             <h3>🔥 Arcade Extremo</h3>
-            <p>Puntuación: <span id="score">10</span></p>
-            <canvas id="canvas" width="200" height="150" style="background:#111; display:block; margin: 0 auto; border-radius: 5px;"></canvas>
+            <p>Puntuación: <span id="score" style="color: #22c55e; font-size: 20px; font-weight: bold;">10</span></p>
+            <canvas id="canvas" width="200" height="120" style="background:#111; display:block; margin: 0 auto; border-radius: 5px; border: 1px solid #444;"></canvas>
             <button onclick="actionBlock()">⚡ Acción / Colocar Pieza</button>
         </div>
         <script>
             let score = 10;
             function actionBlock() {
-                if(Math.random() > 0.45) {
-                    score += 10;
+                if(Math.random() > 0.4) {
+                    score += 15;
                 } else {
-                    score = Math.max(0, score - 8);
+                    score = Math.max(0, score - 5);
                 }
                 document.getElementById('score').innerText = score;
             }
@@ -122,7 +150,7 @@ if opcion == "Minijuego Bloques (Hard)":
     </body>
     </html>
     """
-    components.html(tetris_html, height=350)
+    components.html(tetris_html, height=280)
 
 elif opcion == "Minijuego Snake (Hard)":
     st.title("🐍 Minijuego Snake (Modo Difícil)")
@@ -144,7 +172,7 @@ elif opcion == "Minijuego Snake (Hard)":
     <body>
         <div style="max-width: 300px; margin: auto;">
             <p>Puntuación: <span id="snake-score" style="color: #ef4444; font-weight: bold; font-size: 18px;">0</span></p>
-            <canvas id="snakeCanvas" width="220" height="220" style="background: #111; border: 2px solid #ef4444; border-radius: 8px; display: block; margin: 0 auto;"></canvas>
+            <canvas id="snakeCanvas" width="200" height="200" style="background: #111; border: 2px solid #ef4444; border-radius: 8px; display: block; margin: 0 auto;"></canvas>
             
             <div class="controls">
                 <button class="empty"></button>
@@ -162,7 +190,7 @@ elif opcion == "Minijuego Snake (Hard)":
             let score = 0;
             let box = 10;
             let snake = [{x: 100, y: 100}];
-            let food = {x: Math.floor(Math.random() * 20) * box, y: Math.floor(Math.random() * 20) * box};
+            let food = {x: Math.floor(Math.random() * 19) * box, y: Math.floor(Math.random() * 19) * box};
             let d = "RIGHT";
             let nextD = "RIGHT";
 
@@ -197,7 +225,7 @@ elif opcion == "Minijuego Snake (Hard)":
                 if (snakeX === food.x && snakeY === food.y) {
                     score += 10;
                     document.getElementById("snake-score").innerText = score;
-                    food = {x: Math.floor(Math.random() * 21) * box, y: Math.floor(Math.random() * 21) * box};
+                    food = {x: Math.floor(Math.random() * 19) * box, y: Math.floor(Math.random() * 19) * box};
                 } else {
                     snake.pop();
                 }
@@ -214,12 +242,12 @@ elif opcion == "Minijuego Snake (Hard)":
                 snake.unshift({x: snakeX, y: snakeY});
             }
 
-            let game = setInterval(draw, 70); // Alta velocidad
+            let game = setInterval(draw, 80);
         </script>
     </body>
     </html>
     """
-    components.html(snake_html, height=410)
+    components.html(snake_html, height=360)
 
 elif opcion == "Caza de Minas (Difícil)":
     st.title("💣 Caza de Minas (Modo Difícil)")
@@ -228,7 +256,7 @@ elif opcion == "Caza de Minas (Difícil)":
     cols = st.columns(5)
     for i in range(1, 6):
         with cols[i-1]:
-            if st.button(f"Casilla {i}"):
+            if st.button(f"Casilla {i}", key=f"mina_{i}"):
                 if i == st.session_state.mina_pos:
                     st.session_state.saldo = max(0.0, st.session_state.saldo - 2.50)
                     st.error(f"💥 ¡BOOM! La casilla {i} ocultaba una mina. -2.50 💎")
@@ -264,36 +292,46 @@ elif opcion == "Caja Misteriosa":
             st.error(f"💀 ¡Era una trampa! Perdiste {abs(premio)} 💎.")
         st.rerun()
 
-elif opcion == "Ganar por Tiempo y Anuncios (Monetag)":
-    st.title("⏱️ Sesión de Video y Anuncios Monetag")
-    st.write("Mantén abierta tu sesión y utiliza tu enlace directo de Monetag para acumular bonos por uso estilo Terybit.")
+elif opcion == "Sesión de Videos y Monetag":
+    st.title("🎬 Videos Publicitarios y Monetag")
+    st.write("Mira los videos de bonificación o utiliza tu enlace directo para acumular ganancias automáticamente estilo Terybit.")
     
-    tiempo_transcurrido = int(time.time() - st.session_state.tiempo_inicio)
-    st.info(f"⏳ Llevas **{tiempo_transcurrido} segundos** activos en la plataforma.")
+    st.subheader("📺 Reproductor de Video de Bonificación")
+    st.write("Reproduce este video promocional hasta el final para reclamar tu recompensa de saldo:")
     
-    if st.button("Reclamar Bono por Tiempo Activo"):
-        st.session_state.saldo += 0.50
-        st.success("¡Bono por tiempo reclamado! +0.50 💎")
+    # Incrustar un video de demostración compatible (puedes cambiar el link de YouTube o video mp4)
+    video_html = """
+    <div style="text-align: center;">
+        <iframe width="100%" height="210" src="https://www.youtube.com/embed/tgbNymZ7vqY" 
+        title="Video Patrocinado" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border-radius: 8px;">
+        </iframe>
+    </div>
+    """
+    components.html(video_html, height=230)
+    
+    if st.button("🎁 Reclamar Bono por Ver Video"):
+        st.session_state.saldo += 1.50
+        st.success("¡Video completado con éxito! +1.50 💎 añadidos a tu cuenta.")
+        st.rerun()
         
     st.markdown("---")
-    st.subheader("📺 Enlace Directo de Monetag")
-    st.write("Pega aquí tu enlace directo exacto que te otorga Monetag para que los usuarios abran tu publicidad de forma correcta:")
-    
+    st.subheader("🚀 Enlace Directo Monetag")
+    st.write("Pega tu enlace publicitario directo para generar vistas adicionales:")
     enlace_monetag = st.text_input("Tu enlace directo de Monetag:", value="https://www.profitablecpmrate.com/tu_codigo_aqui")
     
     st.markdown(f"""
         <div style="text-align: center; margin: 15px 0;">
             <a href="{enlace_monetag}" target="_blank">
                 <button style="background-color: #f59e0b; color: white; padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%;">
-                    🚀 Ver Anuncio Monetag (Abrir enlace publicitario)
+                    ⚡ Abrir Enlace Publicitario Monetag
                 </button>
             </a>
         </div>
     """, unsafe_allow_html=True)
     
-    if st.button("Confirmar visualización"):
+    if st.button("Confirmar visualización de enlace"):
         st.session_state.saldo += 1.00
-        st.success("¡Visualización registrada y acreditada! +1.00 💎")
+        st.success("¡Visualización de enlace acreditada! +1.00 💎")
         st.rerun()
 
 elif opcion == "Invitar Amigos":
