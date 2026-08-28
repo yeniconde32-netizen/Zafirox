@@ -18,26 +18,71 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- GESTIÓN DE USUARIOS Y REFERIDOS DINÁMICOS ---
-query_params = st.query_params
-ref_user = query_params.get("ref", "Invitado")
+# --- BASE DE DATOS LOCAL EN MEMORIA (SIMULADA) ---
+if 'usuarios_db' not in st.session_state:
+    # Usuarios precargados de ejemplo (Usuario: Contraseña)
+    st.session_state.usuarios_db = {
+        "Lud337": {"password": "123", "saldo": 31.60},
+        "Carlos_99": {"password": "456", "saldo": 10.00}
+    }
 
-if 'usuario' not in st.session_state:
-    st.session_state.usuario = ref_user if ref_user != "Lud337" else "Lud337 (Tú)"
+if 'usuario_actual' not in st.session_state:
+    st.session_state.usuario_actual = None
 
-if 'saldo' not in st.session_state:
-    st.session_state.saldo = 31.60 if ref_user == "Lud337" else 0.00
-
-# Control para evitar recargas automáticas infinitas al reclamar por video
 if 'video_reclamado' not in st.session_state:
     st.session_state.video_reclamado = False
+
+query_params = st.query_params
+
+# --- PANTALLA DE LOGIN / REGISTRO SI NO HA INICIADO SESIÓN ---
+if st.session_state.usuario_actual is None:
+    st.title("💎 ZafiroX - Acceso de Usuarios")
+    st.write("Inicia sesión con tu cuenta o regístrate para guardar tu saldo de forma segura.")
+    
+    tab1, tab2 = st.tabs(["Iniciar Sesión", "Registrarse"])
+    
+    with tab1:
+        user_login = st.text_input("Usuario", key="login_user")
+        pass_login = st.text_input("Contraseña", type="password", key="login_pass")
+        if st.button("Entrar a ZafiroX"):
+            if user_login in st.session_state.usuarios_db and st.session_state.usuarios_db[user_login]["password"] == pass_login:
+                st.session_state.usuario_actual = user_login
+                st.success(f"¡Bienvenido de nuevo, {user_login}!")
+                st.rerun()
+            else:
+                st.error("Usuario o contraseña incorrectos.")
+                
+    with tab2:
+        user_reg = st.text_input("Nuevo Usuario", key="reg_user")
+        pass_reg = st.text_input("Nueva Contraseña", type="password", key="reg_pass")
+        if st.button("Crear Cuenta"):
+            if user_reg and pass_reg:
+                if user_reg in st.session_state.usuarios_db:
+                    st.error("El usuario ya existe. Prueba con otro.")
+                else:
+                    st.session_state.usuarios_db[user_reg] = {"password": pass_reg, "saldo": 0.00}
+                    st.session_state.usuario_actual = user_reg
+                    st.success(f"¡Cuenta creada con éxito! Bienvenido, {user_reg}.")
+                    st.rerun()
+            else:
+                st.warning("Completa todos los campos para registrarte.")
+    
+    st.stop() # Detiene la ejecución aquí hasta que el usuario inicie sesión
+
+# Sincronizamos el saldo con la base de datos temporal del usuario actual
+usuario = st.session_state.usuario_actual
+saldo_actual = st.session_state.usuarios_db[usuario]["saldo"]
 
 # --- MENÚ LATERAL (SIDEBAR) ---
 with st.sidebar:
     st.image("https://img.icons8.com/color/96/controller.png", width=60)
     st.title("ZafiroX")
-    st.write(f"Hola, **{st.session_state.usuario}** 👋")
+    st.write(f"Hola, **{usuario}** 👋")
     
+    if st.button("🚪 Cerrar Sesión"):
+        st.session_state.usuario_actual = None
+        st.rerun()
+        
     st.markdown("---")
     st.subheader("Menú Principal")
     
@@ -58,7 +103,11 @@ with st.sidebar:
     
     st.markdown("---")
     st.write("💎 **Tu Saldo Actual:**")
-    st.metric(label="", value=f"{st.session_state.saldo:.2f} 💎")
+    st.metric(label="", value=f"{saldo_actual:.2f} 💎")
+
+# Función auxiliar para actualizar saldo de forma segura
+def actualizar_saldo(cantidad):
+    st.session_state.usuarios_db[usuario]["saldo"] = max(0.0, st.session_state.usuarios_db[usuario]["saldo"] + cantidad)
 
 # --- CONTENIDO DE LAS SECCIONES ---
 
@@ -252,7 +301,7 @@ elif opcion == "Ruleta de la Suerte":
     st.write("Gira la ruleta bajo tu propio riesgo: puedes duplicar tus gemas o perderlas.")
     if st.button("¡Girar con Riesgo!"):
         resultado = random.choice([4.00, -2.00, 8.00, -3.00, 15.00])
-        st.session_state.saldo = max(0.0, st.session_state.saldo + resultado)
+        actualizar_saldo(resultado)
         if resultado > 0:
             st.success(f"🎉 ¡Ganaste {resultado} 💎!")
         else:
@@ -264,7 +313,7 @@ elif opcion == "Caja Misteriosa":
     st.write("Una caja cerrada que esconde premios jugosos o sorpresas amargas.")
     if st.button("Abrir Caja"):
         premio = random.choice([3.50, -1.50, 6.00])
-        st.session_state.saldo = max(0.0, st.session_state.saldo + premio)
+        actualizar_saldo(premio)
         if premio > 0:
             st.success(f"🎁 ¡Descubriste {premio} 💎!")
         else:
@@ -273,9 +322,8 @@ elif opcion == "Caja Misteriosa":
 
 elif opcion == "Sesión de Videos y Monetag":
     st.title("🎬 Videos Publicitarios y Monetag")
-    st.write("Mira los videos de bonificación o utiliza tu enlace directo para acumular ganancias automáticamente estilo Terybit.")
+    st.write("Mira los videos de bonificación o utiliza tu enlace directo para acumular ganancias automáticamente.")
     
-    # --- TEMPORIZADOR EN TIEMPO REAL ---
     timer_video_html = """
     <div style="background: rgba(30, 30, 30, 0.95); color: #f59e0b; padding: 12px; border-radius: 8px; font-weight: bold; text-align: center; border: 1px solid #f59e0b; margin-bottom: 15px;">
         ⏳ Bono de Video Activo - Tiempo Restante: <span id="countdown" style="font-size: 18px;">03:00</span>
@@ -299,7 +347,6 @@ elif opcion == "Sesión de Videos y Monetag":
     st.subheader("📺 Reproductor de Video de Bonificación Automático")
     st.write("Reproduce este video promocional hasta el final. Al terminar, tu saldo se actualizará solo:")
     
-    # Reproductor YouTube con integración JavaScript para detectar el final de la reproducción
     youtube_auto_html = """
     <div style="text-align: center;">
         <div id="player" style="border-radius: 8px; overflow: hidden; display:inline-block;"></div>
@@ -323,9 +370,7 @@ elif opcion == "Sesión de Videos y Monetag":
         }
 
         function onPlayerStateChange(event) {
-            // Estado 0 significa que el video terminó (Ended)
             if (event.data === YT.PlayerState.ENDED) {
-                // Redirige la página agregando un indicador de recompensa en la URL
                 window.parent.location.href = window.parent.location.href.split('?')[0] + "?recompensa=video";
             }
         }
@@ -333,9 +378,8 @@ elif opcion == "Sesión de Videos y Monetag":
     """
     components.html(youtube_auto_html, height=230)
     
-    # Validar si el usuario terminó de ver el video mediante el parámetro automático
     if query_params.get("recompensa") == "video" and not st.session_state.video_reclamado:
-        st.session_state.saldo += 1.50
+        actualizar_saldo(1.50)
         st.session_state.video_reclamado = True
         st.success("🎉 ¡Video completado hasta el final! +1.50 💎 añadidos automáticamente.")
         st.rerun()
@@ -356,14 +400,14 @@ elif opcion == "Sesión de Videos y Monetag":
     """, unsafe_allow_html=True)
     
     if st.button("Confirmar visualización de enlace"):
-        st.session_state.saldo += 1.00
+        actualizar_saldo(1.00)
         st.success("¡Visualización de enlace acreditada! +1.00 💎")
         st.rerun()
 
 elif opcion == "Invitar Amigos":
     st.title("👥 Invitar Amigos con Recompensa")
     st.write("Comparte tu enlace de referido personalizado. Ganas un bono automático cada vez que un invitado se registra.")
-    st.code(f"https://zafirox.streamlit.app/?ref={st.session_state.usuario}", language="text")
+    st.code(f"https://zafirox.streamlit.app/?ref={usuario}", language="text")
     st.success("Recompensa activa: 5.00 💎 por cada amigo verificado.")
 
 elif opcion == "Ranking Semanal Top 4":
@@ -376,10 +420,10 @@ elif opcion == "Ranking Semanal Top 4":
     
     st.warning(f"⏰ **Cierre del ranking en:** {tiempo_restante.days} días y {tiempo_restante.seconds // 3600} horas.")
     
-    st.markdown("""
+    st.markdown(f"""
     | Puesto | Usuario | Puntuación | Premio Semanal |
     | :---: | :--- | :---: | :---: |
-    | 🥇 **1°** | **Lud337 (Tú)** | 1,650 pts | $50.000 COP |
+    | 🥇 **1°** | **{usuario} (Tú)** | 1,650 pts | $50.000 COP |
     | 🥈 **2°** | Carlos_99 | 1,420 pts | $30.000 COP |
     | 🥉 **3°** | SofiGamer | 1,200 pts | $20.000 COP |
     | 🏅 **4°** | AndresX | 990 pts | $10.000 COP |
@@ -387,12 +431,12 @@ elif opcion == "Ranking Semanal Top 4":
 
 elif opcion == "Solicitar Retiro y Conversor":
     st.title("💰 Conversor de Dinero y Retiro Real")
-    st.write(f"Tu saldo disponible es de **{st.session_state.saldo:.2f} 💎**.")
+    st.write(f"Tu saldo disponible es de **{saldo_actual:.2f} 💎**.")
     
     tasa_conversion = 4000 
-    valor_cop = st.session_state.saldo * tasa_conversion
+    valor_cop = saldo_actual * tasa_conversion
     
-    st.info(f"💱 **Conversor automático:** Tus {st.session_state.saldo:.2f} 💎 equivalen a **${valor_cop:,.0f} COP**.")
+    st.info(f"💱 **Conversor automático:** Tus {saldo_actual:.2f} 💎 equivalen a **${valor_cop:,.0f} COP**.")
     
     st.markdown("---")
     st.subheader("Métodos de Retiro Disponibles")
@@ -403,14 +447,14 @@ elif opcion == "Solicitar Retiro y Conversor":
     )
     
     cuenta_destino = st.text_input(f"Número de celular / Cuenta o Correo para {metodo}")
-    monto_retiro = st.number_input("Monto en 💎 a retirar", min_value=5.0, max_value=float(max(5.0, st.session_state.saldo)), value=5.0)
+    monto_retiro = st.number_input("Monto en 💎 a retirar", min_value=5.0, max_value=float(max(5.0, saldo_actual)), value=5.0)
     
     monto_cop_retiro = monto_retiro * tasa_conversion
     st.write(f"Monto a recibir: **${monto_cop_retiro:,.0f} COP**")
     
     if st.button("📤 Enviar Solicitud de Retiro"):
-        if cuenta_destino and st.session_state.saldo >= monto_retiro:
-            st.session_state.saldo -= monto_retiro
-            st.success(f"¡Retiro de ${monto_cop_retiro:,.0f} COP solicitado con éxito por {metodo} ({cuenta_destino})!")
+        if cuenta_destino and saldo_actual >= monto_retiro:
+            actualizar_saldo(-monto_retiro)
+            st.success(f"¡Retiro de ${monto_cop_retiro:,.0f} COP solicitado con éxito por {metodo} ({cuenta_destino}) para la cuenta de {usuario}!")
         else:
             st.error("Por favor completa los datos de destino o verifica que tu saldo sea suficiente para este retiro.")
