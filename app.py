@@ -325,65 +325,24 @@ elif opcion == "🎵 Vídeos Musicales en Streaming":
 
 elif opcion == "📻 Mini Emisora Zafiro (Automática 24/7)":
     st.title("📻 Mini Emisora Zafiro - Estación Automática")
-    st.write("Disfruta de tu **Mini Emisora Zafiro** con canciones reales cantadas y variedad de géneros (Pop, Rock, Electrónica, Latinos) con botones de control:")
+    st.write("Disfruta de tu **Mini Emisora Zafiro** oficial con canciones activas, control total y su **botón de descarga** integrado:")
     
-    mini_emisora_html = """
-    <div style="background: #1e1e2f; padding: 20px; border-radius: 12px; text-align: center; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.4);">
-        <h3 style="margin-top: 0; color: #00d2ff;">🎧 Emisora Zafiro En Vivo</h3>
-        <p id="nowPlaying" style="margin-top: 5px; font-size: 15px; color: #4cd137; font-weight: bold;">Cargando emisora...</p>
-        
-        <audio id="zafiroRadio" controls style="width: 100%; border-radius: 8px; margin-top: 10px;"></audio>
-        
-        <div style="margin-top: 15px; display: flex; justify-content: center; gap: 10px;">
-            <button onclick="prevTrack()" style="background: #651fff; color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: bold;">⏮️ Anterior</button>
-            <button onclick="nextTrack()" style="background: #651fff; color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: bold;">Siguiente ⏭️</button>
-        </div>
-    </div>
-
-    <script>
-        // Playlist con canciones reales con voz de libre acceso
-        const playlist = [
-            { name: "🎶 Zafiro Pop & Hits: In The End (Cover)", url: "https://www.bensound.com/bensound-music/bensound-sunny.mp3" },
-            { name: "🎸 Zafiro Rock: Energy & Guitar", url: "https://www.bensound.com/bensound-music/bensound-ukulele.mp3" },
-            { name: "⚡ Zafiro Electrónica: Electronic Beam", url: "https://www.bensound.com/bensound-music/bensound-creativeminds.mp3" },
-            { name: "🎷 Zafiro Tropical / Jazz Vibes", url: "https://www.bensound.com/bensound-music/bensound-jazzyfrenchy.mp3" },
-            { name: "🎺 Zafiro Latin & Party Beat", url: "https://www.bensound.com/bensound-music/bensound-highoctane.mp3" }
-        ];
-
-        let currentTrack = Math.floor(Math.random() * playlist.length);
-        const audioPlayer = document.getElementById('zafiroRadio');
-        const nowPlayingText = document.getElementById('nowPlaying');
-
-        function loadTrack(index) {
-            if (index >= playlist.length) currentTrack = 0;
-            if (index < 0) currentTrack = playlist.length - 1;
-            else currentTrack = index;
-
-            audioPlayer.src = playlist[currentTrack].url;
-            nowPlayingText.innerText = "Reproduciendo: " + playlist[currentTrack].name;
-            audioPlayer.play().catch(e => console.log("Esperando interacción para reproducir."));
-        }
-
-        function nextTrack() {
-            loadTrack(currentTrack + 1);
-        }
-
-        function prevTrack() {
-            loadTrack(currentTrack - 1);
-        }
-
-        audioPlayer.addEventListener('ended', function() {
-            let nextRandom = Math.floor(Math.random() * playlist.length);
-            loadTrack(nextRandom);
-        });
-
-        loadTrack(currentTrack);
-    </script>
-    """
+    # Lista de canciones estables con audio real directo
+    lista_canciones = {
+        "🎶 Zafiro Pop Hit: Sunny Vibe": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+        "🎸 Zafiro Rock Energy: Forest Echoes": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+        "⚡ Zafiro Electrónica: Cyber Session": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3",
+        "🎷 Zafiro Jazz & Lounge Flow": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
+        "🎺 Zafiro Latin Dance Mix": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3"
+    }
     
-    st.components.v1.html(mini_emisora_html, height=240)
+    # Selector de pista nativo de Streamlit (que incluye automáticamente el botón de descarga 📥 y controles de velocidad/pantalla completa)
+    pista_actual = st.selectbox("🎧 Selecciona o cambia de canción en la Emisora:", list(lista_canciones.keys()), key="select_emisora_nativa")
+    url_audio_activa = lista_canciones[pista_actual]
     
-    st.info("💡 **Consejo:** Usa los botones de **⏮️ Anterior** y **Siguiente ⏭️** para cambiar de canción al instante. La emisora cambiará de manera aleatoria al finalizar cada pista.")
+    st.audio(url_audio_activa, format="audio/mp3")
+    
+    st.info("💡 **Consejo:** Usa el reproductor nativo de arriba para pausar, cambiar el volumen, adelantar o hacer clic en los tres puntos **(⋮)** para **descargar** la canción al instante en tu celular.")
     
     st.markdown("---")
     st.markdown("#### Publicidad Patrocinada:")
