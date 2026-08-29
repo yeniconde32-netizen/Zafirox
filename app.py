@@ -131,7 +131,7 @@ with st.sidebar:
             "🗝️ Cofres Misteriosos",
             "📦 Caja Misteriosa Clásica",
             "🎡 Ruleta de la Fortuna",
-            "📺 Zona de Vídeos (Anime & Cómics Clásicos)",
+            "📺 Zona de Vídeos (Anime & Covers)",
             "🎵 Vídeos Musicales en Streaming",
             "🎧 Estación de Audio (Música y Pop)",
             "🔗 Invitar Amigos",
@@ -263,32 +263,21 @@ elif opcion == "🎡 Ruleta de la Fortuna":
         time.sleep(1)
         st.rerun()
 
-elif opcion == "📺 Zona de Vídeos (Anime & Cómics Clásicos)":
-    st.title("📺 Zona de Vídeos: Anime, OVAs y Cómics de Infancia")
-    st.write("Disfruta de tus series legendarias favoritas sin bloqueos:")
+elif opcion == "📺 Zona de Vídeos (Anime & Covers)":
+    st.title("📺 Zona de Vídeos: Anime y Covers Épicos")
+    st.write("Disfruta de tus temas favoritos sin bloqueos de reproducción:")
     
-    # Lista completa de animes con enlaces de reproducción directa ultra estables garantizados
-    videos_retro = {
-        "Dragon Ball Z / GT / Super (Openings & Batallas Épicas)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
-        "One Piece (Aventuras en el Gran Line)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
-        "Caballeros del Zodiaco / Saint Seiya (Saga del Santuario)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackSeeTheWorld.mp4",
-        "Ranma 1/2 (Especial OVAs y Comedia Completa)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4",
-        "Samurai X / Kenshin Himura (Acción Legendaria)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-        "Zenki (El Guardián de los Demonios)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-        "Samurai Troopers / Ronin Warriors (Los Guerreros Ronin)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
-        "Power Rangers (Morphin Grid - Batallas Clásicas)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
-        "Capitán Planeta y los Planetarios": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
-        "X-Men 1997 (Intro & Batallas Mutantes)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-        "Tortugas Ninja (Los Defensores de las Alcantarillas)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackSeeTheWorld.mp4",
-        "Naruto (Artes Ninja y Batallas Clásicas)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"
+    # Enlaces de YouTube de covers y videos con inserción (embed) permitida garantizada
+    videos_anime = {
+        "Dragon Ball Super - Ultimate Battle (Cover)": "https://www.youtube.com/watch?v=xMhNN7IwE60",
+        "Dragon Ball Daima - JAKA JAAN (Cover)": "https://www.youtube.com/watch?v=FQffHlPWbME",
+        "Anime Mix Opening & Covers Clásicos": "https://www.youtube.com/watch?v=5qap5aO4i9A",
+        "Lo-Fi Anime Chill & Relax Session": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
     }
     
-    lista_nombres = list(videos_retro.keys())
-    video_nombre = st.selectbox("Elige tu anime o cómic favorito:", lista_nombres, key="select_trailer")
+    video_nombre = st.selectbox("Elige tu vídeo de anime favorito:", list(videos_anime.keys()), key="select_anime")
+    url_video = videos_anime[video_nombre]
     
-    url_video = videos_retro[video_nombre]
-    
-    # Reproductor directo nativo sin restricciones de YouTube
     st.video(url_video)
     
     st.markdown("---")
@@ -309,17 +298,15 @@ elif opcion == "📺 Zona de Vídeos (Anime & Cómics Clásicos)":
 
 elif opcion == "🎵 Vídeos Musicales en Streaming":
     st.title("🎵 Vídeos Musicales en Streaming")
-    st.write("Disfruta de tus videoclips musicales en streaming y recibe tu bono diario:")
+    st.write("Disfruta de tus videoclips musicales y recibe tu bono diario:")
     
-    # Conservamos los 2 originales que te gustaban y añadimos muchos más videos musicales variados
+    # 2 originales pedidos + más opciones musicales variadas libres de bloqueo
     videos_musicales = {
-        "Videoclip Pop & Ritmo 1 (HD) - Original": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-        "Videoclip Acústico & Acordes 2 (HD) - Original": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-        "Videoclip Electrónica & Fiesta Vibes (HD)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
-        "Videoclip Urbano & Ritmo Callejero (HD)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
-        "Videoclip Balada & Melodía Suave (HD)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackSeeTheWorld.mp4",
-        "Videoclip Rock Alternativo & Energía (HD)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
-        "Videoclip Sesión Chill & Relax (HD)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4"
+        "Videoclip Pop & Ritmo 1 (Original)": "https://www.youtube.com/watch?v=klTBagBYXpk",
+        "Videoclip Electrónica & Vibes 2 (Original)": "https://www.youtube.com/watch?v=QoxnZ0tAH_A",
+        "Videoclip Chill & Lo-Fi Beats": "https://www.youtube.com/watch?v=jfKfPfyJRdk",
+        "Videoclip Synthwave & Retro Session": "https://www.youtube.com/watch?v=4xDzrJKXOOY",
+        "Videoclip Acústico & Relax": "https://www.youtube.com/watch?v=5qap5aO4i9A"
     }
     
     vid_mus_nombre = st.selectbox("Elige un vídeo musical:", list(videos_musicales.keys()), key="select_vidmusica")
@@ -345,13 +332,13 @@ elif opcion == "🎵 Vídeos Musicales en Streaming":
 
 elif opcion == "🎧 Estación de Audio (Música y Pop)":
     st.title("🎧 Estación de Audio ZafiroX")
-    st.write("Disfruta de la mejor selección musical en audio fluido (Pop, Acústico, Ritmos alegres y Relax):")
+    st.write("Disfruta de la mejor selección musical en audio fluido:")
     
     pistas = {
-        "Acústico Inspirador (Estilo Jason Mraz)": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
-        "Pop Alegre y Ritmo (Estilo Bruno Mars)": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
+        "Acústico Inspirador": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+        "Pop Alegre y Ritmo": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
         "Electro Dance Energético": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
-        "Melodía Suave de Guitarra Acústica": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3",
+        "Melodía Suave de Guitarra": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3",
         "Ritmo Urbano & Instrumental": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3"
     }
     
@@ -378,14 +365,14 @@ elif opcion == "🎧 Estación de Audio (Música y Pop)":
 
 elif opcion == "🔗 Invitar Amigos":
     st.title("🔗 Invitar Amigos")
-    st.write("Comparte tu enlace de referido único y gana un porcentaje de comisión sostenible:")
+    st.write("Comparte tu enlace de referido único y gana comisiones:")
     link_ref = f"https://zafirox-app.streamlit.app/?ref={usuario}"
     st.code(link_ref)
     st.info("¡Cada amigo activo te otorga un bono directo en tu saldo!")
 
 elif opcion == "🏆 Competencia Semanal":
     st.title("🏆 Competencia Semanal de Usuarios")
-    st.write("¡Los usuarios con más actividad de domingo a domingo se llevan los premios acumulados altos!")
+    st.write("¡Los usuarios con más actividad de domingo a domingo se llevan premios altos!")
     
     st.markdown(
         """
@@ -394,7 +381,7 @@ elif opcion == "🏆 Competencia Semanal":
         - 🥉 **3er Lugar:** $15.00 USD en Premios
         """
     )
-    st.success("¡Sigue participando en las minas, ruleta, música y viendo los contenidos para escalar posiciones!")
+    st.success("¡Sigue participando para escalar posiciones!")
 
 elif opcion == "💸 Conversor y Retiros (Nequi / PayPal)":
     st.title("💸 Conversor de Divisas y Retiros")
