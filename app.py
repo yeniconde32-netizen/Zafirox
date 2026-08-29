@@ -26,11 +26,10 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- CÓDIGO HTML PARA EL DISPLAY AD (BANNER DE MONETAG) ---
+# --- CÓDIGO HTML PARA EL DISPLAY AD ---
 banner_anuncio_html = """
 <div style="text-align: center; margin: 15px 0; background: #1a1c23; padding: 10px; border-radius: 8px;">
     <p style="color: #888; font-size: 11px; margin-bottom: 5px;">Publicidad Patrocinada</p>
-    <!-- PEGA TU SCRIPT DE MONETAG DISPLAY ADS AQUÍ -->
     <script async src="https://alwingulla.com/act/files/tag.min.js" data-zone="TU_ZONA_AQUI" data-sdk="show_12345"></script>
 </div>
 """
@@ -90,7 +89,6 @@ if not st.session_state.logged_in:
                 guardar_db(db_usuarios)
                 st.success("¡Cuenta creada con éxito! Ve a la pestaña de Iniciar Sesión.")
 else:
-    # --- APLICACIÓN PRINCIPAL ---
     usuario_actual = st.session_state.user
     saldo_actual = db_usuarios[usuario_actual]["saldo"]
 
@@ -108,7 +106,6 @@ else:
 
     opcion = st.sidebar.radio("Menú Principal", ["Minijuegos", "Ranking Semanal", "Solicitar Retiro y Conversor"])
 
-    # Mostrar Banner de Anuncios en la barra lateral
     st.sidebar.markdown("---")
     st.sidebar.markdown("### Patrocinador")
     with st.sidebar:
@@ -160,7 +157,6 @@ else:
         st.title("🏆 Competencia Semanal")
         st.write("¡Los mejores jugadores ganan premios en efectivo reales cada semana!")
         
-        # Reloj cuenta regresiva dinámico
         countdown_clock_html = """
         <div style="text-align: center; font-size: 20px; font-weight: bold; background: #222; padding: 10px; border-radius: 8px;">
             ⏱️ Cierre del ranking en tiempo real: <span id="live-clock"></span>
