@@ -57,6 +57,9 @@ if 'videos_vistos' not in st.session_state:
 if 'musica_escuchada' not in st.session_state:
     st.session_state.musica_escuchada = {}
 
+if 'videomusica_vista' not in st.session_state:
+    st.session_state.videomusica_vista = {}
+
 # --- PANTALLA DE LOGIN / REGISTRO ---
 if st.session_state.usuario_actual is None:
     st.title("💎 ZafiroX - Acceso de Usuarios")
@@ -68,7 +71,7 @@ if st.session_state.usuario_actual is None:
         user_login = st.text_input("Usuario", key="login_user", placeholder="Tu nombre de usuario")
         pass_login = st.text_input("Contraseña", type="password", key="login_pass", placeholder="Tu contraseña")
         
-        if st.button("Entrar a ZafiroX"):
+        if st.button("Entrar a ZafiroX", key="btn_login"):
             db = st.session_state.usuarios_db
             if user_login in db and db[user_login]["password"] == pass_login:
                 st.session_state.usuario_actual = user_login
@@ -80,7 +83,7 @@ if st.session_state.usuario_actual is None:
     with tab2:
         user_reg = st.text_input("Nuevo Usuario", key="reg_user", placeholder="Elige un usuario")
         pass_reg = st.text_input("Nueva Contraseña", type="password", key="reg_pass", placeholder="Elige una contraseña")
-        if st.button("Crear Cuenta"):
+        if st.button("Crear Cuenta", key="btn_register"):
             if user_reg and pass_reg:
                 db = st.session_state.usuarios_db
                 if user_reg in db:
@@ -114,7 +117,7 @@ with st.sidebar:
     st.title("ZafiroX")
     st.write(f"Hola, **{usuario}** 👋")
     
-    if st.button("🚪 Cerrar Sesión"):
+    if st.button("🚪 Cerrar Sesión", key="btn_logout"):
         st.session_state.usuario_actual = None
         st.rerun()
         
@@ -129,8 +132,9 @@ with st.sidebar:
             "🗝️ Cofres Misteriosos",
             "📦 Caja Misteriosa Clásica",
             "🎡 Ruleta de la Fortuna",
-            "📺 Zona de Tráilers (Anime Clásico & Cómics)",
-            "🎧 Estación de Música",
+            "📺 Zona de Tráilers (Anime Antiguo & Cómics)",
+            "🎵 Videos Musicales en Streaming",
+            "🎧 Estación de Audio (Música y Pop)",
             "🔗 Invitar Amigos",
             "🏆 Competencia Semanal",
             "💸 Conversor y Retiros (Nequi / PayPal)"
@@ -154,7 +158,6 @@ if opcion == "💎 Resumen de Saldo":
     st.markdown("---")
     st.subheader("⏳ Tiempo Restante para Premios Semanales (Domingo a Domingo)")
     
-    # Cálculo real del tiempo restante hasta el próximo domingo a la medianoche
     ahora = datetime.datetime.now()
     dias_para_domingo = (6 - ahora.weekday()) % 7
     if dias_para_domingo == 0 and (ahora.hour > 0 or ahora.minute > 0 or ahora.second > 0):
@@ -167,7 +170,6 @@ if opcion == "💎 Resumen de Saldo":
     horas = diferencia.seconds // 3600
     minutos = (diferencia.seconds % 3600) // 60
     
-    # Contador regresivo grande en la pantalla principal
     st.markdown(
         f"""
         <div style="background: linear-gradient(135deg, #651fff, #3d5afe); padding: 20px; border-radius: 12px; text-align: center; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
@@ -188,20 +190,15 @@ elif opcion == "💣 Caza de Minas (Casino)":
     col1, col2, col3 = st.columns(3)
     with col1:
         if st.button("Casilla 1", key="mina_1"):
-            premio = 0.002
-            actualizar_saldo(premio)
-            st.success(f"✅ ¡Casilla segura! Ganaste 💎 {premio:.4f}")
+            actualizar_saldo(0.002)
     with col2:
         if st.button("Casilla 2", key="mina_2"):
-            premio = 0.002
-            actualizar_saldo(premio)
-            st.success(f"✅ ¡Casilla segura! Ganaste 💎 {premio:.4f}")
+            actualizar_saldo(0.002)
     with col3:
         if st.button("Casilla 3 (Peligro)", key="mina_3"):
             castigo = 0.003
             if saldo_actual >= castigo:
                 actualizar_saldo(-castigo)
-                st.error(f"💥 ¡Explosión! Perdiste 💎 {castigo:.4f}")
             else:
                 st.warning("⚠️ Estás a 0, no hay saldo que restar.")
 
@@ -214,7 +211,6 @@ elif opcion == "🗝️ Cofres Misteriosos":
             premio = random.choice([0.001, 0.0005, 0.0000])
             if premio > 0:
                 actualizar_saldo(premio)
-                st.success(f"🎉 ¡Encontraste 💎 {premio:.4f}!")
             else:
                 st.error("🚫 El cofre estaba vacío.")
     with c2:
@@ -222,7 +218,6 @@ elif opcion == "🗝️ Cofres Misteriosos":
             premio = random.choice([0.001, 0.0005, 0.0000])
             if premio > 0:
                 actualizar_saldo(premio)
-                st.success(f"🎉 ¡Encontraste 💎 {premio:.4f}!")
             else:
                 st.error("🚫 El cofre estaba vacío.")
 
@@ -232,7 +227,6 @@ elif opcion == "📦 Caja Misteriosa Clásica":
         premio = random.choice([0.005, 0.001, 0.0005, 0.0000, 0.0000])
         if premio > 0:
             actualizar_saldo(premio)
-            st.success(f"💎 ¡Felicidades! Encontraste 💎 {premio:.4f}")
         else:
             st.error("🪹 ¡Oh no! La caja estaba vacía.")
 
@@ -244,22 +238,20 @@ elif opcion == "🎡 Ruleta de la Fortuna":
         premio_ruleta = random.choice([0.0005, 0.0010, 0.0020, 0.0050, 0.0100, 0.0000])
         if premio_ruleta > 0:
             actualizar_saldo(premio_ruleta)
-            st.success(f"🎰 ¡La ruleta se detuvo y ganaste 💎 {premio_ruleta:.4f}!")
         else:
             st.warning("🔄 ¡Casi cae! Esta vez fue un giro nulo, ¡vuelve a intentar!")
 
-elif opcion == "📺 Zona de Tráilers (Anime Clásico & Cómics)":
-    st.title("📺 Zona de Tráilers y Resúmenes (Anime Clásico & Cómics)")
-    st.write("Disfruta de los resúmenes y tráilers retro de anime clásico y cómics, y reclama tu recompensa:")
+elif opcion == "📺 Zona de Tráilers (Anime Antiguo & Cómics)":
+    st.title("📺 Zona de Tráilers y Resúmenes (Anime Antiguo & Cómics)")
+    st.write("Disfruta de pequeños resúmenes y videos de 20 minutos de cómics y animes clásicos para recordar la infancia:")
     
-    # Enlaces de video estables y funcionales optimizados para reproductores web
     videos_retro = {
-        "Resumen Retro: Anime Clásico 90s (Openings & Promos)": "https://www.w3schools.com/html/mov_bbb.mp4",
-        "Tráiler Corto: Leyendas del Manga y Cómics": "https://www.w3schools.com/html/movie.mp4",
-        "Especial Anime Antiguo: Joyas Ocultas": "https://www.w3schools.com/html/mov_bbb.mp4"
+        "Resumen de Infancia: Anime Clásico 80s y 90s": "https://www.w3schools.com/html/mov_bbb.mp4",
+        "Especial Cómics de Antaño y Mangas Legendarios": "https://www.w3schools.com/html/movie.mp4",
+        "Joyas Ocultas de la Animación Retro": "https://www.w3schools.com/html/mov_bbb.mp4"
     }
     
-    video_nombre = st.selectbox("Elige un contenido para ver:", list(videos_retro.keys()))
+    video_nombre = st.selectbox("Elige un contenido retro para ver:", list(videos_retro.keys()), key="select_trailer")
     url_video = videos_retro[video_nombre]
     
     st.video(url_video)
@@ -274,23 +266,48 @@ elif opcion == "📺 Zona de Tráilers (Anime Clásico & Cómics)":
         st.button("🎁 Recompensa ya reclamada", disabled=True, key="btn_video_disabled")
     else:
         if st.button(f"🎁 Reclamar Recompensa (+0.005 💎)", key="btn_video_claim"):
-            actualizar_saldo(0.005)
             st.session_state.videos_vistos[estado_video_clave] = True
-            st.success("✅ ¡Recompensa acreditada con éxito!")
-            st.rerun()
+            actualizar_saldo(0.005)
 
-elif opcion == "🎧 Estación de Música":
-    st.title("🎧 Estación de Música ZafiroX")
-    st.write("Disfruta de la selección musical (estilo acústico/pop alegre como Jason Mraz y Bruno Mars) y reclama tu bonus:")
+elif opcion == "🎵 Videos Musicales en Streaming":
+    st.title("🎵 Videos Musicales en Streaming")
+    st.write("Disfruta de tus videos musicales favoritos en formato de video y recibe tu bonus diario:")
+    
+    videos_musicales = {
+        "Clip Musical Pop & Ritmo 1": "https://www.w3schools.com/html/mov_bbb.mp4",
+        "Clip Musical Acústico & Acordes 2": "https://www.w3schools.com/html/movie.mp4"
+    }
+    
+    vid_mus_nombre = st.selectbox("Elige un video musical:", list(videos_musicales.keys()), key="select_vidmusica")
+    url_vid_mus = videos_musicales[vid_mus_nombre]
+    
+    st.video(url_vid_mus)
+    
+    st.markdown("---")
+    st.markdown("#### Publicidad Patrocinada:")
+    st.components.v1.html(banner_anuncio_html, height=120)
+    
+    estado_vidmus_clave = f"{usuario}_vidmus_{url_vid_mus}"
+    
+    if estado_vidmus_clave in st.session_state.videomusica_vista:
+        st.button("🎥 Video musical ya reclamado", disabled=True, key="btn_vidmus_disabled")
+    else:
+        if st.button("🎥 Reclamar Bonus de Video Musical (+0.004 💎)", key="btn_vidmus_claim"):
+            st.session_state.videomusica_vista[estado_vidmus_clave] = True
+            actualizar_saldo(0.004)
+
+elif opcion == "🎧 Estación de Audio (Música y Pop)":
+    st.title("🎧 Estación de Audio ZafiroX")
+    st.write("Disfruta de la mejor selección musical (estilo acústico/pop alegre estilo Jason Mraz, Bruno Mars y más) en audio fluido:")
     
     pistas = {
         "Acústico Inspirador (Estilo Jason Mraz)": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
         "Pop Alegre y Ritmo (Estilo Bruno Mars)": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
-        "Electro Dance (Energía)": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
-        "Melodía Suave de Guitarra": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"
+        "Electro Dance Energético": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+        "Melodía Suave de Guitarra Acústica": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"
     }
     
-    pista_nombre = st.selectbox("Elige una pista de audio:", list(pistas.keys()))
+    pista_nombre = st.selectbox("Elige una pista de audio:", list(pistas.keys()), key="select_pista")
     url_audio = pistas[pista_nombre]
     
     st.audio(url_audio)
@@ -302,13 +319,11 @@ elif opcion == "🎧 Estación de Música":
     estado_musica_clave = f"{usuario}_musica_{url_audio}"
     
     if estado_musica_clave in st.session_state.musica_escuchada:
-        st.button("🎵 Bonus ya reclamado hoy", disabled=True, key="btn_musica_disabled")
+        st.button("🎵 Bonus musical ya reclamado hoy", disabled=True, key="btn_musica_disabled")
     else:
         if st.button("🎵 Reclamar Bonus Musical (+0.003 💎)", key="btn_musica_claim"):
-            actualizar_saldo(0.003)
             st.session_state.musica_escuchada[estado_musica_clave] = True
-            st.success("✅ ¡Bonus musical acreditado!")
-            st.rerun()
+            actualizar_saldo(0.003)
 
 elif opcion == "🔗 Invitar Amigos":
     st.title("🔗 Invitar Amigos")
@@ -347,14 +362,14 @@ elif opcion == "💸 Conversor y Retiros (Nequi / PayPal)":
     st.markdown("---")
     st.subheader("Solicitar Retiro")
     
-    metodo_pago = st.selectbox("Selecciona tu Método de Pago:", ["Nequi (Colombia)", "PayPal (Dólares USD)", "PayPal (Euros EUR)"])
+    metodo_pago = st.selectbox("Selecciona tu Método de Pago:", ["Nequi (Colombia)", "PayPal (Dólares USD)", "PayPal (Euros EUR)"], key="select_metodopago")
     
     if "Nequi" in metodo_pago:
-        num_cuenta = st.text_input("Número de cuenta para Nequi", placeholder="Ej: 3001234567")
+        num_cuenta = st.text_input("Número de cuenta para Nequi", placeholder="Ej: 3001234567", key="input_nequi")
     else:
-        num_cuenta = st.text_input("Correo electrónico de tu cuenta PayPal", placeholder="tucorreo@dominio.com")
+        num_cuenta = st.text_input("Correo electrónico de tu cuenta PayPal", placeholder="tucorreo@dominio.com", key="input_paypal")
         
-    monto_retirar = st.number_input("Monto en 💎 a retirar", min_value=0.0, max_value=float(saldo_actual), value=float(min(1.0, saldo_actual)), step=0.1)
+    monto_retirar = st.number_input("Monto en 💎 a retirar", min_value=0.0, max_value=float(saldo_actual), value=float(min(1.0, saldo_actual)), step=0.1, key="input_monto")
     
     if st.button("📥 Enviar Solicitud de Retiro", key="btn_retirar"):
         if saldo_actual <= 0:
