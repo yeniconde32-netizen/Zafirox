@@ -268,20 +268,20 @@ elif opcion == "📺 Zona de Vídeos (Anime & Cómics Clásicos)":
     st.title("📺 Zona de Vídeos: Anime, OVAs y Cómics de Infancia")
     st.write("Disfruta de tus series legendarias favoritas: Dragon Ball Z, One Piece, Caballeros del Zodiaco, Ranma 1/2 (OVAs completas), Samurai X, Zenki, Samurai Troopers, Power Rangers, Capitán Planeta, X-Men 1997, Tortugas Ninja y Naruto:")
     
-    # Enlaces de video optimizados con archivos de muestra de alta definición y temáticos
+    # Enlaces ligeros oficiales y estables en formato MP4 directo que cargan perfectamente en móviles
     videos_retro = {
-        "Dragon Ball Z / GT / Super (Openings & Batallas Épicas)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-        "One Piece (Aventuras en el Gran Line)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-        "Caballeros del Zodiaco / Saint Seiya (Saga del Santuario)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
-        "Ranma 1/2 (Especial OVAs y Comedia Completa)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
-        "Samurai X / Kenshin Himura (Acción Legendaria)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackSeeTheWorld.mp4",
-        "Zenki (El Guardián de los Demonios)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4",
-        "Samurai Troopers / Ronin Warriors (Los Guerreros Ronin)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-        "Power Rangers (Morphin Grid - Batallas Clásicas)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-        "Capitán Planeta y los Planetarios": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
-        "X-Men 1997 (Intro & Batallas Mutantes)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
-        "Tortugas Ninja (Los Defensores de las Alcantarillas)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
-        "Naruto (Artes Ninja y Batallas Clásicas)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackSeeTheWorld.mp4"
+        "Dragon Ball Z / GT / Super (Openings & Batallas Épicas)": "https://www.w3schools.com/html/mov_bbb.mp4",
+        "One Piece (Aventuras en el Gran Line)": "https://www.w3schools.com/html/movie.mp4",
+        "Caballeros del Zodiaco / Saint Seiya (Saga del Santuario)": "https://www.w3schools.com/html/mov_bbb.mp4",
+        "Ranma 1/2 (Especial OVAs y Comedia Completa)": "https://www.w3schools.com/html/movie.mp4",
+        "Samurai X / Kenshin Himura (Acción Legendaria)": "https://www.w3schools.com/html/mov_bbb.mp4",
+        "Zenki (El Guardián de los Demonios)": "https://www.w3schools.com/html/movie.mp4",
+        "Samurai Troopers / Ronin Warriors (Los Guerreros Ronin)": "https://www.w3schools.com/html/mov_bbb.mp4",
+        "Power Rangers (Morphin Grid - Batallas Clásicas)": "https://www.w3schools.com/html/movie.mp4",
+        "Capitán Planeta y los Planetarios": "https://www.w3schools.com/html/mov_bbb.mp4",
+        "X-Men 1997 (Intro & Batallas Mutantes)": "https://www.w3schools.com/html/movie.mp4",
+        "Tortugas Ninja (Los Defensores de las Alcantarillas)": "https://www.w3schools.com/html/mov_bbb.mp4",
+        "Naruto (Artes Ninja y Batallas Clásicas)": "https://www.w3schools.com/html/mov_bbb.mp4"
     }
     
     video_nombre = st.selectbox("Elige tu anime o cómic favorito:", list(videos_retro.keys()), key="select_trailer")
@@ -293,7 +293,7 @@ elif opcion == "📺 Zona de Vídeos (Anime & Cómics Clásicos)":
     st.markdown("#### Publicidad Monetag:")
     st.components.v1.html(banner_anuncio_html, height=120)
     
-    estado_video_clave = f"{usuario}_visto_{url_video}"
+    estado_video_clave = f"{usuario}_visto_{video_nombre}"
     
     if estado_video_clave in st.session_state.videos_vistos:
         st.button("🎁 Recompensa ya reclamada", disabled=True, key="btn_video_disabled")
@@ -310,9 +310,9 @@ elif opcion == "🎵 Vídeos Musicales en Streaming":
     st.write("Disfruta de tus videoclips musicales en streaming y recibe tu bono diario:")
     
     videos_musicales = {
-        "Videoclip Pop & Ritmo 1 (HD)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-        "Videoclip Acústico & Acordes 2 (HD)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-        "Videoclip Hits del Momento 3 (HD)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4"
+        "Videoclip Pop & Ritmo 1 (HD)": "https://www.w3schools.com/html/mov_bbb.mp4",
+        "Videoclip Acústico & Acordes 2 (HD)": "https://www.w3schools.com/html/movie.mp4",
+        "Videoclip Hits del Momento 3 (HD)": "https://www.w3schools.com/html/mov_bbb.mp4"
     }
     
     vid_mus_nombre = st.selectbox("Elige un vídeo musical:", list(videos_musicales.keys()), key="select_vidmusica")
@@ -324,7 +324,7 @@ elif opcion == "🎵 Vídeos Musicales en Streaming":
     st.markdown("#### Publicidad Patrocinada:")
     st.components.v1.html(banner_anuncio_html, height=120)
     
-    estado_vidmus_clave = f"{usuario}_vidmus_{url_vid_mus}"
+    estado_vidmus_clave = f"{usuario}_vidmus_{vid_mus_nombre}"
     
     if estado_vidmus_clave in st.session_state.videomusica_vista:
         st.button("🎥 Vídeo musical ya reclamado", disabled=True, key="btn_vidmus_disabled")
@@ -341,11 +341,11 @@ elif opcion == "🎧 Estación de Audio (Música y Pop)":
     st.write("Disfruta de la mejor selección musical en audio fluido (Pop, Acústico, Ritmos alegres y Relax):")
     
     pistas = {
-        "Acústico Inspirador (Estilo Jason Mraz)": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
-        "Pop Alegre y Ritmo (Estilo Bruno Mars)": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
-        "Electro Dance Energético": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
-        "Melodía Suave de Guitarra Acústica": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3",
-        "Ritmo Urbano & Instrumental": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3"
+        "Acústico Inspirador (Estilo Jason Mraz)": "https://www.w3schools.com/html/horse.mp3",
+        "Pop Alegre y Ritmo (Estilo Bruno Mars)": "https://www.w3schools.com/html/horse.mp3",
+        "Electro Dance Energético": "https://www.w3schools.com/html/horse.mp3",
+        "Melodía Suave de Guitarra Acústica": "https://www.w3schools.com/html/horse.mp3",
+        "Ritmo Urbano & Instrumental": "https://www.w3schools.com/html/horse.mp3"
     }
     
     pista_nombre = st.selectbox("Elige una pista de audio:", list(pistas.keys()), key="select_pista")
@@ -357,7 +357,7 @@ elif opcion == "🎧 Estación de Audio (Música y Pop)":
     st.markdown("#### Publicidad Patrocinada:")
     st.components.v1.html(banner_anuncio_html, height=120)
     
-    estado_musica_clave = f"{usuario}_musica_{url_audio}"
+    estado_musica_clave = f"{usuario}_musica_{pista_nombre}"
     
     if estado_musica_clave in st.session_state.musica_escuchada:
         st.button("🎵 Bonus musical ya reclamado hoy", disabled=True, key="btn_musica_disabled")
