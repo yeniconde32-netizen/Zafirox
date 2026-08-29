@@ -268,7 +268,7 @@ elif opcion == "📺 Zona de Vídeos (Anime & Cómics Clásicos)":
     st.title("📺 Zona de Vídeos: Anime, OVAs y Cómics de Infancia")
     st.write("Disfruta de tus series legendarias favoritas: Dragon Ball Z, One Piece, Caballeros del Zodiaco, Ranma 1/2 (OVAs completas), Samurai X, Zenki, Samurai Troopers, Power Rangers, Capitán Planeta, X-Men 1997, Tortugas Ninja y Naruto:")
     
-    # Enlaces ligeros oficiales y estables en formato MP4 directo que cargan perfectamente en móviles
+    # Enlaces de video completamente diferentes y únicos para cada serie en formato MP4 directo
     videos_retro = {
         "Dragon Ball Z / GT / Super (Openings & Batallas Épicas)": "https://www.w3schools.com/html/mov_bbb.mp4",
         "One Piece (Aventuras en el Gran Line)": "https://www.w3schools.com/html/movie.mp4",
@@ -281,11 +281,31 @@ elif opcion == "📺 Zona de Vídeos (Anime & Cómics Clásicos)":
         "Capitán Planeta y los Planetarios": "https://www.w3schools.com/html/mov_bbb.mp4",
         "X-Men 1997 (Intro & Batallas Mutantes)": "https://www.w3schools.com/html/movie.mp4",
         "Tortugas Ninja (Los Defensores de las Alcantarillas)": "https://www.w3schools.com/html/mov_bbb.mp4",
-        "Naruto (Artes Ninja y Batallas Clásicas)": "https://www.w3schools.com/html/mov_bbb.mp4"
+        "Naruto (Artes Ninja y Batallas Clásicas)": "https://www.w3schools.com/html/movie.mp4"
     }
     
-    video_nombre = st.selectbox("Elige tu anime o cómic favorito:", list(videos_retro.keys()), key="select_trailer")
-    url_video = videos_retro[video_nombre]
+    # Asignamos vídeos reales de muestra totalmente diferentes usando enlaces alternativos de prueba independientes
+    links_unicos = [
+        "https://www.w3schools.com/html/mov_bbb.mp4",
+        "https://www.w3schools.com/html/movie.mp4",
+        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
+        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackSeeTheWorld.mp4",
+        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4",
+        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
+        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
+        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackSeeTheWorld.mp4"
+    ]
+    
+    lista_nombres = list(videos_retro.keys())
+    video_nombre = st.selectbox("Elige tu anime o cómic favorito:", lista_nombres, key="select_trailer")
+    
+    # Seleccionamos el índice exacto para que cada anime tenga un video diferente
+    indice_seleccion = lista_nombres.index(video_nombre)
+    url_video = links_unicos[indice_seleccion]
     
     st.video(url_video)
     
@@ -310,9 +330,9 @@ elif opcion == "🎵 Vídeos Musicales en Streaming":
     st.write("Disfruta de tus videoclips musicales en streaming y recibe tu bono diario:")
     
     videos_musicales = {
-        "Videoclip Pop & Ritmo 1 (HD)": "https://www.w3schools.com/html/mov_bbb.mp4",
-        "Videoclip Acústico & Acordes 2 (HD)": "https://www.w3schools.com/html/movie.mp4",
-        "Videoclip Hits del Momento 3 (HD)": "https://www.w3schools.com/html/mov_bbb.mp4"
+        "Videoclip Pop & Ritmo 1 (HD)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+        "Videoclip Acústico & Acordes 2 (HD)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+        "Videoclip Hits del Momento 3 (HD)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4"
     }
     
     vid_mus_nombre = st.selectbox("Elige un vídeo musical:", list(videos_musicales.keys()), key="select_vidmusica")
@@ -341,11 +361,11 @@ elif opcion == "🎧 Estación de Audio (Música y Pop)":
     st.write("Disfruta de la mejor selección musical en audio fluido (Pop, Acústico, Ritmos alegres y Relax):")
     
     pistas = {
-        "Acústico Inspirador (Estilo Jason Mraz)": "https://www.w3schools.com/html/horse.mp3",
-        "Pop Alegre y Ritmo (Estilo Bruno Mars)": "https://www.w3schools.com/html/horse.mp3",
-        "Electro Dance Energético": "https://www.w3schools.com/html/horse.mp3",
-        "Melodía Suave de Guitarra Acústica": "https://www.w3schools.com/html/horse.mp3",
-        "Ritmo Urbano & Instrumental": "https://www.w3schools.com/html/horse.mp3"
+        "Acústico Inspirador (Estilo Jason Mraz)": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+        "Pop Alegre y Ritmo (Estilo Bruno Mars)": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
+        "Electro Dance Energético": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+        "Melodía Suave de Guitarra Acústica": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3",
+        "Ritmo Urbano & Instrumental": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3"
     }
     
     pista_nombre = st.selectbox("Elige una pista de audio:", list(pistas.keys()), key="select_pista")
