@@ -3,49 +3,14 @@ import datetime
 import random
 import json
 import os
+import time
 
 # Configuración de la página
 st.set_page_config(
-    page_title="ZafiroX - Minijuegos y Recompensas",
+    page_title="ZafiroX - Economía Real",
     page_icon="💎",
     layout="centered"
 )
-
-# Configuración de parámetros de consulta
-query_params = st.query_params
-
-# --- INYECTAR RUTA VIRTUAL PARA SW.JS MEDIANTE HTML ---
-sw_content = """
-self.options = {
-    "domain": "3nbf4.com",
-    "zoneId": "11679572"
-}
-self.lary = ""
-importScripts('https://3nbf4.com/act/files/service-worker.min.js?r=sw')
-"""
-
-# Verificación de Monetag en cabecera
-st.markdown("""
-    <head>
-        <meta name="monetag" content="2a33ba0f516ac5e9a267fc7e784b8969">
-    </head>
-    <script>
-        // Registrar el Service Worker automáticamente si el navegador lo soporta
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js').catch(function(err) {
-                console.log('SW registration failed: ', err);
-            });
-        }
-    </script>
-""", unsafe_allow_html=True)
-
-# --- ESTILOS CSS ---
-st.markdown("""
-    <style>
-    .main { background-color: #0e1117; color: white; }
-    .stButton>button { width: 100%; border-radius: 8px; font-weight: bold; }
-    </style>
-""", unsafe_allow_html=True)
 
 # --- CÓDIGO HTML PARA EL DISPLAY AD ---
 banner_anuncio_html = """
@@ -59,26 +24,38 @@ banner_anuncio_html = """
 DB_FILE = "usuarios_db.json"
 
 def cargar_db():
+    """Carga la base de datos de usuarios desde el archivo JSON."""
     if os.path.exists(DB_FILE):
-        with open(DB_FILE, "r") as f:
-            try:
+        try:
+            with open(DB_FILE, "r") as f:
                 return json.load(f)
-            except:
-                return {}
+        except (json.JSONDecodeError, IOError):
+            return {}
     return {
         "Lud337": {"password": "123", "saldo": 38.15},
         "Carlos_99": {"password": "456", "saldo": 10.00}
     }
 
 def guardar_db(db):
-    with open(DB_FILE, "w") as f:
-        json.dump(db, f, indent=4)
+    """Guarda la base de datos de usuarios en el archivo JSON de forma segura."""
+    try:
+        with open(DB_FILE, "w") as f:
+            json.dump(db, f, indent=4)
+    except IOError:
+        st.error("Error crítico: No se pudo guardar la base de datos. Los cambios podrían perderse.")
 
+# Inicialización de session_state
 if 'usuarios_db' not in st.session_state:
     st.session_state.usuarios_db = cargar_db()
 
 if 'usuario_actual' not in st.session_state:
     st.session_state.usuario_actual = None
+
+if 'videos_vistos' not in st.session_state:
+    st.session_state.videos_vistos = {}
+
+if 'musica_escuchada' not in st.session_state:
+    st.session_state.musica_escuchada = {}
 
 # --- PANTALLA DE LOGIN / REGISTRO ---
 if st.session_state.usuario_actual is None:
@@ -119,12 +96,17 @@ if st.session_state.usuario_actual is None:
     
     st.stop()
 
+# --- LOGICA DE SESIÓN ---
 usuario = st.session_state.usuario_actual
+st.session_state.usuarios_db = cargar_db()
 saldo_actual = st.session_state.usuarios_db[usuario]["saldo"]
 
 def actualizar_saldo(cantidad):
-    st.session_state.usuarios_db[usuario]["saldo"] = max(0.0, st.session_state.usuarios_db[usuario]["saldo"] + cantidad)
+    """Actualiza el saldo del usuario actual y guarda en la DB."""
+    nuevo_saldo = max(0.0, st.session_state.usuarios_db[usuario]["saldo"] + cantidad)
+    st.session_state.usuarios_db[usuario]["saldo"] = nuevo_saldo
     guardar_db(st.session_state.usuarios_db)
+    st.rerun()
 
 # --- MENÚ LATERAL ---
 with st.sidebar:
@@ -142,21 +124,22 @@ with st.sidebar:
     opcion = st.selectbox(
         "Selecciona una sección:",
         [
-            "Caza de Minas (Casino)",
-            "Ruleta de la Fortuna 🎡 (NUEVO)",
-            "Cofres Misteriosos de Tensión",
-            "Caja Misteriosa",
-            "Sesión de Videos Reales (YouTube)",
-            "🎧 Música & Beats Recompensados",
-            "Invitar Amigos",
-            "Ranking Semanal Top 4",
-            "Solicitar Retiro y Conversor"
+            "💎 Resumen de Saldo",
+            "💣 Caza de Minas (Casino)",
+            "🗝️ Cofres Misteriosos",
+            "📦 Caja Misteriosa Clásica",
+            "🎡 Ruleta de la Fortuna",
+            "📺 Zona de Videos (Tráilers)",
+            "🎧 Estación de Música",
+            "🔗 Invitar Amigos",
+            "🏆 Competencia Semanal",
+            "💸 Conversor y Retiros (Nequi / PayPal)"
         ]
     )
     
     st.markdown("---")
     st.write("💎 **Tu Saldo Actual:**")
-    st.metric(label="", value=f"{saldo_actual:.2f} 💎")
+    st.metric(label="", value=f"{saldo_actual:.4f} 💎")
 
     st.markdown("---")
     st.markdown("### Patrocinador")
@@ -164,202 +147,225 @@ with st.sidebar:
 
 # --- CONTENIDO DE SECCIONES ---
 
-if opcion == "Caza de Minas (Casino)":
+if opcion == "💎 Resumen de Saldo":
+    st.title("💎 Resumen de Saldo y Actividad")
+    st.metric(label="Saldo Disponible", value=f"{saldo_actual:.4f} 💎")
+    
+    st.markdown("---")
+    st.subheader("⏳ Tiempo Restantes para Premios Semanales")
+    # Contador regresivo grande en la pantalla principal
+    st.markdown(
+        """
+        <div style="background: linear-gradient(135deg, #651fff, #3d5afe); padding: 20px; border-radius: 12px; text-align: center; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+            <h2 style="margin: 0; font-size: 24px; text-transform: uppercase; letter-spacing: 2px;">⏰ Cierre de Premios en:</h2>
+            <p style="font-size: 38px; font-weight: bold; margin: 10px 0;">3 Días : 14 Horas : 22 Min</p>
+            <p style="font-size: po; margin: 0; font-size: 14px; opacity: 0.9;">¡Mantén tu lugar en el ranking para llevarte el gran premio semanal!</p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    
+    st.info(f"Bienvenido de nuevo, {usuario}. Utiliza el menú lateral para navegar por las secciones y generar recompensas sostenibles.")
+
+elif opcion == "💣 Caza de Minas (Casino)":
     st.title("💣 Caza de Minas (Casino)")
     st.write("Elige una casilla con cuidado. ¡Evita la mina escondida!")
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        if st.button("Casilla 1"):
-            actualizar_saldo(0.30)
-            st.success("¡Casilla segura! Ganaste 💎 0.30")
-    with col2:
-        if st.button("Casilla 2"):
-            actualizar_saldo(0.30)
-            st.success("¡Casilla segura! Ganaste 💎 0.30")
-    with col3:
-        if st.button("Casilla 3 (Peligro)"):
-            if saldo_actual >= 0.10:
-                actualizar_saldo(-0.10)
-                st.error("¡Explosión! Perdiste 💎 0.10")
-            else:
-                st.warning("Estás a 0, no hay saldo que restar.")
-
-elif opcion == "Ruleta de la Fortuna 🎡 (NUEVO)":
-    st.title("🎡 Ruleta de la Fortuna ZafiroX")
-    st.write("¡Gira la ruleta mágica y prueba tu suerte para ganar premios instantáneos!")
     
-    if st.button("🎲 ¡Girar Ruleta Ahora!"):
-        premio_ruleta = random.choice([0.05, 0.15, 0.30, 0.60, 1.20, 0.00])
-        if premio_ruleta > 0:
-            actualizar_saldo(premio_ruleta)
-            st.success(f"🎉 ¡La ruleta se detuvo y ganaste 💎 {premio_ruleta:.2f}!")
-        else:
-            st.warning("🔄 ¡Casi cae! Esta vez fue un giro nulo, ¡vuelve a intentar!")
+    estado_minas = st.session_state.setdefault("estado_minas", {"juego_activo": True})
+    
+    if estado_minas["juego_activo"]:
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            if st.button("Casilla 1"):
+                premio = 0.002
+                actualizar_saldo(premio)
+                st.success(f"✅ ¡Casilla segura! Ganaste 💎 {premio:.4f}")
+        with col2:
+            if st.button("Casilla 2"):
+                premio = 0.002
+                actualizar_saldo(premio)
+                st.success(f"✅ ¡Casilla segura! Ganaste 💎 {premio:.4f}")
+        with col3:
+            if st.button("Casilla 3 (Peligro)"):
+                castigo = 0.003
+                if saldo_actual >= castigo:
+                    actualizar_saldo(-castigo)
+                    st.error(f"💥 ¡Explosión! Perdiste 💎 {castigo:.4f}")
+                else:
+                    st.warning("⚠️ Estás a 0, no hay saldo que restar.")
+    else:
+        st.write("Juego reiniciado...")
+        estado_minas["juego_activo"] = True
+        st.rerun()
 
-elif opcion == "Cofres Misteriosos de Tensión":
+elif opcion == "🗝️ Cofres Misteriosos":
     st.title("🗝️ Cofres Misteriosos de Tensión")
     st.write("Elige un cofre para revelar tu recompensa oculta.")
     c1, c2 = st.columns(2)
     with c1:
         if st.button("Abrir Cofre A"):
-            premio = random.choice([0.15, 0.40, 0.00])
+            premio = random.choice([0.001, 0.0005, 0.0000])
             if premio > 0:
                 actualizar_saldo(premio)
-                st.success(f"¡Encontraste 💎 {premio:.2f}!")
+                st.success(f"🎉 ¡Encontraste 💎 {premio:.4f}!")
             else:
-                st.error("El cofre estaba vacío.")
+                st.error("🚫 El cofre estaba vacío.")
     with c2:
         if st.button("Abrir Cofre B"):
-            premio = random.choice([0.20, 0.50, 0.00])
+            premio = random.choice([0.001, 0.0005, 0.0000])
             if premio > 0:
                 actualizar_saldo(premio)
-                st.success(f"¡Encontraste 💎 {premio:.2f}!")
+                st.success(f"🎉 ¡Encontraste 💎 {premio:.4f}!")
             else:
-                st.error("El cofre estaba vacío.")
+                st.error("🚫 El cofre estaba vacío.")
 
-elif opcion == "Caja Misteriosa":
+elif opcion == "📦 Caja Misteriosa Clásica":
     st.title("📦 Caja Misteriosa Clásica")
     if st.button("Abrir Caja"):
-        premio = random.choice([0.10, 0.25, 0.50, 1.00, 0.00])
+        premio = random.choice([0.005, 0.001, 0.0005, 0.0000, 0.0000])
         if premio > 0:
             actualizar_saldo(premio)
-            st.success(f"¡Felicidades! Encontraste 💎 {premio:.2f}")
+            st.success(f"💎 ¡Felicidades! Encontraste 💎 {premio:.4f}")
         else:
-            st.error("¡Oh no! La caja estaba vacía.")
+            st.error("🪹 ¡Oh no! La caja estaba vacía.")
 
-elif opcion == "Sesión de Videos Reales (YouTube)":
-    st.title("📺 Zona de Videos Patrocinados")
-    st.write("Selecciona tu video favorito, visualízalo completo y reclama tu recompensa de saldo:")
+elif opcion == "🎡 Ruleta de la Fortuna":
+    st.title("🎡 Ruleta de la Fortuna ZafiroX")
+    st.write("¡Gira la ruleta mágica y prueba tu suerte para ganar premios instantáneos!")
     
-    # Selector de múltiples videos de YouTube añadidos
-    video_opcion = st.selectbox(
-        "Elige un video para reproducir:",
-        [
-            "Luis Fonsi - Despacito",
-            "Alan Walker - Faded",
-            "Lo-Fi Chill Beats Stream",
-            "Shakira - Waka Waka"
-        ]
-    )
+    if st.button("🎲 ¡Girar Ruleta Ahora!"):
+        premio_ruleta = random.choice([0.0005, 0.0010, 0.0020, 0.0050, 0.0100, 0.0000])
+        if premio_ruleta > 0:
+            actualizar_saldo(premio_ruleta)
+            st.success(f"🎰 ¡La ruleta se detuvo y ganaste 💎 {premio_ruleta:.4f}!")
+        else:
+            st.warning("🔄 ¡Casi cae! Esta vez fue un giro nulo, ¡vuelve a intentar!")
+
+elif opcion == "📺 Zona de Videos (Tráilers)":
+    st.title("📺 Zona de Videos Patrocinados (Tráilers)")
+    st.write("Selecciona tu tráiler favorito, visualízalo completo y reclama tu recompensa de saldo:")
     
-    if video_opcion == "Luis Fonsi - Despacito":
-        st.video("https://www.youtube.com/watch?v=kJQP7kiw5Fk")
-    elif video_opcion == "Alan Walker - Faded":
-        st.video("https://www.youtube.com/watch?v=60ItHLz5WEA")
-    elif video_opcion == "Lo-Fi Chill Beats Stream":
-        st.video("https://www.youtube.com/watch?v=5qap5aO4i9A")
-    elif video_opcion == "Shakira - Waka Waka":
-        st.video("https://www.youtube.com/watch?v=pRpeEdMmmQ0")
+    videos = {
+        "Avengers: Endgame - Tráiler Final": "https://www.youtube.com/watch?v=TcMBFSGVI1c",
+        "Demon Slayer: Kimetsu no Yaiba - Tráiler Oficial": "https://www.youtube.com/watch?v=p8a_xZzV_Lw",
+        "Spider-Man: No Way Home - Tráiler 2": "https://www.youtube.com/watch?v=JfVOs7_CcQc",
+        "Jujutsu Kaisen 0 - Tráiler Oficial": "https://www.youtube.com/watch?v=u2F4_w1K720"
+    }
+    
+    video_nombre = st.selectbox("Elige un tráiler para ver:", list(videos.keys()))
+    url_video = videos[video_nombre]
+    
+    st.video(url_video)
     
     st.markdown("---")
     st.markdown("#### Publicidad Monetag:")
     st.components.v1.html(banner_anuncio_html, height=120)
     
-    if st.button("🎁 Reclamar Recompensa por Ver el Video (+0.25 💎)"):
-        actualizar_saldo(0.25)
-        st.success("¡Recompensa acreditada con éxito!")
-
-elif opcion == "🎧 Música & Beats Recompensados":
-    st.title("🎧 Estación de Música ZafiroX")
-    st.write("Disfruta de nuestra selección expandida de pistas de audio en alta calidad:")
+    estado_video_clave = f"{usuario}_visto_{url_video}"
     
-    pista_musica = st.selectbox(
-        "Elige tu pista de audio:",
-        [
-            "Beat Urbano / Electrónico (SoundHelix 1)",
-            "Melodía Acústica Relajante (SoundHelix 2)",
-            "Ritmo Instrumental Dinámico (SoundHelix 3)"
-        ]
-    )
-    
-    if "1" in pista_musica:
-        url_audio = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
-    elif "2" in pista_musica:
-        url_audio = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
+    if estado_video_clave in st.session_state.videos_vistos:
+        st.button("🎁 Recompensa ya reclamada", disabled=True)
     else:
-        url_audio = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
-        
-    audio_html = f"""
-    <div style="background: #1a1c23; padding: 15px; border-radius: 8px; text-align: center;">
-        <audio controls preload="auto" style="width: 100%;">
-            <source src="{url_audio}" type="audio/mpeg">
-            Tu navegador no soporta audio HTML5.
-        </audio>
-    </div>
-    """
-    st.components.v1.html(audio_html, height=80)
+        if st.button(f"🎁 Reclamar Recompensa (+0.005 💎)"):
+            actualizar_saldo(0.005)
+            st.session_state.videos_vistos[estado_video_clave] = True
+            st.success("✅ ¡Recompensa acreditada con éxito!")
+            st.rerun()
+
+elif opcion == "🎧 Estación de Música":
+    st.title("🎧 Estación de Música ZafiroX")
+    st.write("Disfruta de la selección de audio (Electro, Pop y más) y reclama tu bonus por escucha:")
+    
+    # Pistas ampliadas con Electro, Pop y otros estilos
+    pistas = {
+        "Electro Dance 1 (SoundHelix 1)": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+        "Electro Club 2 (SoundHelix 2)": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+        "Pop Melódico 1 (SoundHelix 3)": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+        "Pop Urbano 2 (SoundHelix 4)": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
+        "Electro Remezcla (SoundHelix 16)": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-16.mp3"
+    }
+    
+    pista_nombre = st.selectbox("Elige una pista de audio:", list(pistas.keys()))
+    url_audio = pistas[pista_nombre]
+    
+    st.audio(url_audio)
     
     st.markdown("---")
-    if st.button("🎵 Reclamar Bonus por Escucha Musical (+0.20 💎)"):
-        actualizar_saldo(0.20)
-        st.success("¡Se han sumado 💎 0.20 a tu cuenta por escuchar los beats!")
+    st.markdown("#### Publicidad Patrocinada:")
+    st.components.v1.html(banner_anuncio_html, height=120)
+    
+    estado_musica_clave = f"{usuario}_musica_{url_audio}"
+    
+    if estado_musica_clave in st.session_state.musica_escuchada:
+        st.button("🎵 Bonus ya reclamado hoy", disabled=True)
+    else:
+        if st.button("🎵 Reclamar Bonus Musical (+0.003 💎)"):
+            actualizar_saldo(0.003)
+            st.session_state.musica_escuchada[estado_musica_clave] = True
+            st.success("✅ ¡Bonus musical acreditado!")
+            st.rerun()
 
-elif opcion == "Invitar Amigos":
+elif opcion == "🔗 Invitar Amigos":
     st.title("🔗 Invitar Amigos")
-    st.write("Comparte tu enlace de referido para ganar comisiones:")
-    st.code(f"https://tradynglimon.online/?ref={usuario}")
-    if st.button("Simular Registro de Amigo (+0.50 💎)"):
-        actualizar_saldo(0.50)
-        st.success("¡Un amigo se unió con tu enlace! Ganaste 💎 0.50")
+    st.write("Comparte tu enlace de referido único y gana un porcentaje de comisión sostenible:")
+    link_ref = f"https://zafirox-app.streamlit.app/?ref={usuario}"
+    st.code(link_ref)
+    st.info("¡Cada amigo activo te otorga un bono directo en tu saldo!")
 
-elif opcion == "Ranking Semanal Top 4":
-    st.title("🏆 Competencia Semanal")
-    st.write("¡Los mejores jugadores ganan premios en efectivo reales cada semana!")
+elif opcion == "🏆 Competencia Semanal":
+    st.title("🏆 Competencia Semanal de Usuarios")
+    st.write("¡Los usuarios con más actividad de la semana se llevan premios acumulados altos!")
     
-    countdown_clock_html = """
-    <div style="text-align: center; font-size: 16px; font-weight: bold; background: #1a1c23; padding: 12px; border-radius: 8px; color: white; border: 1px solid #333;">
-        ⏱️ Cierre del ranking en: <span id="live-clock" style="color: #00ffcc;">Calculando...</span>
-    </div>
-    <script>
-        if (!window.myCountdownInterval) {
-            window.targetTime = new Date().getTime() + (2 * 24 * 60 * 60 * 1000);
-            window.myCountdownInterval = setInterval(function() {
-                let now = new Date().getTime();
-                let distance = window.targetTime - now;
-                let days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                let hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                let seconds = Math.floor((distance % (1000 * 60)) / 1000);
-                let el = document.getElementById("live-clock");
-                if(el) { 
-                    el.innerHTML = days + "d " + hours + "h " + minutes + "m " + seconds + "s "; 
-                }
-                if (distance < 0) {
-                    clearInterval(window.myCountdownInterval);
-                    if(el) { el.innerHTML = "¡COMPETENCIA FINALIZADA!"; }
-                }
-            }, 1000);
-        }
-    </script>
-    """
-    st.components.v1.html(countdown_clock_html, height=75)
+    st.markdown(
+        """
+        - 🥇 **1er Lugar:** $50.00 USD en Premios
+        - 🥈 **2do Lugar:** $30.00 USD en Premios
+        - 🥉 **3er Lugar:** $15.00 USD en Premios
+        """
+    )
+    st.success("¡Sigue participando en las minas, ruleta y viendo los tráilers para escalar posiciones!")
 
-    puntos_usuario = 1650 + int(saldo_actual * 10)
-    st.markdown(f"""
-| Puesto | Usuario | Puntuación | Premio Semanal |
-| :--- | :--- | :--- | :--- |
-| 🥇 **1º** | **{usuario} (Tú)** | {puntos_usuario:,} pts | $50.000 COP |
-| 🥈 **2º** | CyberKing_99 | 1,420 pts | $30.000 COP |
-| 🥉 **3º** | ZafiroQueen | 1,200 pts | $20.000 COP |
-| 🏅 **4º** | NeoGamer_X | 990 pts | $10.000 COP |
-""")
-
-elif opcion == "Solicitar Retiro y Conversor":
-    st.title("💸 Conversor de Dinero y Retiro Real")
-    tasa_conversion = 4000
-    valor_cop = saldo_actual * tasa_conversion
-    st.info(f"💡 Tus 💎 {saldo_actual:.2f} equivalen aproximadamente a **${valor_cop:,.0f} COP**")
+elif opcion == "💸 Conversor y Retiros (Nequi / PayPal)":
+    st.title("💸 Conversor de Divisas y Retiros")
+    st.write("Convierte tus diamantes a moneda local o divisa internacional y solicita tu pago.")
     
-    metodo = st.selectbox("Método de pago:", ["Nequi", "Daviplata", "PSE", "PayPal"])
-    cuenta_destino = st.text_input(f"Número de cuenta para {metodo}")
+    st.metric(label="Saldo Disponible en Diamantes", value=f"{saldo_actual:.4f} 💎")
     
-    # Rango seguro de retiro corregido para evitar errores de valor máximo
-    limite_max = max(1.0, float(saldo_actual))
-    monto_retiro = st.number_input("Monto en 💎 a retirar", min_value=1.0, max_value=limite_max, value=min(1.0, limite_max), step=0.5)
+    # Conversiones fijas aproximadas
+    cop_por_usd = 4000
+    eur_por_usd = 0.92
+    
+    total_cop = saldo_actual * cop_por_usd
+    total_eur = saldo_actual * eur_por_usd
+    
+    st.info(f"💵 **Equivalencias aproximadas:**\n\n- En Pesos Colombianos (COP): **${total_cop:,.2f} COP**\n- En Euros (EUR): **€{total_eur:.2f} EUR**\n- En Dólares (USD): **${saldo_actual:.2f} USD**")
+    
+    st.markdown("---")
+    st.subheader("Solicitar Retiro")
+    
+    metodo_pago = st.selectbox("Selecciona tu Método de Pago:", ["Nequi (Colombia)", "PayPal (Dólares USD)", "PayPal (Euros EUR)"])
+    
+    if "Nequi" in metodo_pago:
+        num_cuenta = st.text_input("Número de cuenta para Nequi", placeholder="Ej: 3001234567")
+    else:
+        num_cuenta = st.text_input("Correo electrónico de tu cuenta PayPal", placeholder="tucorreo@dominio.com")
+        
+    monto_retirar = st.number_input("Monto en 💎 a retirar", min_value=0.0, max_value=float(saldo_actual), value=float(min(1.0, saldo_actual)), step=0.1)
     
     if st.button("📥 Enviar Solicitud de Retiro"):
-        if cuenta_destino and saldo_actual >= monto_retiro:
-            actualizar_saldo(-monto_retiro)
-            st.success(f"¡Retiro solicitado con éxito a través de {metodo}!")
+        if saldo_actual <= 0:
+            st.error("❌ No tienes saldo disponible para retirar.")
+        elif not num_cuenta:
+            st.warning("⚠️ Por favor ingresa los datos de tu cuenta destino.")
+        elif monto_retirar <= 0:
+            st.warning("⚠️ El monto a retirar debe ser mayor a 0.")
+        elif monto_retirar > saldo_actual:
+            st.error("❌ No puedes retirar más de tu saldo actual.")
         else:
-            st.error("Verifica tus datos de destino o tu saldo disponible.")
+            # Descontar saldo y guardar
+            st.session_state.usuarios_db[usuario]["saldo"] -= monto_retirar
+            guardar_db(st.session_state.usuarios_db)
+            st.success(f"🎉 ¡Solicitud de retiro por 💎 {monto_retirar:.4f} enviada con éxito a {metodo_pago}!")
+            st.balloons()
+            time.sleep(2)
+            st.rerun()
