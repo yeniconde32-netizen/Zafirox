@@ -122,12 +122,11 @@ with st.sidebar:
     opcion = st.selectbox(
         "Selecciona una sección:",
         [
-            "Minijuego Bloques (Hard)",
-            "Minijuego Snake (Hard)",
             "Caza de Minas (Casino)",
             "Cofres Misteriosos de Tensión",
             "Caja Misteriosa",
-            "Sesión de Videos y Monetag",
+            "Sesión de Videos Reales (YouTube)",
+            "🎧 Música & Beats Recompensados",
             "Invitar Amigos",
             "Ranking Semanal Top 4",
             "Solicitar Retiro y Conversor"
@@ -144,21 +143,7 @@ with st.sidebar:
 
 # --- CONTENIDO DE SECCIONES ---
 
-if opcion == "Minijuego Bloques (Hard)":
-    st.title("🧩 Minijuego de Bloques (Modo Difícil)")
-    st.write("¡Velocidad alta estilo Arcade para poner a prueba tus reflejos!")
-    if st.button("Jugar y Superar Nivel (+0.25 💎)"):
-        actualizar_saldo(0.25)
-        st.success("¡Nivel superado con éxito! Ganaste 💎 0.25")
-
-elif opcion == "Minijuego Snake (Hard)":
-    st.title("🐍 Minijuego Snake (Modo Difícil)")
-    st.write("¡Come la mayor cantidad de manzanas sin chocar con los bordes!")
-    if st.button("Completar Partida Snake (+0.25 💎)"):
-        actualizar_saldo(0.25)
-        st.success("¡Excelente partida de Snake! Ganaste 💎 0.25")
-
-elif opcion == "Caza de Minas (Casino)":
+if opcion == "Caza de Minas (Casino)":
     st.title("💣 Caza de Minas (Casino)")
     st.write("Elige una casilla con cuidado. ¡Evita la mina escondida!")
     col1, col2, col3 = st.columns(3)
@@ -209,13 +194,32 @@ elif opcion == "Caja Misteriosa":
         else:
             st.error("¡Oh no! La caja estaba vacía.")
 
-elif opcion == "Sesión de Videos y Monetag":
-    st.title("📺 Sesión de Videos y Monetag")
-    st.write("Mira los anuncios patrocinados abajo para reclamar tus recompensas diarias:")
+elif opcion == "Sesión de Videos Reales (YouTube)":
+    st.title("📺 Zona de Videos Patrocinados")
+    st.write("Mira el video completo en el reproductor de abajo para asegurar que lo ves, y luego reclama tu recompensa:")
+    
+    # Reproductor oficial de YouTube integrado para obligar al usuario a visualizarlo
+    st.video("https://www.youtube.com/watch?v=kJQP7kiw5Fk")
+    
+    st.markdown("---")
+    st.markdown("#### Publicidad Adicional Monetag:")
     st.components.v1.html(banner_anuncio_html, height=120)
-    if st.button("Reclamar Bonus por Ver Anuncio (+0.20 💎)"):
+    
+    if st.button("🎁 Reclamar Recompensa por Ver el Video (+0.25 💎)"):
+        actualizar_saldo(0.25)
+        st.success("¡Excelente! Has acreditado 💎 0.25 por visualizar el contenido multimedia.")
+
+elif opcion == "🎧 Música & Beats Recompensados":
+    st.title("🎧 Estación de Música ZafiroX")
+    st.write("Disfruta de nuestros beats oficiales mientras acumulas saldo a tu cuenta:")
+    
+    # Reproductor de audio embebido de muestra
+    st.audio("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3")
+    
+    st.markdown("---")
+    if st.button("🎵 Reclamar Bonus por Escucha Musical (+0.20 💎)"):
         actualizar_saldo(0.20)
-        st.success("¡Recompensa acreditada con éxito!")
+        st.success("¡Disfrutaste la sesión musical! Se han sumado 💎 0.20 a tu cuenta.")
 
 elif opcion == "Invitar Amigos":
     st.title("🔗 Invitar Amigos")
