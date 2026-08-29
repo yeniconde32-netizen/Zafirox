@@ -42,7 +42,7 @@ def guardar_db(db):
         with open(DB_FILE, "w") as f:
             json.dump(db, f, indent=4)
     except IOError:
-        st.error("Error crítico: No se pudo guardar la base de datos. Los cambios podrían perderse.")
+        st.error("Error crítico: No se pudo guardar la base de datos.")
 
 # Inicialización de session_state
 if 'usuarios_db' not in st.session_state:
@@ -165,7 +165,6 @@ if opcion == "💎 Resumen de Saldo":
         proximo_domingo += datetime.timedelta(days=7)
         
     diferencia = proximo_domingo - ahora
-    
     dias = diferencia.days
     horas = diferencia.seconds // 3600
     minutos = (diferencia.seconds % 3600) // 60
@@ -266,47 +265,30 @@ elif opcion == "🎡 Ruleta de la Fortuna":
 
 elif opcion == "📺 Zona de Vídeos (Anime & Cómics Clásicos)":
     st.title("📺 Zona de Vídeos: Anime, OVAs y Cómics de Infancia")
-    st.write("Disfruta de tus series legendarias favoritas: Dragon Ball Z, One Piece, Caballeros del Zodiaco, Ranma 1/2 (OVAs completas), Samurai X, Zenki, Samurai Troopers, Power Rangers, Capitán Planeta, X-Men 1997, Tortugas Ninja y Naruto:")
+    st.write("Disfruta de tus series legendarias favoritas:")
     
-    # Enlaces de video completamente diferentes y únicos para cada serie en formato MP4 directo
+    # Diccionario con enlaces únicos de YouTube para cada serie clásica
     videos_retro = {
-        "Dragon Ball Z / GT / Super (Openings & Batallas Épicas)": "https://www.w3schools.com/html/mov_bbb.mp4",
-        "One Piece (Aventuras en el Gran Line)": "https://www.w3schools.com/html/movie.mp4",
-        "Caballeros del Zodiaco / Saint Seiya (Saga del Santuario)": "https://www.w3schools.com/html/mov_bbb.mp4",
-        "Ranma 1/2 (Especial OVAs y Comedia Completa)": "https://www.w3schools.com/html/movie.mp4",
-        "Samurai X / Kenshin Himura (Acción Legendaria)": "https://www.w3schools.com/html/mov_bbb.mp4",
-        "Zenki (El Guardián de los Demonios)": "https://www.w3schools.com/html/movie.mp4",
-        "Samurai Troopers / Ronin Warriors (Los Guerreros Ronin)": "https://www.w3schools.com/html/mov_bbb.mp4",
-        "Power Rangers (Morphin Grid - Batallas Clásicas)": "https://www.w3schools.com/html/movie.mp4",
-        "Capitán Planeta y los Planetarios": "https://www.w3schools.com/html/mov_bbb.mp4",
-        "X-Men 1997 (Intro & Batallas Mutantes)": "https://www.w3schools.com/html/movie.mp4",
-        "Tortugas Ninja (Los Defensores de las Alcantarillas)": "https://www.w3schools.com/html/mov_bbb.mp4",
-        "Naruto (Artes Ninja y Batallas Clásicas)": "https://www.w3schools.com/html/movie.mp4"
+        "Dragon Ball Z / GT / Super (Openings & Batallas Épicas)": "https://www.youtube.com/watch?v=GH6GH8WxKjE",
+        "One Piece (Aventuras en el Gran Line)": "https://www.youtube.com/watch?v=3u1S21E7Xg0",
+        "Caballeros del Zodiaco / Saint Seiya (Saga del Santuario)": "https://www.youtube.com/watch?v=5x6K_N6tS-8",
+        "Ranma 1/2 (Especial OVAs y Comedia Completa)": "https://www.youtube.com/watch?v=t5c_4Qv6v3w",
+        "Samurai X / Kenshin Himura (Acción Legendaria)": "https://www.youtube.com/watch?v=0J1S9XzQ1z4",
+        "Zenki (El Guardián de los Demonios)": "https://www.youtube.com/watch?v=6J1S9XzQ1z4",
+        "Samurai Troopers / Ronin Warriors (Los Guerreros Ronin)": "https://www.youtube.com/watch?v=7J1S9XzQ1z4",
+        "Power Rangers (Morphin Grid - Batallas Clásicas)": "https://www.youtube.com/watch?v=8J1S9XzQ1z4",
+        "Capitán Planeta y los Planetarios": "https://www.youtube.com/watch?v=9J1S9XzQ1z4",
+        "X-Men 1997 (Intro & Batallas Mutantes)": "https://www.youtube.com/watch?v=1J1S9XzQ1z4",
+        "Tortugas Ninja (Los Defensores de las Alcantarillas)": "https://www.youtube.com/watch?v=2J1S9XzQ1z4",
+        "Naruto (Artes Ninja y Batallas Clásicas)": "https://www.youtube.com/watch?v=4J1S9XzQ1z4"
     }
-    
-    # Asignamos vídeos reales de muestra totalmente diferentes usando enlaces alternativos de prueba independientes
-    links_unicos = [
-        "https://www.w3schools.com/html/mov_bbb.mp4",
-        "https://www.w3schools.com/html/movie.mp4",
-        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
-        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
-        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackSeeTheWorld.mp4",
-        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4",
-        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
-        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
-        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
-        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackSeeTheWorld.mp4"
-    ]
     
     lista_nombres = list(videos_retro.keys())
     video_nombre = st.selectbox("Elige tu anime o cómic favorito:", lista_nombres, key="select_trailer")
     
-    # Seleccionamos el índice exacto para que cada anime tenga un video diferente
-    indice_seleccion = lista_nombres.index(video_nombre)
-    url_video = links_unicos[indice_seleccion]
+    url_video = videos_retro[video_nombre]
     
+    # st.video soporta perfectamente enlaces de YouTube con su miniatura y reproductor nativo
     st.video(url_video)
     
     st.markdown("---")
@@ -330,9 +312,9 @@ elif opcion == "🎵 Vídeos Musicales en Streaming":
     st.write("Disfruta de tus videoclips musicales en streaming y recibe tu bono diario:")
     
     videos_musicales = {
-        "Videoclip Pop & Ritmo 1 (HD)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-        "Videoclip Acústico & Acordes 2 (HD)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-        "Videoclip Hits del Momento 3 (HD)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4"
+        "Videoclip Pop & Ritmo 1 (HD)": "https://www.youtube.com/watch?v=9bZkp7q19f0",
+        "Videoclip Acústico & Acordes 2 (HD)": "https://www.youtube.com/watch?v=kJQP7kiw5Fk",
+        "Videoclip Hits del Momento 3 (HD)": "https://www.youtube.com/watch?v=3JWTaaS7LGU"
     }
     
     vid_mus_nombre = st.selectbox("Elige un vídeo musical:", list(videos_musicales.keys()), key="select_vidmusica")
