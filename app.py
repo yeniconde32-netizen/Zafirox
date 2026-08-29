@@ -1,6 +1,8 @@
 import streamlit as st
 import datetime
 import random
+import json
+import os
 
 # Configuración de la página
 st.set_page_config(
@@ -17,12 +19,27 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- BASE DE DATOS LOCAL EN MEMORIA ---
-if 'usuarios_db' not in st.session_state:
-    st.session_state.usuarios_db = {
+# --- ARCHIVO DE PERSISTENCIA PARA QUE NO SE PIERDAN LAS CUENTAS ---
+DB_FILE = "usuarios_db.json"
+
+def cargar_db():
+    if os.path.exists(DB_FILE):
+        with open(DB_FILE, "r") as f:
+            try:
+                return json.load(f)
+            except:
+                return {}
+    return {
         "Lud337": {"password": "123", "saldo": 31.60},
         "Carlos_99": {"password": "456", "saldo": 10.00}
     }
+
+def guardar_db(db):
+    with open(DB_FILE, "w") as f:
+        json.dump(db, f, indent=4)
+
+if 'usuarios_db' not in st.session_state:
+    st.session_state.usuarios_db = cargar_db()
 
 if 'usuario_actual' not in st.session_state:
     st.session_state.usuario_actual = None
@@ -35,7 +52,7 @@ query_params = st.query_params
 # --- PANTALLA DE LOGIN / REGISTRO ---
 if st.session_state.usuario_actual is None:
     st.title("💎 ZafiroX - Acceso de Usuarios")
-    st.write("Inicia sesión o regístrate para gestionar tu saldo de forma segura.")
+    st.write("Inicia sesión o regístrate. Tus datos ahora se guardan de forma permanente.")
     
     tab1, tab2 = st.tabs(["Iniciar Sesión", "Registrarse"])
     
@@ -44,7 +61,8 @@ if st.session_state.usuario_actual is None:
         pass_login = st.text_input("Contraseña", type="password", key="login_pass", placeholder="Tu contraseña")
         
         if st.button("Entrar a ZafiroX"):
-            if user_login in st.session_state.usuarios_db and st.session_state.usuarios_db[user_login]["password"] == pass_login:
+            db = st.session_state.usuarios_db
+            if user_login in db and db[user_login]["password"] == pass_login:
                 st.session_state.usuario_actual = user_login
                 st.success(f"¡Bienvenido de nuevo, {user_login}!")
                 st.rerun()
@@ -56,10 +74,12 @@ if st.session_state.usuario_actual is None:
         pass_reg = st.text_input("Nueva Contraseña", type="password", key="reg_pass", placeholder="Elige una contraseña")
         if st.button("Crear Cuenta"):
             if user_reg and pass_reg:
-                if user_reg in st.session_state.usuarios_db:
+                db = st.session_state.usuarios_db
+                if user_reg in db:
                     st.error("El usuario ya existe.")
                 else:
-                    st.session_state.usuarios_db[user_reg] = {"password": pass_reg, "saldo": 0.00}
+                    db[user_reg] = {"password": pass_reg, "saldo": 0.00}
+                    guardar_db(db)
                     st.session_state.usuario_actual = user_reg
                     st.success(f"¡Cuenta creada con éxito! Bienvenido, {user_reg}.")
                     st.rerun()
@@ -68,9 +88,13 @@ if st.session_state.usuario_actual is None:
     
     st.stop()
 
-# Sincronizamos usuario activo
+# Sincronizamos usuario activo y base de datos
 usuario = st.session_state.usuario_actual
 saldo_actual = st.session_state.usuarios_db[usuario]["saldo"]
+
+def actualizar_saldo(cantidad):
+    st.session_state.usuarios_db[usuario]["saldo"] = max(0.0, st.session_state.usuarios_db[usuario]["saldo"] + cantidad)
+    guardar_db(st.session_state.usuarios_db)
 
 # --- MENÚ LATERAL ---
 with st.sidebar:
@@ -90,7 +114,7 @@ with st.sidebar:
         [
             "Minijuego Bloques (Hard)",
             "Minijuego Snake (Hard)",
-            "Caza de Minas (Difícil)",
+            "Caza de Minas (Casino)",
             "Cofres Misteriosos de Tensión",
             "Caja Misteriosa",
             "Sesión de Videos y Monetag",
@@ -103,9 +127,6 @@ with st.sidebar:
     st.markdown("---")
     st.write("💎 **Tu Saldo Actual:**")
     st.metric(label="", value=f"{saldo_actual:.2f} 💎")
-
-def actualizar_saldo(cantidad):
-    st.session_state.usuarios_db[usuario]["saldo"] = max(0.0, st.session_state.usuarios_db[usuario]["saldo"] + cantidad)
 
 # --- CONTENIDO DE SECCIONES ---
 
@@ -135,11 +156,7 @@ if opcion == "Minijuego Bloques (Hard)":
         <script>
             let score = 10;
             function actionBlock() {
-                if(Math.random() > 0.4) {
-                    score += 15;
-                } else {
-                    score = Math.max(0, score - 5);
-                }
+                if(Math.random() > 0.4) { score += 15; } else { score = Math.max(0, score - 5); }
                 document.getElementById('score').innerText = score;
             }
         </script>
@@ -169,7 +186,6 @@ elif opcion == "Minijuego Snake (Hard)":
         <div style="max-width: 300px; margin: auto;">
             <p>Puntuación: <span id="snake-score" style="color: #ef4444; font-weight: bold; font-size: 18px;">0</span></p>
             <canvas id="snakeCanvas" width="200" height="200" style="background: #111; border: 2px solid #ef4444; border-radius: 8px; display: block; margin: 0 auto;"></canvas>
-            
             <div class="controls">
                 <button class="empty"></button>
                 <button onclick="changeDir('UP')">⬆️</button>
@@ -203,22 +219,17 @@ elif opcion == "Minijuego Snake (Hard)":
                 }
                 ctx.fillStyle = "#22c55e";
                 ctx.fillRect(food.x, food.y, box, box);
-
                 d = nextD;
                 let snakeX = snake[0].x, snakeY = snake[0].y;
                 if (d === 'LEFT') snakeX -= box;
                 if (d === 'UP') snakeY -= box;
                 if (d === 'RIGHT') snakeX += box;
                 if (d === 'DOWN') snakeY += box;
-
                 if (snakeX === food.x && snakeY === food.y) {
                     score += 10;
                     document.getElementById("snake-score").innerText = score;
                     food = {x: Math.floor(Math.random() * 19) * box, y: Math.floor(Math.random() * 19) * box};
-                } else {
-                    snake.pop();
-                }
-
+                } else { snake.pop(); }
                 if (snakeX < 0 || snakeX >= canvas.width || snakeY < 0 || snakeY >= canvas.height) {
                     snake = [{x: 100, y: 100}]; score = 0;
                     document.getElementById("snake-score").innerText = score;
@@ -234,57 +245,50 @@ elif opcion == "Minijuego Snake (Hard)":
     """
     st.components.v1.html(snake_html, height=370)
 
-elif opcion == "Caza de Minas (Difícil)":
-    st.title("💣 Caza de Minas (Modo Difícil)")
-    st.write("¡Elige una casilla con cuidado! 4 están a salvo y 1 esconde la trampa mortal.")
+elif opcion == "Caza de Minas (Casino)":
+    st.title("💣 Caza de Minas (Estilo Casino)")
+    st.write("¡Apuesta con inteligencia! Elige una casilla: 4 están a salvo con multiplicadores y 1 oculta la trampa.")
     
-    minas_html = """
-    <!DOCTYPE html>
-    <html lang="es">
-    <head>
-        <meta charset="UTF-8">
-        <style>
-            body { font-family: Arial, sans-serif; text-align: center; background-color: #0e1117; color: white; margin: 0; padding: 10px; }
-            .grid { display: flex; flex-direction: column; gap: 8px; max-width: 300px; margin: auto; }
-            .mine-btn { background: #1f2937; color: white; border: 2px solid #374151; padding: 12px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; }
-            .mine-btn:active { transform: scale(0.97); }
-            #result-msg { margin-top: 12px; font-size: 15px; font-weight: bold; min-height: 25px; }
-        </style>
-    </head>
-    <body>
-        <div class="grid">
-            <button class="mine-btn" onclick="checkMine(1)">Casilla 1</button>
-            <button class="mine-btn" onclick="checkMine(2)">Casilla 2</button>
-            <button class="mine-btn" onclick="checkMine(3)">Casilla 3</button>
-            <button class="mine-btn" onclick="checkMine(4)">Casilla 4</button>
-            <button class="mine-btn" onclick="checkMine(5)">Casilla 5</button>
-        </div>
-        <div id="result-msg"></div>
-        <script>
-            let winningBox = Math.floor(Math.random() * 5) + 1;
-            function checkMine(selected) {
-                let msg = document.getElementById("result-msg");
-                if (selected === winningBox) {
-                    msg.style.color = "#ef4444";
-                    msg.innerHTML = "💥 ¡BOOM! Era la mina. ¡Perdiste!";
-                } else {
-                    msg.style.color = "#22c55e";
-                    msg.innerHTML = "🎉 ¡Zona segura! ¡Sobreviviste a la ronda!";
-                }
-                setTimeout(() => {
-                    winningBox = Math.floor(Math.random() * 5) + 1;
-                    msg.innerHTML = "🔄 ¡Nueva ronda lista! Elige otra casilla.";
-                }, 2000);
-            }
-        </script>
-    </body>
-    </html>
-    """
-    st.components.v1.html(minas_html, height=330)
+    col1, col2, col3, col4, col5 = st.columns(5)
+    with col1:
+        if st.button("Casilla 1"):
+            res = random.choice([2.0, -1.0])
+            actualizar_saldo(res)
+            if res > 0: st.success("¡Salvado! +2.0 💎")
+            else: st.error("¡Boom! -1.0 💎")
+            st.rerun()
+    with col2:
+        if st.button("Casilla 2"):
+            res = random.choice([3.0, -1.5])
+            actualizar_saldo(res)
+            if res > 0: st.success("¡Salvado! +3.0 💎")
+            else: st.error("¡Boom! -1.5 💎")
+            st.rerun()
+    with col3:
+        if st.button("Casilla 3"):
+            res = random.choice([1.5, -2.0])
+            actualizar_saldo(res)
+            if res > 0: st.success("¡Salvado! +1.5 💎")
+            else: st.error("¡Boom! -2.0 💎")
+            st.rerun()
+    with col4:
+        if st.button("Casilla 4"):
+            res = random.choice([4.0, -2.5])
+            actualizar_saldo(res)
+            if res > 0: st.success("¡Premio! +4.0 💎")
+            else: st.error("¡Boom! -2.5 💎")
+            st.rerun()
+    with col5:
+        if st.button("Casilla 5"):
+            res = random.choice([5.0, -3.0])
+            actualizar_saldo(res)
+            if res > 0: st.success("¡Jackpot! +5.0 💎")
+            else: st.error("¡Boom! -3.0 💎")
+            st.rerun()
 
 elif opcion == "Cofres Misteriosos de Tensión":
     st.title("🗝️ Cofres de Tensión ZafiroX")
-    st.write("Selecciona uno de los 3 cofres ocultos. Uno tiene un premio masivo, otro un premio menor y el último una trampa.")
+    st.write("Selecciona uno de los 3 cofres ocultos para reclamar tu botín.")
     
     col1, col2, col3 = st.columns(3)
     with col1:
@@ -401,13 +405,11 @@ elif opcion == "Invitar Amigos":
 elif opcion == "Ranking Semanal Top 4":
     st.title("🏆 Competencia Semanal de Puntajes")
     
-    # Reloj en vivo de cuenta regresiva integrado
     countdown_clock_html = """
     <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #ef4444; padding: 12px; border-radius: 8px; font-weight: bold; text-align: center; margin-bottom: 15px;">
         ⏰ Cierre del ranking en tiempo real: <span id="live-clock" style="font-size: 18px; color: #fff;">Calculando...</span>
     </div>
     <script>
-        // Fecha límite simulada a 2 días desde ahora
         let countDownDate = new Date().getTime() + (2 * 24 * 60 * 60 * 1000);
         let x = setInterval(function() {
             let now = new Date().getTime();
@@ -416,9 +418,7 @@ elif opcion == "Ranking Semanal Top 4":
             let hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             let seconds = Math.floor((distance % (1000 * 60)) / 1000);
-            
             document.getElementById("live-clock").innerHTML = days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
-            
             if (distance < 0) {
                 clearInterval(x);
                 document.getElementById("live-clock").innerHTML = "¡COMPETENCIA FINALIZADA!";
@@ -428,8 +428,7 @@ elif opcion == "Ranking Semanal Top 4":
     """
     st.components.v1.html(countdown_clock_html, height=75)
     
-    # Ranking dinámico basado en actividad real de usuarios simulados
-    puntos_usuario = 1650 + int(saldo_actual * 10) # Varía dinámicamente con las ganancias del usuario activo
+    puntos_usuario = 1650 + int(saldo_actual * 10)
     
     st.markdown(f"""
     | Puesto | Usuario | Puntuación | Premio Semanal |
