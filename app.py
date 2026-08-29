@@ -24,7 +24,6 @@ banner_anuncio_html = """
 DB_FILE = "usuarios_db.json"
 
 def cargar_db():
-    """Carga la base de datos de usuarios desde el archivo JSON."""
     if os.path.exists(DB_FILE):
         try:
             with open(DB_FILE, "r") as f:
@@ -37,14 +36,12 @@ def cargar_db():
     }
 
 def guardar_db(db):
-    """Guarda la base de datos de usuarios en el archivo JSON de forma segura."""
     try:
         with open(DB_FILE, "w") as f:
             json.dump(db, f, indent=4)
     except IOError:
         st.error("Error crítico: No se pudo guardar la base de datos.")
 
-# Inicialización de session_state
 if 'usuarios_db' not in st.session_state:
     st.session_state.usuarios_db = cargar_db()
 
@@ -99,13 +96,11 @@ if st.session_state.usuario_actual is None:
     
     st.stop()
 
-# --- LOGICA DE SESIÓN ---
 usuario = st.session_state.usuario_actual
 st.session_state.usuarios_db = cargar_db()
 saldo_actual = st.session_state.usuarios_db[usuario]["saldo"]
 
 def actualizar_saldo(cantidad):
-    """Actualiza el saldo del usuario actual y guarda en la DB de forma inmediata."""
     nuevo_saldo = max(0.0, st.session_state.usuarios_db[usuario]["saldo"] + cantidad)
     st.session_state.usuarios_db[usuario]["saldo"] = nuevo_saldo
     guardar_db(st.session_state.usuarios_db)
@@ -131,9 +126,9 @@ with st.sidebar:
             "🗝️ Cofres Misteriosos",
             "📦 Caja Misteriosa Clásica",
             "🎡 Ruleta de la Fortuna",
-            "📺 Zona de Vídeos (Anime & Covers)",
+            "📺 Zona de Vídeos (Anime & Cómics)",
             "🎵 Vídeos Musicales en Streaming",
-            "🎧 Estación de Audio (Música y Pop)",
+            "🎧 Estación de Audio (Emisora Pop & Rock)",
             "🔗 Invitar Amigos",
             "🏆 Competencia Semanal",
             "💸 Conversor y Retiros (Nequi / PayPal)"
@@ -263,28 +258,35 @@ elif opcion == "🎡 Ruleta de la Fortuna":
         time.sleep(1)
         st.rerun()
 
-elif opcion == "📺 Zona de Vídeos (Anime & Covers)":
-    st.title("📺 Zona de Vídeos: Anime y Covers Épicos")
-    st.write("Disfruta de tus temas favoritos sin bloqueos de reproducción:")
+elif opcion == "📺 Zona de Vídeos (Anime & Cómics)":
+    st.title("📺 Zona de Vídeos: Anime y Cómics Legendarios")
+    st.write("Selecciona tu serie favorita y disfruta del contenido especial sin interrupciones:")
     
-    # Enlaces de YouTube de covers y videos con inserción (embed) permitida garantizada
+    # Enlaces oficiales seguros de YouTube (trailers y clips musicales oficiales de alta estabilidad)
     videos_anime = {
-        "Dragon Ball Super - Ultimate Battle (Cover)": "https://www.youtube.com/watch?v=xMhNN7IwE60",
-        "Dragon Ball Daima - JAKA JAAN (Cover)": "https://www.youtube.com/watch?v=FQffHlPWbME",
-        "Anime Mix Opening & Covers Clásicos": "https://www.youtube.com/watch?v=5qap5aO4i9A",
-        "Lo-Fi Anime Chill & Relax Session": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        "Dragon Ball Super - Opening Oficial (Toei Animation)": "https://www.youtube.com/embed/W9o76wmb-0s",
+        "Saint Seiya (Caballeros del Zodiaco) Opening": "https://www.youtube.com/embed/5U2_0K0K19o",
+        "One Piece - Clip Oficial / Opening": "https://www.youtube.com/embed/s3Mnb-9g2l0",
+        "Naruto Shippuden - Opening Select": "https://www.youtube.com/embed/j275riwNmvU"
     }
     
-    video_nombre = st.selectbox("Elige tu vídeo de anime favorito:", list(videos_anime.keys()), key="select_anime")
-    url_video = videos_anime[video_nombre]
+    anime_elegido = st.selectbox("Elige tu serie de anime favorita:", list(videos_anime.keys()), key="select_anime_iframe")
+    embed_url = videos_anime[anime_elegido]
     
-    st.video(url_video)
+    st.markdown(
+        f"""
+        <div style="position: relative; width: 100%; height: 315px; margin-bottom: 15px;">
+            <iframe src="{embed_url}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="width: 100%; height: 100%; border-radius: 10px;"></iframe>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
     
     st.markdown("---")
     st.markdown("#### Publicidad Monetag:")
     st.components.v1.html(banner_anuncio_html, height=120)
     
-    estado_video_clave = f"{usuario}_visto_{video_nombre}"
+    estado_video_clave = f"{usuario}_visto_{anime_elegido}"
     
     if estado_video_clave in st.session_state.videos_vistos:
         st.button("🎁 Recompensa ya reclamada", disabled=True, key="btn_video_disabled")
@@ -298,27 +300,32 @@ elif opcion == "📺 Zona de Vídeos (Anime & Covers)":
 
 elif opcion == "🎵 Vídeos Musicales en Streaming":
     st.title("🎵 Vídeos Musicales en Streaming")
-    st.write("Disfruta de tus videoclips musicales y recibe tu bono diario:")
+    st.write("Disfruta de tus videoclips musicales favoritos con máxima estabilidad:")
     
-    # 2 originales pedidos + más opciones musicales variadas libres de bloqueo
     videos_musicales = {
-        "Videoclip Pop & Ritmo 1 (Original)": "https://www.youtube.com/watch?v=klTBagBYXpk",
-        "Videoclip Electrónica & Vibes 2 (Original)": "https://www.youtube.com/watch?v=QoxnZ0tAH_A",
-        "Videoclip Chill & Lo-Fi Beats": "https://www.youtube.com/watch?v=jfKfPfyJRdk",
-        "Videoclip Synthwave & Retro Session": "https://www.youtube.com/watch?v=4xDzrJKXOOY",
-        "Videoclip Acústico & Relax": "https://www.youtube.com/watch?v=5qap5aO4i9A"
+        "Videoclip Pop & Hits Globales": "https://www.youtube.com/embed/9bZkp7q19f0",
+        "Videoclip Dance & Party Electrónica": "https://www.youtube.com/embed/kJQP7kiw5Fk",
+        "Videoclip Rock & Alternative Vibes": "https://www.youtube.com/embed/hTWKbfoikeg",
+        "Videoclip Synthwave & Retro Beats": "https://www.youtube.com/embed/4xDzrJKXOOY"
     }
     
-    vid_mus_nombre = st.selectbox("Elige un vídeo musical:", list(videos_musicales.keys()), key="select_vidmusica")
-    url_vid_mus = videos_musicales[vid_mus_nombre]
+    mus_elegida = st.selectbox("Elige un vídeo musical:", list(videos_musicales.keys()), key="select_musica_iframe")
+    embed_mus_url = videos_musicales[mus_elegida]
     
-    st.video(url_vid_mus)
+    st.markdown(
+        f"""
+        <div style="position: relative; width: 100%; height: 315px; margin-bottom: 15px;">
+            <iframe src="{embed_mus_url}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="width: 100%; height: 100%; border-radius: 10px;"></iframe>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
     
     st.markdown("---")
     st.markdown("#### Publicidad Patrocinada:")
     st.components.v1.html(banner_anuncio_html, height=120)
     
-    estado_vidmus_clave = f"{usuario}_vidmus_{vid_mus_nombre}"
+    estado_vidmus_clave = f"{usuario}_vidmus_{mus_elegida}"
     
     if estado_vidmus_clave in st.session_state.videomusica_vista:
         st.button("🎥 Vídeo musical ya reclamado", disabled=True, key="btn_vidmus_disabled")
@@ -330,19 +337,21 @@ elif opcion == "🎵 Vídeos Musicales en Streaming":
             time.sleep(0.8)
             st.rerun()
 
-elif opcion == "🎧 Estación de Audio (Música y Pop)":
-    st.title("🎧 Estación de Audio ZafiroX")
-    st.write("Disfruta de la mejor selección musical en audio fluido:")
+elif opcion == "🎧 Estación de Audio (Emisora Pop & Rock)":
+    st.title("🎧 Estación de Audio ZafiroX - Emisora Pop & Rock")
+    st.write("Conéctate a la emisora oficial de la app. Disfruta de la mejor selección de música pop, rock y pistas fluidas:")
     
+    # Pistas musicales ampliadas incluyendo géneros Pop, Rock y estilo de emisora profesional
     pistas = {
-        "Acústico Inspirador": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
-        "Pop Alegre y Ritmo": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
-        "Electro Dance Energético": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
-        "Melodía Suave de Guitarra": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3",
-        "Ritmo Urbano & Instrumental": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3"
+        "📻 Emisora ZafiroX Pop & Hits (En Vivo)": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+        "🎸 Rock Alternativo & Energía (Pista Clásica)": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+        "🎤 Pop Comercial & Ritmo Suave": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+        "⚡ Rock & Roll Session (Estilo Radio)": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
+        "🎹 Balada Pop & Melodías Acústicas": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3",
+        "🎧 Electronic & Pop Mix Especial": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3"
     }
     
-    pista_nombre = st.selectbox("Elige una pista de audio:", list(pistas.keys()), key="select_pista")
+    pista_nombre = st.selectbox("Selecciona una pista de la emisora:", list(pistas.keys()), key="select_pista")
     url_audio = pistas[pista_nombre]
     
     st.audio(url_audio)
