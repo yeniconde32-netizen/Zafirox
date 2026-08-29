@@ -19,6 +19,16 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# --- CÓDIGO HTML PARA EL DISPLAY AD (BANNER DE MONETAG) ---
+# Reemplaza el script de abajo con el código real que te da Monetag para tu Display Ad
+banner_anuncio_html = """
+<div style="text-align: center; margin: 15px 0; background: #1e1e1e; padding: 10px; border-radius: 8px; border: 1px dashed #444;">
+    <p style="color: #888; font-size: 11px; margin-bottom: 5px;">- Publicidad -</p>
+    <!-- PEGA TU SCRIPT DE MONETAG DISPLAY ADS AQUÍ -->
+    <script async src="https://alwingulla.com/act/files/tag.min.js?z=TU_ZONA_AQUI" data-cfasync="false"></script>
+</div>
+"""
+
 # --- ARCHIVO DE PERSISTENCIA ---
 DB_FILE = "usuarios_db.json"
 
@@ -164,6 +174,8 @@ if opcion == "Minijuego Bloques (Hard)":
     </html>
     """
     st.components.v1.html(tetris_html, height=290)
+    # Banner publicitario debajo del minijuego
+    st.components.v1.html(banner_anuncio_html, height=100)
 
 elif opcion == "Minijuego Snake (Hard)":
     st.title("🐍 Minijuego Snake (Modo Difícil)")
@@ -244,6 +256,8 @@ elif opcion == "Minijuego Snake (Hard)":
     </html>
     """
     st.components.v1.html(snake_html, height=370)
+    # Banner publicitario debajo del minijuego
+    st.components.v1.html(banner_anuncio_html, height=100)
 
 elif opcion == "Caza de Minas (Casino)":
     st.title("💣 Caza de Minas (Estilo Casino)")
@@ -280,6 +294,9 @@ elif opcion == "Caza de Minas (Casino)":
             actualizar_saldo(res)
             if res > 0: st.success(f"¡Jackpot! +{res} 💎")
             else: st.error(f"¡Boom! {res} 💎")
+            
+    # Banner publicitario debajo de Caza de Minas
+    st.components.v1.html(banner_anuncio_html, height=100)
 
 elif opcion == "Cofres Misteriosos de Tensión":
     st.title("🗝️ Cofres de Tensión ZafiroX")
@@ -304,6 +321,9 @@ elif opcion == "Cofres Misteriosos de Tensión":
             actualizar_saldo(premio)
             if premio > 0: st.success(f"¡Buen botín! +{premio} 💎")
             else: st.error(f"¡Mala suerte! {premio} 💎")
+            
+    # Banner publicitario debajo de Cofres
+    st.components.v1.html(banner_anuncio_html, height=100)
 
 elif opcion == "Caja Misteriosa":
     st.title("📦 Caja Misteriosa de Alto Riesgo")
@@ -315,6 +335,9 @@ elif opcion == "Caja Misteriosa":
             st.success(f"🎁 ¡Descubriste +{premio} 💎!")
         else:
             st.error(f"💀 ¡Era una trampa! Perdiste {abs(premio)} 💎.")
+            
+    # Banner publicitario debajo de Caja Misteriosa
+    st.components.v1.html(banner_anuncio_html, height=100)
 
 elif opcion == "Sesión de Videos y Monetag":
     st.title("🎬 Videos Publicitarios y Monetag")
@@ -385,6 +408,8 @@ elif opcion == "Sesión de Videos y Monetag":
     if st.button("Confirmar visualización de enlace"):
         actualizar_saldo(1.00)
         st.success("¡Visualización acreditada! +1.00 💎")
+        
+    st.components.v1.html(banner_anuncio_html, height=100)
 
 elif opcion == "Invitar Amigos":
     st.title("👥 Invitar Amigos con Recompensa")
