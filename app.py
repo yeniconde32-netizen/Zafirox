@@ -27,7 +27,6 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- CÓDIGO HTML PARA EL DISPLAY AD (BANNER DE MONETAG) ---
-# Reemplaza el script de abajo con el código real que te dé Monetag al crear tu zona Display Ads
 banner_anuncio_html = """
 <div style="text-align: center; margin: 15px 0; background: #1a1c23; padding: 10px; border-radius: 8px;">
     <p style="color: #888; font-size: 11px; margin-bottom: 5px;">Publicidad Patrocinada</p>
@@ -109,10 +108,11 @@ else:
 
     opcion = st.sidebar.radio("Menú Principal", ["Minijuegos", "Ranking Semanal", "Solicitar Retiro y Conversor"])
 
-    # Mostrar Banner de Anuncios en la barra lateral o principal
+    # Mostrar Banner de Anuncios en la barra lateral
     st.sidebar.markdown("---")
     st.sidebar.markdown("### Patrocinador")
-    st.sidebar.components.v1.html(banner_anuncio_html, height=120)
+    with st.sidebar:
+        st.components.v1.html(banner_anuncio_html, height=120)
 
     if opcion == "Minijuegos":
         st.title("🎮 Zona de Minijuegos")
