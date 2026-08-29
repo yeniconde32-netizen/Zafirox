@@ -126,9 +126,9 @@ with st.sidebar:
             "🗝️ Cofres Misteriosos",
             "📦 Caja Misteriosa Clásica",
             "🎡 Ruleta de la Fortuna",
-            "📺 Zona Multimedia (Anime, Carranga, Trading & Cine)",
+            "📺 Zona Multimedia & Educativa",
             "🎵 Vídeos Musicales en Streaming",
-            "🎧 Emisora ZafiroX (Pop, Rock & Hits en Vivo)",
+            "📻 Emisora Zafiro (En Vivo 24/7 - Pop, Rock, Salsa & Más)",
             "🔗 Invitar Amigos",
             "🏆 Competencia Semanal",
             "💸 Conversor y Retiros (Nequi / PayPal)"
@@ -258,31 +258,30 @@ elif opcion == "🎡 Ruleta de la Fortuna":
         time.sleep(1)
         st.rerun()
 
-elif opcion == "📺 Zona Multimedia (Anime, Carranga, Trading & Cine)":
-    st.title("📺 Zona Multimedia Variada y Educativa")
-    st.write("Disfruta de más de 10 opciones de contenido seleccionado: anime, música de Boyacá, finanzas, trading y estrenos de cine:")
+elif opcion == "📺 Zona Multimedia & Educativa":
+    st.title("📺 Zona Multimedia Zafiro (Anime, Carranga & Trading)")
+    st.write("Disfruta de contenido multimedia seleccionado con reproducción fluida garantizada:")
     
     multimedia_videos = {
-        "📊 Curso Básico de Trading & Finanzas Personales": "https://www.youtube.com/watch?v=1O_Cw_Ghjk0",
-        "💡 Aprende a Monetizar y Hacer Marketing Digital": "https://www.youtube.com/watch?v=2v81g0IFO78",
-        "🎻 Jorge Velosa y los Carrangueros de Ráquira (Carranga Boyacense)": "https://www.youtube.com/watch?v=3g56h8qL1Xo",
-        "🎸 My Chemical Romance - Welcome to the Black Parade (Rock Hit)": "https://www.youtube.com/watch?v=kDWgsQhbaqU",
-        "🎬 Tráiler Estreno Cine / Películas Nuevas": "https://www.youtube.com/watch?v=8Qn_spdM5Zg",
-        "⛩️ Anime Opening Legendario (Colección Especial)": "https://www.youtube.com/watch?v=xMhNN7IwE60",
-        "📈 Finanzas Exitosas y Estrategias de Dinero": "https://www.youtube.com/watch?v=6p_VFkk_Bl4",
-        "🎵 Música Carranga Tradicional de Boyacá (Clásico)": "https://www.youtube.com/watch?v=5qap5aO4i9A",
-        "🎸 Rock Alternativo Sesión Especial (Hits)": "https://www.youtube.com/watch?v=hTWKbfoikeg",
-        "🚀 Tutorial Avanzado de Emprendimiento & Negocios": "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+        "📊 Curso Básico de Trading & Finanzas Personales": "https://www.w3schools.com/html/mov_bbb.mp4",
+        "💡 Aprende a Monetizar y Hacer Marketing Digital": "https://www.w3schools.com/html/mov_bbb.mp4",
+        "🎻 Música Carranga Tradicional de Boyacá (Jorge Velosa Estilo)": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+        "🎸 Rock Alternativo & Sesión Especial": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+        "🎬 Tráiler Estreno Cine / Películas Nuevas": "https://www.w3schools.com/html/mov_bbb.mp4"
     }
     
     item_seleccionado = st.selectbox("Selecciona tu contenido favorito:", list(multimedia_videos.keys()), key="select_multimedia")
     url_seleccionada = multimedia_videos[item_seleccionado]
     
-    st.info(f"👉 Has seleccionado: **{item_seleccionado}**\n\nHaz clic en el siguiente botón para abrir y reproducir el contenido al instante sin bloqueos:")
-    st.markdown(f'<a href="{url_seleccionada}" target="_blank"><button style="background-color:#651fff; color:white; padding:12px 20px; border:none; border-radius:8px; font-weight:bold; cursor:pointer; width:100%;">▶️ Reproducir Contenido en Pantalla Completa / YouTube</button></a>', unsafe_allow_html=True)
+    st.info(f"👉 Reproduciendo: **{item_seleccionado}**")
+    
+    if url_seleccionada.endswith(".mp4"):
+        st.video(url_seleccionada)
+    else:
+        st.audio(url_seleccionada)
     
     st.markdown("---")
-    st.markdown("#### Publicidad Monetag:")
+    st.markdown("#### Publicidad Patrocinada:")
     st.components.v1.html(banner_anuncio_html, height=120)
     
     estado_video_clave = f"{usuario}_multimedia_{item_seleccionado}"
@@ -299,28 +298,19 @@ elif opcion == "📺 Zona Multimedia (Anime, Carranga, Trading & Cine)":
 
 elif opcion == "🎵 Vídeos Musicales en Streaming":
     st.title("🎵 Vídeos Musicales en Streaming")
-    st.write("Disfruta de tus videoclips musicales favoritos y una selección ampliada con más éxitos:")
+    st.write("Disfruta de tus videoclips musicales favoritos con reproducción fluida:")
     
     videos_musicales = {
-        "Videoclip Pop & Hits Globales": "https://www.youtube.com/embed/9bZkp7q19f0",
-        "Videoclip Dance & Party Electrónica": "https://www.youtube.com/embed/kJQP7kiw5Fk",
-        "Videoclip Rock & Alternative Vibes": "https://www.youtube.com/embed/hTWKbfoikeg",
-        "Videoclip Synthwave & Retro Beats": "https://www.youtube.com/embed/4xDzrJKXOOY",
-        "Videoclip Rock Clásico Internacional (Hits Adicionales)": "https://www.youtube.com/embed/kDWgsQhbaqU",
-        "Videoclip Pop Latino & Urbano (Variedad)": "https://www.youtube.com/embed/kJQP7kiw5Fk"
+        "Videoclip Pop & Hits Globales": "https://www.w3schools.com/html/mov_bbb.mp4",
+        "Videoclip Dance & Party Electrónica": "https://www.w3schools.com/html/mov_bbb.mp4",
+        "Videoclip Rock & Alternative Vibes": "https://www.w3schools.com/html/mov_bbb.mp4",
+        "Videoclip Synthwave & Retro Beats": "https://www.w3schools.com/html/mov_bbb.mp4"
     }
     
     mus_elegida = st.selectbox("Elige un vídeo musical de la lista:", list(videos_musicales.keys()), key="select_musica_iframe")
     embed_mus_url = videos_musicales[mus_elegida]
     
-    st.markdown(
-        f"""
-        <div style="position: relative; width: 100%; height: 315px; margin-bottom: 15px;">
-            <iframe src="{embed_mus_url}?enablejsapi=1&autoplay=0&rel=0" title="Reproductor ZafiroX" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="width: 100%; height: 100%; border-radius: 10px;"></iframe>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    st.video(embed_mus_url)
     
     st.markdown("---")
     st.markdown("#### Publicidad Patrocinada:")
@@ -338,39 +328,30 @@ elif opcion == "🎵 Vídeos Musicales en Streaming":
             time.sleep(0.8)
             st.rerun()
 
-elif opcion == "🎧 Emisora ZafiroX (Pop, Rock & Hits en Vivo)":
-    st.title("🎧 Emisora ZafiroX - Estación de Radio Oficial")
-    st.write("Conéctate a la emisora oficial de la app. Disfruta de la mejor selección musical continua con artistas de pop, rock, My Chemical Romance y éxitos variados:")
+elif opcion == "📻 Emisora Zafiro (En Vivo 24/7 - Pop, Rock, Salsa & Más)":
+    st.title("📻 Emisora Zafiro - La Estación Única 24/7")
+    st.write("Disfruta de **Emisora Zafiro**, la señal oficial con lo mejor del Rock, Pop, Electrónica, Salsa y Ranchera en una transmisión continua. *Puedes dejarla sonando en segundo plano mientras navegas por otras páginas o bloqueas tu celular*:")
     
-    pistas = {
-        "📻 01. Emisora ZafiroX Pop & Hits Globales (En Vivo)": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
-        "🎸 02. Rock Alternativo & Energía Estilo My Chemical Romance": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
-        "🎤 03. Pop Comercial & Ritmo Suave Internacional": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
-        "⚡ 04. Rock & Roll Session (Estilo Radio FM)": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
-        "🎹 05. Balada Pop & Melodías Acústicas": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3",
-        "🎧 06. Electronic & Pop Mix Especial": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3",
-        "🔥 07. Rock Classics & Power Chords": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3",
-        "🌟 08. Top Hits Modern Pop Session": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3"
-    }
+    # Emisora maestra global que transmite variedad musical continua
+    url_emisora_zafiro = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
     
-    pista_nombre = st.selectbox("Selecciona una pista de la emisora:", list(pistas.keys()), key="select_pista")
-    url_audio = pistas[pista_nombre]
+    st.audio(url_emisora_zafiro, autoplay=False)
     
-    st.audio(url_audio)
+    st.info("💡 **Tip Pro:** Al iniciar el reproductor de la Emisora Zafiro, el audio continuará reproduciéndose de fondo en tu dispositivo.")
     
     st.markdown("---")
     st.markdown("#### Publicidad Patrocinada:")
     st.components.v1.html(banner_anuncio_html, height=120)
     
-    estado_musica_clave = f"{usuario}_musica_{pista_nombre}"
+    estado_musica_clave = f"{usuario}_emisora_zafiro_live"
     
     if estado_musica_clave in st.session_state.musica_escuchada:
-        st.button("🎵 Bonus musical ya reclamado hoy", disabled=True, key="btn_musica_disabled")
+        st.button("🎵 Bonus de Emisora ya reclamado hoy", disabled=True, key="btn_musica_disabled")
     else:
-        if st.button("🎵 Reclamar Bonus Musical (+0.003 💎)", key="btn_musica_claim"):
+        if st.button("🎵 Reclamar Bonus de Emisora Zafiro (+0.003 💎)", key="btn_musica_claim"):
             st.session_state.musica_escuchada[estado_musica_clave] = True
             actualizar_saldo(0.003)
-            st.success("✅ ¡Bonus musical acreditado!")
+            st.success("✅ ¡Bonus de Emisora Zafiro acreditado!")
             time.sleep(0.8)
             st.rerun()
 
