@@ -143,6 +143,7 @@ with st.sidebar:
         "Selecciona una sección:",
         [
             "Caza de Minas (Casino)",
+            "Ruleta de la Fortuna 🎡 (NUEVO)",
             "Cofres Misteriosos de Tensión",
             "Caja Misteriosa",
             "Sesión de Videos Reales (YouTube)",
@@ -183,6 +184,18 @@ if opcion == "Caza de Minas (Casino)":
             else:
                 st.warning("Estás a 0, no hay saldo que restar.")
 
+elif opcion == "Ruleta de la Fortuna 🎡 (NUEVO)":
+    st.title("🎡 Ruleta de la Fortuna ZafiroX")
+    st.write("¡Gira la ruleta mágica y prueba tu suerte para ganar premios instantáneos!")
+    
+    if st.button("🎲 ¡Girar Ruleta Ahora!"):
+        premio_ruleta = random.choice([0.05, 0.15, 0.30, 0.60, 1.20, 0.00])
+        if premio_ruleta > 0:
+            actualizar_saldo(premio_ruleta)
+            st.success(f"🎉 ¡La ruleta se detuvo y ganaste 💎 {premio_ruleta:.2f}!")
+        else:
+            st.warning("🔄 ¡Casi cae! Esta vez fue un giro nulo, ¡vuelve a intentar!")
+
 elif opcion == "Cofres Misteriosos de Tensión":
     st.title("🗝️ Cofres Misteriosos de Tensión")
     st.write("Elige un cofre para revelar tu recompensa oculta.")
@@ -216,9 +229,27 @@ elif opcion == "Caja Misteriosa":
 
 elif opcion == "Sesión de Videos Reales (YouTube)":
     st.title("📺 Zona de Videos Patrocinados")
-    st.write("Visualiza el video completo y reclama tu recompensa de saldo:")
+    st.write("Selecciona tu video favorito, visualízalo completo y reclama tu recompensa de saldo:")
     
-    st.video("https://www.youtube.com/watch?v=kJQP7kiw5Fk")
+    # Selector de múltiples videos de YouTube añadidos
+    video_opcion = st.selectbox(
+        "Elige un video para reproducir:",
+        [
+            "Luis Fonsi - Despacito",
+            "Alan Walker - Faded",
+            "Lo-Fi Chill Beats Stream",
+            "Shakira - Waka Waka"
+        ]
+    )
+    
+    if video_opcion == "Luis Fonsi - Despacito":
+        st.video("https://www.youtube.com/watch?v=kJQP7kiw5Fk")
+    elif video_opcion == "Alan Walker - Faded":
+        st.video("https://www.youtube.com/watch?v=60ItHLz5WEA")
+    elif video_opcion == "Lo-Fi Chill Beats Stream":
+        st.video("https://www.youtube.com/watch?v=5qap5aO4i9A")
+    elif video_opcion == "Shakira - Waka Waka":
+        st.video("https://www.youtube.com/watch?v=pRpeEdMmmQ0")
     
     st.markdown("---")
     st.markdown("#### Publicidad Monetag:")
@@ -230,12 +261,28 @@ elif opcion == "Sesión de Videos Reales (YouTube)":
 
 elif opcion == "🎧 Música & Beats Recompensados":
     st.title("🎧 Estación de Música ZafiroX")
-    st.write("Reproduce el beat oficial de la plataforma de forma estable sin cortes:")
+    st.write("Disfruta de nuestra selección expandida de pistas de audio en alta calidad:")
     
-    audio_html = """
+    pista_musica = st.selectbox(
+        "Elige tu pista de audio:",
+        [
+            "Beat Urbano / Electrónico (SoundHelix 1)",
+            "Melodía Acústica Relajante (SoundHelix 2)",
+            "Ritmo Instrumental Dinámico (SoundHelix 3)"
+        ]
+    )
+    
+    if "1" in pista_musica:
+        url_audio = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+    elif "2" in pista_musica:
+        url_audio = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
+    else:
+        url_audio = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
+        
+    audio_html = f"""
     <div style="background: #1a1c23; padding: 15px; border-radius: 8px; text-align: center;">
         <audio controls preload="auto" style="width: 100%;">
-            <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+            <source src="{url_audio}" type="audio/mpeg">
             Tu navegador no soporta audio HTML5.
         </audio>
     </div>
@@ -305,7 +352,10 @@ elif opcion == "Solicitar Retiro y Conversor":
     
     metodo = st.selectbox("Método de pago:", ["Nequi", "Daviplata", "PSE", "PayPal"])
     cuenta_destino = st.text_input(f"Número de cuenta para {metodo}")
-    monto_retiro = st.number_input("Monto en 💎 a retirar", min_value=1.0, max_value=float(saldo_actual) if saldo_actual > 0 else 1.0, step=0.5)
+    
+    # Rango seguro de retiro corregido para evitar errores de valor máximo
+    limite_max = max(1.0, float(saldo_actual))
+    monto_retiro = st.number_input("Monto en 💎 a retirar", min_value=1.0, max_value=limite_max, value=min(1.0, limite_max), step=0.5)
     
     if st.button("📥 Enviar Solicitud de Retiro"):
         if cuenta_destino and saldo_actual >= monto_retiro:
