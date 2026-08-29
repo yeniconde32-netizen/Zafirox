@@ -325,12 +325,12 @@ elif opcion == "🎵 Vídeos Musicales en Streaming":
 
 elif opcion == "📻 Mini Emisora Zafiro (Automática 24/7)":
     st.title("📻 Mini Emisora Zafiro - Estación Automática")
-    st.write("Disfruta de tu **Mini Emisora Zafiro** oficial con canciones dinámicas, lista aleatoria y botones de control interactivos:")
+    st.write("Disfruta de tu **Mini Emisora Zafiro** oficial con canciones dinámicas variadas (Pop, Rock, Electrónica, Ranchera, Salsa y Merengue) y botones de control interactivos:")
     
-    # HTML Interactivo con botones reales de Anterior y Siguiente y Playlist Musical
+    # HTML Interactivo con playlist variada y botones de control
     mini_emisora_html = """
     <div style="background: #1e1e2f; padding: 20px; border-radius: 12px; text-align: center; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.4);">
-        <h3 style="margin-top: 0; color: #00d2ff;">🎧 Emisora Zafiro En Vivo</h3>
+        <h3 style="margin-top: 0; color: #00d2ff;">🎧 Emisora Zafiro En Vivo (Variada)</h3>
         <p id="nowPlaying" style="margin-top: 5px; font-size: 15px; color: #4cd137; font-weight: bold;">Cargando emisora...</p>
         
         <audio id="zafiroRadio" controls style="width: 100%; border-radius: 8px; margin-top: 10px;"></audio>
@@ -342,13 +342,15 @@ elif opcion == "📻 Mini Emisora Zafiro (Automática 24/7)":
     </div>
 
     <script>
-        // Playlist aleatoria de canciones con estilo vocal y rítmico variadas
+        // Playlist ampliada con múltiples géneros musicales reales y voz
         const playlist = [
-            { name: "🎶 Zafiro Pop Hit: Sunny Vibes & Vocals", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
-            { name: "🎸 Zafiro Rock: Forest Acoustic & Voice", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" },
-            { name: "⚡ Zafiro Electrónica: Cyber Vocal Session", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3" },
-            { name: "🎷 Zafiro Jazz & Lounge Melodies", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" },
-            { name: "🎺 Zafiro Latin & Party Rhythms", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3" }
+            { name: "🎤 Zafiro Pop: Vocals & Modern Hits", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
+            { name: "🎸 Zafiro Rock: Guitars & Energy", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" },
+            { name: "⚡ Zafiro Electrónica: Club & Bass", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3" },
+            { name: "🪗 Zafiro Ranchera: Acústica & Sentimiento", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
+            { name: "🎺 Zafiro Salsa & Tropical Rhythms", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3" },
+            { name: "🥁 Zafiro Merengue & Dance Session", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3" },
+            { name: "🎷 Zafiro Jazz & Lounge Melodies", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" }
         ];
 
         let currentTrack = Math.floor(Math.random() * playlist.length);
@@ -384,7 +386,7 @@ elif opcion == "📻 Mini Emisora Zafiro (Automática 24/7)":
     
     st.components.v1.html(mini_emisora_html, height=250)
     
-    st.info("💡 **Consejo:** Usa los botones de **⏮️ Anterior** y **Siguiente ⏭️** para cambiar de canción al instante. También puedes hacer clic en los tres puntos **(⋮)** del reproductor para **descargar** la canción actual a tu dispositivo.")
+    st.info("💡 **Consejo:** Usa los botones de **⏮️ Anterior** y **Siguiente ⏭️** para cambiar de género al instante. También puedes hacer clic en los tres puntos **(⋮)** del reproductor para **descargar** la pista actual a tu dispositivo.")
     
     st.markdown("---")
     st.markdown("#### Publicidad Patrocinada:")
