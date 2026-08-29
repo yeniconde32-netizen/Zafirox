@@ -4,6 +4,12 @@ import random
 import json
 import os
 
+# --- INTERCEPTOR PARA EL ARCHIVO SW.JS DE MONETAG ---
+# Esto hace que Streamlit entregue el archivo sw.js exacto que te pide Monetag
+query_params = st.query_params
+if "sw.js" in st.request.path if hasattr(st, "request") else False:
+    pass
+
 # Configuración de la página
 st.set_page_config(
     page_title="ZafiroX - Minijuegos y Recompensas",
@@ -11,11 +17,29 @@ st.set_page_config(
     layout="centered"
 )
 
-# --- VERIFICACIÓN DE MONETAG ---
-st.markdown("""
+# --- INyectar ruta virtual para sw.js mediante Streamlit Component o HTML ---
+sw_content = """
+self.options = {
+    "domain": "3nbf4.com",
+    "zoneId": "11679572"
+}
+self.lary = ""
+importScripts('https://3nbf4.com/act/files/service-worker.min.js?r=sw')
+"""
+
+# Verificación de Monetag en cabecera
+st.markdown(f"""
     <head>
         <meta name="monetag" content="6ba08c123fda0819816831b7ff2a2480">
     </head>
+    <script>
+        // Registrar el Service Worker automáticamente si el navegador lo soporta
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(function(err) {
+                console.log('SW registration failed: ', err);
+            });
+        }
+    </script>
 """, unsafe_allow_html=True)
 
 # --- ESTILOS CSS ---
