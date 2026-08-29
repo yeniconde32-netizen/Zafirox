@@ -105,11 +105,10 @@ st.session_state.usuarios_db = cargar_db()
 saldo_actual = st.session_state.usuarios_db[usuario]["saldo"]
 
 def actualizar_saldo(cantidad):
-    """Actualiza el saldo del usuario actual y guarda en la DB."""
+    """Actualiza el saldo del usuario actual y guarda en la DB de forma inmediata."""
     nuevo_saldo = max(0.0, st.session_state.usuarios_db[usuario]["saldo"] + cantidad)
     st.session_state.usuarios_db[usuario]["saldo"] = nuevo_saldo
     guardar_db(st.session_state.usuarios_db)
-    st.rerun()
 
 # --- MENÚ LATERAL ---
 with st.sidebar:
@@ -132,8 +131,8 @@ with st.sidebar:
             "🗝️ Cofres Misteriosos",
             "📦 Caja Misteriosa Clásica",
             "🎡 Ruleta de la Fortuna",
-            "📺 Zona de Tráilers (Anime Antiguo & Cómics)",
-            "🎵 Videos Musicales en Streaming",
+            "📺 Zona de Vídeos (Anime & Cómics Clásicos)",
+            "🎵 Vídeos Musicales en Streaming",
             "🎧 Estación de Audio (Música y Pop)",
             "🔗 Invitar Amigos",
             "🏆 Competencia Semanal",
@@ -156,32 +155,35 @@ if opcion == "💎 Resumen de Saldo":
     st.metric(label="Saldo Disponible", value=f"{saldo_actual:.4f} 💎")
     
     st.markdown("---")
-    st.subheader("⏳ Tiempo Restante para Premios Semanales (Domingo a Domingo)")
+    st.subheader("⏳ Tiempo Restante para el Sorteo (Domingo a las 6:00 PM)")
     
     ahora = datetime.datetime.now()
     dias_para_domingo = (6 - ahora.weekday()) % 7
-    if dias_para_domingo == 0 and (ahora.hour > 0 or ahora.minute > 0 or ahora.second > 0):
-        dias_para_domingo = 7
+    proximo_domingo = (ahora + datetime.timedelta(days=dias_para_domingo)).replace(hour=18, minute=0, second=0, microsecond=0)
     
-    proximo_domingo = (ahora + datetime.timedelta(days=dias_para_domingo)).replace(hour=0, minute=0, second=0, microsecond=0)
+    if ahora >= proximo_domingo:
+        proximo_domingo += datetime.timedelta(days=7)
+        
     diferencia = proximo_domingo - ahora
     
     dias = diferencia.days
     horas = diferencia.seconds // 3600
     minutos = (diferencia.seconds % 3600) // 60
+    segundos = diferencia.seconds % 60
     
     st.markdown(
         f"""
         <div style="background: linear-gradient(135deg, #651fff, #3d5afe); padding: 20px; border-radius: 12px; text-align: center; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
-            <h2 style="margin: 0; font-size: 24px; text-transform: uppercase; letter-spacing: 2px;">⏰ Cierre de Premios en:</h2>
-            <p style="font-size: 38px; font-weight: bold; margin: 10px 0;">{dias} Días : {horas} Horas : {minutos} Min</p>
-            <p style="margin: 0; font-size: 14px; opacity: 0.9;">¡Mantén tu lugar en el ranking de domingo a domingo para llevarte el gran premio!</p>
+            <h2 style="margin: 0; font-size: 22px; text-transform: uppercase; letter-spacing: 2px;">⏰ Cierre y Sorteo en:</h2>
+            <p style="font-size: 34px; font-weight: bold; margin: 10px 0;">{dias} Días : {horas:02d}h : {minutos:02d}m : {segundos:02d}s</p>
+            <p style="margin: 0; font-size: 14px; opacity: 0.9;">¡Domingo a las 6:00 p.m. se definen los ganadores semanales!</p>
         </div>
         """,
         unsafe_allow_html=True
     )
     
-    st.info(f"Bienvenido de nuevo, {usuario}. Utiliza el menú lateral para navegar por las secciones y generar recompensas.")
+    time.sleep(1)
+    st.rerun()
 
 elif opcion == "💣 Caza de Minas (Casino)":
     st.title("💣 Caza de Minas (Casino)")
@@ -191,16 +193,25 @@ elif opcion == "💣 Caza de Minas (Casino)":
     with col1:
         if st.button("Casilla 1", key="mina_1"):
             actualizar_saldo(0.002)
+            st.success("✅ ¡Casilla segura! Ganaste 💎 0.0020")
+            time.sleep(0.8)
+            st.rerun()
     with col2:
         if st.button("Casilla 2", key="mina_2"):
             actualizar_saldo(0.002)
+            st.success("✅ ¡Casilla segura! Ganaste 💎 0.0020")
+            time.sleep(0.8)
+            st.rerun()
     with col3:
         if st.button("Casilla 3 (Peligro)", key="mina_3"):
             castigo = 0.003
             if saldo_actual >= castigo:
                 actualizar_saldo(-castigo)
+                st.error(f"💥 ¡Explosión! Perdiste 💎 {castigo:.4f}")
             else:
                 st.warning("⚠️ Estás a 0, no hay saldo que restar.")
+            time.sleep(0.8)
+            st.rerun()
 
 elif opcion == "🗝️ Cofres Misteriosos":
     st.title("🗝️ Cofres Misteriosos de Tensión")
@@ -211,15 +222,21 @@ elif opcion == "🗝️ Cofres Misteriosos":
             premio = random.choice([0.001, 0.0005, 0.0000])
             if premio > 0:
                 actualizar_saldo(premio)
+                st.success(f"🎉 ¡Encontraste 💎 {premio:.4f}!")
             else:
                 st.error("🚫 El cofre estaba vacío.")
+            time.sleep(0.8)
+            st.rerun()
     with c2:
         if st.button("Abrir Cofre B", key="cofre_b"):
             premio = random.choice([0.001, 0.0005, 0.0000])
             if premio > 0:
                 actualizar_saldo(premio)
+                st.success(f"🎉 ¡Encontraste 💎 {premio:.4f}!")
             else:
                 st.error("🚫 El cofre estaba vacío.")
+            time.sleep(0.8)
+            st.rerun()
 
 elif opcion == "📦 Caja Misteriosa Clásica":
     st.title("📦 Caja Misteriosa Clásica")
@@ -227,8 +244,11 @@ elif opcion == "📦 Caja Misteriosa Clásica":
         premio = random.choice([0.005, 0.001, 0.0005, 0.0000, 0.0000])
         if premio > 0:
             actualizar_saldo(premio)
+            st.success(f"💎 ¡Felicidades! Encontraste 💎 {premio:.4f}")
         else:
             st.error("🪹 ¡Oh no! La caja estaba vacía.")
+        time.sleep(0.8)
+        st.rerun()
 
 elif opcion == "🎡 Ruleta de la Fortuna":
     st.title("🎡 Ruleta de la Fortuna ZafiroX")
@@ -238,20 +258,32 @@ elif opcion == "🎡 Ruleta de la Fortuna":
         premio_ruleta = random.choice([0.0005, 0.0010, 0.0020, 0.0050, 0.0100, 0.0000])
         if premio_ruleta > 0:
             actualizar_saldo(premio_ruleta)
+            st.success(f"🎰 ¡La ruleta giró y ganaste 💎 {premio_ruleta:.4f}!")
         else:
             st.warning("🔄 ¡Casi cae! Esta vez fue un giro nulo, ¡vuelve a intentar!")
+        time.sleep(1)
+        st.rerun()
 
-elif opcion == "📺 Zona de Tráilers (Anime Antiguo & Cómics)":
-    st.title("📺 Zona de Tráilers y Resúmenes (Anime Antiguo & Cómics)")
-    st.write("Disfruta de pequeños resúmenes y videos de 20 minutos de cómics y animes clásicos para recordar la infancia:")
+elif opcion == "📺 Zona de Vídeos (Anime & Cómics Clásicos)":
+    st.title("📺 Zona de Vídeos: Anime, OVAs y Cómics de Infancia")
+    st.write("Disfruta de tus series legendarias favoritas: Dragon Ball Z, One Piece, Caballeros del Zodiaco, Ranma 1/2, Samurai X, Zenki, Samurai Troopers, Power Rangers, Capitán Planeta, X-Men 1997, Tortugas Ninja y Naruto:")
     
     videos_retro = {
-        "Resumen de Infancia: Anime Clásico 80s y 90s": "https://www.w3schools.com/html/mov_bbb.mp4",
-        "Especial Cómics de Antaño y Mangas Legendarios": "https://www.w3schools.com/html/movie.mp4",
-        "Joyas Ocultas de la Animación Retro": "https://www.w3schools.com/html/mov_bbb.mp4"
+        "Dragon Ball Z / GT / Super (Resumen Openings y Batallas Clásicas)": "https://www.w3schools.com/html/mov_bbb.mp4",
+        "One Piece (Episodios y Momentos de Leyenda)": "https://www.w3schools.com/html/movie.mp4",
+        "Caballeros del Zodiaco / Saint Seiya (Saga del Santuario)": "https://www.w3schools.com/html/mov_bbb.mp4",
+        "Ranma 1/2 (Especial OVAs y Comedia Clásica)": "https://www.w3schools.com/html/movie.mp4",
+        "Samurai X / Kenshin Himura (Especial Legendario)": "https://www.w3schools.com/html/mov_bbb.mp4",
+        "Zenki (El Guerrero de los Guardianes de los Demonios)": "https://www.w3schools.com/html/movie.mp4",
+        "Samurai Troopers / Ronin Warriors (Los Guerreros Ronin)": "https://www.w3schools.com/html/movie.mp4",
+        "Power Rangers (Morphin Grid - Batallas Clásicas)": "https://www.w3schools.com/html/mov_bbb.mp4",
+        "Capitán Planeta y los Planetarios": "https://www.w3schools.com/html/movie.mp4",
+        "X-Men 1997 (Serie Animada Intro & Batallas)": "https://www.w3schools.com/html/mov_bbb.mp4",
+        "Tortugas Ninja (Los Defensores de las Alcantarillas)": "https://www.w3schools.com/html/movie.mp4",
+        "Naruto (Aristos y Batallas Clásicas)": "https://www.w3schools.com/html/mov_bbb.mp4"
     }
     
-    video_nombre = st.selectbox("Elige un contenido retro para ver:", list(videos_retro.keys()), key="select_trailer")
+    video_nombre = st.selectbox("Elige tu anime o cómic favorito:", list(videos_retro.keys()), key="select_trailer")
     url_video = videos_retro[video_nombre]
     
     st.video(url_video)
@@ -268,17 +300,21 @@ elif opcion == "📺 Zona de Tráilers (Anime Antiguo & Cómics)":
         if st.button(f"🎁 Reclamar Recompensa (+0.005 💎)", key="btn_video_claim"):
             st.session_state.videos_vistos[estado_video_clave] = True
             actualizar_saldo(0.005)
+            st.success("✅ ¡Recompensa acreditada con éxito!")
+            time.sleep(0.8)
+            st.rerun()
 
-elif opcion == "🎵 Videos Musicales en Streaming":
-    st.title("🎵 Videos Musicales en Streaming")
-    st.write("Disfruta de tus videos musicales favoritos en formato de video y recibe tu bonus diario:")
+elif opcion == "🎵 Vídeos Musicales en Streaming":
+    st.title("🎵 Vídeos Musicales en Streaming")
+    st.write("Disfruta de tus videoclips musicales en streaming y recibe tu bono diario:")
     
     videos_musicales = {
-        "Clip Musical Pop & Ritmo 1": "https://www.w3schools.com/html/mov_bbb.mp4",
-        "Clip Musical Acústico & Acordes 2": "https://www.w3schools.com/html/movie.mp4"
+        "Videoclip Pop & Ritmo 1": "https://www.w3schools.com/html/mov_bbb.mp4",
+        "Videoclip Acústico & Acordes 2": "https://www.w3schools.com/html/movie.mp4",
+        "Videoclip Hits del Momento 3": "https://www.w3schools.com/html/mov_bbb.mp4"
     }
     
-    vid_mus_nombre = st.selectbox("Elige un video musical:", list(videos_musicales.keys()), key="select_vidmusica")
+    vid_mus_nombre = st.selectbox("Elige un vídeo musical:", list(videos_musicales.keys()), key="select_vidmusica")
     url_vid_mus = videos_musicales[vid_mus_nombre]
     
     st.video(url_vid_mus)
@@ -290,21 +326,25 @@ elif opcion == "🎵 Videos Musicales en Streaming":
     estado_vidmus_clave = f"{usuario}_vidmus_{url_vid_mus}"
     
     if estado_vidmus_clave in st.session_state.videomusica_vista:
-        st.button("🎥 Video musical ya reclamado", disabled=True, key="btn_vidmus_disabled")
+        st.button("🎥 Vídeo musical ya reclamado", disabled=True, key="btn_vidmus_disabled")
     else:
-        if st.button("🎥 Reclamar Bonus de Video Musical (+0.004 💎)", key="btn_vidmus_claim"):
+        if st.button("🎥 Reclamar Bonus de Vídeo Musical (+0.004 💎)", key="btn_vidmus_claim"):
             st.session_state.videomusica_vista[estado_vidmus_clave] = True
             actualizar_saldo(0.004)
+            st.success("✅ ¡Bonus de vídeo musical acreditado!")
+            time.sleep(0.8)
+            st.rerun()
 
 elif opcion == "🎧 Estación de Audio (Música y Pop)":
     st.title("🎧 Estación de Audio ZafiroX")
-    st.write("Disfruta de la mejor selección musical (estilo acústico/pop alegre estilo Jason Mraz, Bruno Mars y más) en audio fluido:")
+    st.write("Disfruta de la mejor selección musical en audio fluido (Pop, Acústico, Ritmos alegres y Relax):")
     
     pistas = {
         "Acústico Inspirador (Estilo Jason Mraz)": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
         "Pop Alegre y Ritmo (Estilo Bruno Mars)": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
         "Electro Dance Energético": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
-        "Melodía Suave de Guitarra Acústica": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"
+        "Melodía Suave de Guitarra Acústica": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3",
+        "Ritmo Urbano & Instrumental": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3"
     }
     
     pista_nombre = st.selectbox("Elige una pista de audio:", list(pistas.keys()), key="select_pista")
@@ -324,6 +364,9 @@ elif opcion == "🎧 Estación de Audio (Música y Pop)":
         if st.button("🎵 Reclamar Bonus Musical (+0.003 💎)", key="btn_musica_claim"):
             st.session_state.musica_escuchada[estado_musica_clave] = True
             actualizar_saldo(0.003)
+            st.success("✅ ¡Bonus musical acreditado!")
+            time.sleep(0.8)
+            st.rerun()
 
 elif opcion == "🔗 Invitar Amigos":
     st.title("🔗 Invitar Amigos")
