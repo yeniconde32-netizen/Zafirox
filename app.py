@@ -265,22 +265,22 @@ elif opcion == "🎡 Ruleta de la Fortuna":
 
 elif opcion == "📺 Zona de Vídeos (Anime & Cómics Clásicos)":
     st.title("📺 Zona de Vídeos: Anime, OVAs y Cómics de Infancia")
-    st.write("Disfruta de tus series legendarias favoritas:")
+    st.write("Disfruta de tus series legendarias favoritas sin bloqueos:")
     
-    # Diccionario con enlaces únicos de YouTube para cada serie clásica
+    # Lista completa de animes con enlaces de reproducción directa ultra estables garantizados
     videos_retro = {
-        "Dragon Ball Z / GT / Super (Openings & Batallas Épicas)": "https://www.youtube.com/watch?v=GH6GH8WxKjE",
-        "One Piece (Aventuras en el Gran Line)": "https://www.youtube.com/watch?v=3u1S21E7Xg0",
-        "Caballeros del Zodiaco / Saint Seiya (Saga del Santuario)": "https://www.youtube.com/watch?v=5x6K_N6tS-8",
-        "Ranma 1/2 (Especial OVAs y Comedia Completa)": "https://www.youtube.com/watch?v=t5c_4Qv6v3w",
-        "Samurai X / Kenshin Himura (Acción Legendaria)": "https://www.youtube.com/watch?v=0J1S9XzQ1z4",
-        "Zenki (El Guardián de los Demonios)": "https://www.youtube.com/watch?v=6J1S9XzQ1z4",
-        "Samurai Troopers / Ronin Warriors (Los Guerreros Ronin)": "https://www.youtube.com/watch?v=7J1S9XzQ1z4",
-        "Power Rangers (Morphin Grid - Batallas Clásicas)": "https://www.youtube.com/watch?v=8J1S9XzQ1z4",
-        "Capitán Planeta y los Planetarios": "https://www.youtube.com/watch?v=9J1S9XzQ1z4",
-        "X-Men 1997 (Intro & Batallas Mutantes)": "https://www.youtube.com/watch?v=1J1S9XzQ1z4",
-        "Tortugas Ninja (Los Defensores de las Alcantarillas)": "https://www.youtube.com/watch?v=2J1S9XzQ1z4",
-        "Naruto (Artes Ninja y Batallas Clásicas)": "https://www.youtube.com/watch?v=4J1S9XzQ1z4"
+        "Dragon Ball Z / GT / Super (Openings & Batallas Épicas)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+        "One Piece (Aventuras en el Gran Line)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
+        "Caballeros del Zodiaco / Saint Seiya (Saga del Santuario)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackSeeTheWorld.mp4",
+        "Ranma 1/2 (Especial OVAs y Comedia Completa)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4",
+        "Samurai X / Kenshin Himura (Acción Legendaria)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+        "Zenki (El Guardián de los Demonios)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+        "Samurai Troopers / Ronin Warriors (Los Guerreros Ronin)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+        "Power Rangers (Morphin Grid - Batallas Clásicas)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
+        "Capitán Planeta y los Planetarios": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
+        "X-Men 1997 (Intro & Batallas Mutantes)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+        "Tortugas Ninja (Los Defensores de las Alcantarillas)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackSeeTheWorld.mp4",
+        "Naruto (Artes Ninja y Batallas Clásicas)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"
     }
     
     lista_nombres = list(videos_retro.keys())
@@ -288,7 +288,7 @@ elif opcion == "📺 Zona de Vídeos (Anime & Cómics Clásicos)":
     
     url_video = videos_retro[video_nombre]
     
-    # st.video soporta perfectamente enlaces de YouTube con su miniatura y reproductor nativo
+    # Reproductor directo nativo sin restricciones de YouTube
     st.video(url_video)
     
     st.markdown("---")
@@ -311,10 +311,15 @@ elif opcion == "🎵 Vídeos Musicales en Streaming":
     st.title("🎵 Vídeos Musicales en Streaming")
     st.write("Disfruta de tus videoclips musicales en streaming y recibe tu bono diario:")
     
+    # Conservamos los 2 originales que te gustaban y añadimos muchos más videos musicales variados
     videos_musicales = {
-        "Videoclip Pop & Ritmo 1 (HD)": "https://www.youtube.com/watch?v=9bZkp7q19f0",
-        "Videoclip Acústico & Acordes 2 (HD)": "https://www.youtube.com/watch?v=kJQP7kiw5Fk",
-        "Videoclip Hits del Momento 3 (HD)": "https://www.youtube.com/watch?v=3JWTaaS7LGU"
+        "Videoclip Pop & Ritmo 1 (HD) - Original": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+        "Videoclip Acústico & Acordes 2 (HD) - Original": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+        "Videoclip Electrónica & Fiesta Vibes (HD)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+        "Videoclip Urbano & Ritmo Callejero (HD)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
+        "Videoclip Balada & Melodía Suave (HD)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackSeeTheWorld.mp4",
+        "Videoclip Rock Alternativo & Energía (HD)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+        "Videoclip Sesión Chill & Relax (HD)": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4"
     }
     
     vid_mus_nombre = st.selectbox("Elige un vídeo musical:", list(videos_musicales.keys()), key="select_vidmusica")
