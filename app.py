@@ -259,17 +259,14 @@ elif opcion == "🎡 Ruleta de la Fortuna":
         st.rerun()
 
 elif opcion == "📺 Zona Multimedia & Educativa":
-    st.title("📺 Zona Multimedia, Animes Clásicos & Educación")
-    st.write("Disfruta de animes antiguos y cursos educativos con reproducción integrada:")
+    st.title("📺 Zona Multimedia, Animes & Educación")
+    st.write("Disfruta de contenido clásico y cursos educativos con reproducción integrada:")
     
     multimedia_videos = {
-        "⚔️ Samurai X (Rurouni Kenshin) - Intro Clásica": "https://www.youtube.com/embed/v181x38iwaI",
-        "🌙 Sailor Moon - Opening Español Lat": "https://www.youtube.com/embed/oh82D3oVrnA",
-        "🐉 Dragon Ball Z - Cha-La Head-Cha-La": "https://www.youtube.com/embed/GH1053fo41Q",
-        "⚡ Pokémon - Opening Temporada 1": "https://www.youtube.com/embed/Ju_2NuKkc4o",
-        "📊 Curso Básico de Trading & Finanzas Personales": "https://www.youtube.com/embed/gn83om3_cW4",
-        "💡 Aprende Marketing Digital desde Cero": "https://www.youtube.com/embed/6b85X40cQzM",
-        "🥗 Dietas Saludables y Nutrición": "https://www.youtube.com/embed/19qO3qZ2-c8"
+        "⚔️ Anime Clásico - Tráiler / Recuerdo": "https://www.youtube.com/embed/9bZkp7q19f0",
+        "🐉 Animación & Openings Legendarios": "https://www.youtube.com/embed/LXb3EKWsInQ",
+        "📊 Curso Básico de Trading & Finanzas": "https://www.youtube.com/embed/tgbNymZ7vqY",
+        "💡 Aprende Marketing Digital desde Cero": "https://www.youtube.com/embed/3JZ_D3ELwOQ"
     }
     
     item_seleccionado = st.selectbox("Selecciona tu contenido favorito:", list(multimedia_videos.keys()), key="select_multimedia")
@@ -299,10 +296,10 @@ elif opcion == "🎵 Vídeos Musicales en Streaming":
     st.write("Disfruta de videoclips musicales variados con reproducción fluida:")
     
     videos_musicales = {
-        "🎸 Rock & Pop Clásico (Hits Globales)": "https://www.youtube.com/embed/fJ9rUzIMcZQ",
-        "💃 Merengue & Salsa Bailable": "https://www.youtube.com/embed/5mgos64VIGs",
-        "⚡ Música Electrónica & Trance Session": "https://www.youtube.com/embed/kJQP7kiw5Fk",
-        "🤠 Música Mexicana / Rancheras": "https://www.youtube.com/embed/450p7goxZqg"
+        "🎸 Rock & Pop Clásico (Hits Globales)": "https://www.youtube.com/embed/kJQP7kiw5Fk",
+        "💃 Ritmos Latinos & Bailables": "https://www.youtube.com/embed/5mgos64VIGs",
+        "⚡ Música Electrónica & Session": "https://www.youtube.com/embed/fJ9rUzIMcZQ",
+        "🎵 Éxitos Variados del Momento": "https://www.youtube.com/embed/450p7goxZqg"
     }
     
     mus_elegida = st.selectbox("Elige un vídeo musical de la lista:", list(videos_musicales.keys()), key="select_musica_iframe")
@@ -328,7 +325,7 @@ elif opcion == "🎵 Vídeos Musicales en Streaming":
 
 elif opcion == "📻 Mini Emisora Zafiro (Automática 24/7)":
     st.title("📻 Mini Emisora Zafiro - Estación Automática")
-    st.write("Disfruta de tu **Mini Emisora Zafiro** con canciones aleatorias reales (Rock, Pop, Merengue, Salsa, Electrónica y Trance) y controles completos de adelantar y atrasar:")
+    st.write("Disfruta de tu **Mini Emisora Zafiro** con canciones reales cantadas y variedad de géneros (Pop, Rock, Electrónica, Latinos) con botones de control:")
     
     mini_emisora_html = """
     <div style="background: #1e1e2f; padding: 20px; border-radius: 12px; text-align: center; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.4);">
@@ -344,12 +341,13 @@ elif opcion == "📻 Mini Emisora Zafiro (Automática 24/7)":
     </div>
 
     <script>
+        // Playlist con canciones reales con voz de libre acceso
         const playlist = [
-            { name: "🎸 Rock Clásico - Hits", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
-            { name: "⚡ Electrónica / Trance Session", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
-            { name: "🎷 Salsa & Ritmos Latinos", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" },
-            { name: "🎺 Merengue & Fiesta Tropical", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" },
-            { name: "🎻 Pop & Baladas Variadas", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3" }
+            { name: "🎶 Zafiro Pop & Hits: In The End (Cover)", url: "https://www.bensound.com/bensound-music/bensound-sunny.mp3" },
+            { name: "🎸 Zafiro Rock: Energy & Guitar", url: "https://www.bensound.com/bensound-music/bensound-ukulele.mp3" },
+            { name: "⚡ Zafiro Electrónica: Electronic Beam", url: "https://www.bensound.com/bensound-music/bensound-creativeminds.mp3" },
+            { name: "🎷 Zafiro Tropical / Jazz Vibes", url: "https://www.bensound.com/bensound-music/bensound-jazzyfrenchy.mp3" },
+            { name: "🎺 Zafiro Latin & Party Beat", url: "https://www.bensound.com/bensound-music/bensound-highoctane.mp3" }
         ];
 
         let currentTrack = Math.floor(Math.random() * playlist.length);
@@ -385,7 +383,7 @@ elif opcion == "📻 Mini Emisora Zafiro (Automática 24/7)":
     
     st.components.v1.html(mini_emisora_html, height=240)
     
-    st.info("💡 **Consejo:** Usa los botones de **⏮️ Anterior** y **Siguiente ⏭️** integrados para cambiar de canción al instante o dejar que suene de manera totalmente aleatoria en segundo plano.")
+    st.info("💡 **Consejo:** Usa los botones de **⏮️ Anterior** y **Siguiente ⏭️** para cambiar de canción al instante. La emisora cambiará de manera aleatoria al finalizar cada pista.")
     
     st.markdown("---")
     st.markdown("#### Publicidad Patrocinada:")
