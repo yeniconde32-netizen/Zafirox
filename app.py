@@ -129,7 +129,7 @@ with st.sidebar:
             "🗝️ Cofres Misteriosos",
             "📦 Caja Misteriosa Clásica",
             "🎡 Ruleta de la Fortuna",
-            "📺 Zona de Videos (Tráilers)",
+            "📺 Zona de Tráilers (Anime Clásico & Cómics)",
             "🎧 Estación de Música",
             "🔗 Invitar Amigos",
             "🏆 Competencia Semanal",
@@ -152,58 +152,65 @@ if opcion == "💎 Resumen de Saldo":
     st.metric(label="Saldo Disponible", value=f"{saldo_actual:.4f} 💎")
     
     st.markdown("---")
-    st.subheader("⏳ Tiempo Restantes para Premios Semanales")
+    st.subheader("⏳ Tiempo Restante para Premios Semanales (Domingo a Domingo)")
+    
+    # Cálculo real del tiempo restante hasta el próximo domingo a la medianoche
+    ahora = datetime.datetime.now()
+    dias_para_domingo = (6 - ahora.weekday()) % 7
+    if dias_para_domingo == 0 and (ahora.hour > 0 or ahora.minute > 0 or ahora.second > 0):
+        dias_para_domingo = 7
+    
+    proximo_domingo = (ahora + datetime.timedelta(days=dias_para_domingo)).replace(hour=0, minute=0, second=0, microsecond=0)
+    diferencia = proximo_domingo - ahora
+    
+    dias = diferencia.days
+    horas = diferencia.seconds // 3600
+    minutos = (diferencia.seconds % 3600) // 60
+    
     # Contador regresivo grande en la pantalla principal
     st.markdown(
-        """
+        f"""
         <div style="background: linear-gradient(135deg, #651fff, #3d5afe); padding: 20px; border-radius: 12px; text-align: center; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
             <h2 style="margin: 0; font-size: 24px; text-transform: uppercase; letter-spacing: 2px;">⏰ Cierre de Premios en:</h2>
-            <p style="font-size: 38px; font-weight: bold; margin: 10px 0;">3 Días : 14 Horas : 22 Min</p>
-            <p style="font-size: po; margin: 0; font-size: 14px; opacity: 0.9;">¡Mantén tu lugar en el ranking para llevarte el gran premio semanal!</p>
+            <p style="font-size: 38px; font-weight: bold; margin: 10px 0;">{dias} Días : {horas} Horas : {minutos} Min</p>
+            <p style="margin: 0; font-size: 14px; opacity: 0.9;">¡Mantén tu lugar en el ranking de domingo a domingo para llevarte el gran premio!</p>
         </div>
         """,
         unsafe_allow_html=True
     )
     
-    st.info(f"Bienvenido de nuevo, {usuario}. Utiliza el menú lateral para navegar por las secciones y generar recompensas sostenibles.")
+    st.info(f"Bienvenido de nuevo, {usuario}. Utiliza el menú lateral para navegar por las secciones y generar recompensas.")
 
 elif opcion == "💣 Caza de Minas (Casino)":
     st.title("💣 Caza de Minas (Casino)")
     st.write("Elige una casilla con cuidado. ¡Evita la mina escondida!")
     
-    estado_minas = st.session_state.setdefault("estado_minas", {"juego_activo": True})
-    
-    if estado_minas["juego_activo"]:
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            if st.button("Casilla 1"):
-                premio = 0.002
-                actualizar_saldo(premio)
-                st.success(f"✅ ¡Casilla segura! Ganaste 💎 {premio:.4f}")
-        with col2:
-            if st.button("Casilla 2"):
-                premio = 0.002
-                actualizar_saldo(premio)
-                st.success(f"✅ ¡Casilla segura! Ganaste 💎 {premio:.4f}")
-        with col3:
-            if st.button("Casilla 3 (Peligro)"):
-                castigo = 0.003
-                if saldo_actual >= castigo:
-                    actualizar_saldo(-castigo)
-                    st.error(f"💥 ¡Explosión! Perdiste 💎 {castigo:.4f}")
-                else:
-                    st.warning("⚠️ Estás a 0, no hay saldo que restar.")
-    else:
-        st.write("Juego reiniciado...")
-        estado_minas["juego_activo"] = True
-        st.rerun()
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        if st.button("Casilla 1", key="mina_1"):
+            premio = 0.002
+            actualizar_saldo(premio)
+            st.success(f"✅ ¡Casilla segura! Ganaste 💎 {premio:.4f}")
+    with col2:
+        if st.button("Casilla 2", key="mina_2"):
+            premio = 0.002
+            actualizar_saldo(premio)
+            st.success(f"✅ ¡Casilla segura! Ganaste 💎 {premio:.4f}")
+    with col3:
+        if st.button("Casilla 3 (Peligro)", key="mina_3"):
+            castigo = 0.003
+            if saldo_actual >= castigo:
+                actualizar_saldo(-castigo)
+                st.error(f"💥 ¡Explosión! Perdiste 💎 {castigo:.4f}")
+            else:
+                st.warning("⚠️ Estás a 0, no hay saldo que restar.")
 
 elif opcion == "🗝️ Cofres Misteriosos":
     st.title("🗝️ Cofres Misteriosos de Tensión")
     st.write("Elige un cofre para revelar tu recompensa oculta.")
     c1, c2 = st.columns(2)
     with c1:
-        if st.button("Abrir Cofre A"):
+        if st.button("Abrir Cofre A", key="cofre_a"):
             premio = random.choice([0.001, 0.0005, 0.0000])
             if premio > 0:
                 actualizar_saldo(premio)
@@ -211,7 +218,7 @@ elif opcion == "🗝️ Cofres Misteriosos":
             else:
                 st.error("🚫 El cofre estaba vacío.")
     with c2:
-        if st.button("Abrir Cofre B"):
+        if st.button("Abrir Cofre B", key="cofre_b"):
             premio = random.choice([0.001, 0.0005, 0.0000])
             if premio > 0:
                 actualizar_saldo(premio)
@@ -221,7 +228,7 @@ elif opcion == "🗝️ Cofres Misteriosos":
 
 elif opcion == "📦 Caja Misteriosa Clásica":
     st.title("📦 Caja Misteriosa Clásica")
-    if st.button("Abrir Caja"):
+    if st.button("Abrir Caja", key="caja_clasica"):
         premio = random.choice([0.005, 0.001, 0.0005, 0.0000, 0.0000])
         if premio > 0:
             actualizar_saldo(premio)
@@ -233,7 +240,7 @@ elif opcion == "🎡 Ruleta de la Fortuna":
     st.title("🎡 Ruleta de la Fortuna ZafiroX")
     st.write("¡Gira la ruleta mágica y prueba tu suerte para ganar premios instantáneos!")
     
-    if st.button("🎲 ¡Girar Ruleta Ahora!"):
+    if st.button("🎲 ¡Girar Ruleta Ahora!", key="girar_ruleta"):
         premio_ruleta = random.choice([0.0005, 0.0010, 0.0020, 0.0050, 0.0100, 0.0000])
         if premio_ruleta > 0:
             actualizar_saldo(premio_ruleta)
@@ -241,19 +248,19 @@ elif opcion == "🎡 Ruleta de la Fortuna":
         else:
             st.warning("🔄 ¡Casi cae! Esta vez fue un giro nulo, ¡vuelve a intentar!")
 
-elif opcion == "📺 Zona de Videos (Tráilers)":
-    st.title("📺 Zona de Videos Patrocinados (Tráilers)")
-    st.write("Selecciona tu tráiler favorito, visualízalo completo y reclama tu recompensa de saldo:")
+elif opcion == "📺 Zona de Tráilers (Anime Clásico & Cómics)":
+    st.title("📺 Zona de Tráilers y Resúmenes (Anime Clásico & Cómics)")
+    st.write("Disfruta de los resúmenes y tráilers retro de anime clásico y cómics, y reclama tu recompensa:")
     
-    videos = {
-        "Avengers: Endgame - Tráiler Final": "https://www.youtube.com/watch?v=TcMBFSGVI1c",
-        "Demon Slayer: Kimetsu no Yaiba - Tráiler Oficial": "https://www.youtube.com/watch?v=p8a_xZzV_Lw",
-        "Spider-Man: No Way Home - Tráiler 2": "https://www.youtube.com/watch?v=JfVOs7_CcQc",
-        "Jujutsu Kaisen 0 - Tráiler Oficial": "https://www.youtube.com/watch?v=u2F4_w1K720"
+    # Enlaces de video estables y funcionales optimizados para reproductores web
+    videos_retro = {
+        "Resumen Retro: Anime Clásico 90s (Openings & Promos)": "https://www.w3schools.com/html/mov_bbb.mp4",
+        "Tráiler Corto: Leyendas del Manga y Cómics": "https://www.w3schools.com/html/movie.mp4",
+        "Especial Anime Antiguo: Joyas Ocultas": "https://www.w3schools.com/html/mov_bbb.mp4"
     }
     
-    video_nombre = st.selectbox("Elige un tráiler para ver:", list(videos.keys()))
-    url_video = videos[video_nombre]
+    video_nombre = st.selectbox("Elige un contenido para ver:", list(videos_retro.keys()))
+    url_video = videos_retro[video_nombre]
     
     st.video(url_video)
     
@@ -264,9 +271,9 @@ elif opcion == "📺 Zona de Videos (Tráilers)":
     estado_video_clave = f"{usuario}_visto_{url_video}"
     
     if estado_video_clave in st.session_state.videos_vistos:
-        st.button("🎁 Recompensa ya reclamada", disabled=True)
+        st.button("🎁 Recompensa ya reclamada", disabled=True, key="btn_video_disabled")
     else:
-        if st.button(f"🎁 Reclamar Recompensa (+0.005 💎)"):
+        if st.button(f"🎁 Reclamar Recompensa (+0.005 💎)", key="btn_video_claim"):
             actualizar_saldo(0.005)
             st.session_state.videos_vistos[estado_video_clave] = True
             st.success("✅ ¡Recompensa acreditada con éxito!")
@@ -274,15 +281,13 @@ elif opcion == "📺 Zona de Videos (Tráilers)":
 
 elif opcion == "🎧 Estación de Música":
     st.title("🎧 Estación de Música ZafiroX")
-    st.write("Disfruta de la selección de audio (Electro, Pop y más) y reclama tu bonus por escucha:")
+    st.write("Disfruta de la selección musical (estilo acústico/pop alegre como Jason Mraz y Bruno Mars) y reclama tu bonus:")
     
-    # Pistas ampliadas con Electro, Pop y otros estilos
     pistas = {
-        "Electro Dance 1 (SoundHelix 1)": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
-        "Electro Club 2 (SoundHelix 2)": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
-        "Pop Melódico 1 (SoundHelix 3)": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
-        "Pop Urbano 2 (SoundHelix 4)": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
-        "Electro Remezcla (SoundHelix 16)": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-16.mp3"
+        "Acústico Inspirador (Estilo Jason Mraz)": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+        "Pop Alegre y Ritmo (Estilo Bruno Mars)": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
+        "Electro Dance (Energía)": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+        "Melodía Suave de Guitarra": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"
     }
     
     pista_nombre = st.selectbox("Elige una pista de audio:", list(pistas.keys()))
@@ -297,9 +302,9 @@ elif opcion == "🎧 Estación de Música":
     estado_musica_clave = f"{usuario}_musica_{url_audio}"
     
     if estado_musica_clave in st.session_state.musica_escuchada:
-        st.button("🎵 Bonus ya reclamado hoy", disabled=True)
+        st.button("🎵 Bonus ya reclamado hoy", disabled=True, key="btn_musica_disabled")
     else:
-        if st.button("🎵 Reclamar Bonus Musical (+0.003 💎)"):
+        if st.button("🎵 Reclamar Bonus Musical (+0.003 💎)", key="btn_musica_claim"):
             actualizar_saldo(0.003)
             st.session_state.musica_escuchada[estado_musica_clave] = True
             st.success("✅ ¡Bonus musical acreditado!")
@@ -314,7 +319,7 @@ elif opcion == "🔗 Invitar Amigos":
 
 elif opcion == "🏆 Competencia Semanal":
     st.title("🏆 Competencia Semanal de Usuarios")
-    st.write("¡Los usuarios con más actividad de la semana se llevan premios acumulados altos!")
+    st.write("¡Los usuarios con más actividad de domingo a domingo se llevan los premios acumulados altos!")
     
     st.markdown(
         """
@@ -323,7 +328,7 @@ elif opcion == "🏆 Competencia Semanal":
         - 🥉 **3er Lugar:** $15.00 USD en Premios
         """
     )
-    st.success("¡Sigue participando en las minas, ruleta y viendo los tráilers para escalar posiciones!")
+    st.success("¡Sigue participando en las minas, ruleta, música y viendo los contenidos para escalar posiciones!")
 
 elif opcion == "💸 Conversor y Retiros (Nequi / PayPal)":
     st.title("💸 Conversor de Divisas y Retiros")
@@ -331,7 +336,6 @@ elif opcion == "💸 Conversor y Retiros (Nequi / PayPal)":
     
     st.metric(label="Saldo Disponible en Diamantes", value=f"{saldo_actual:.4f} 💎")
     
-    # Conversiones fijas aproximadas
     cop_por_usd = 4000
     eur_por_usd = 0.92
     
@@ -352,7 +356,7 @@ elif opcion == "💸 Conversor y Retiros (Nequi / PayPal)":
         
     monto_retirar = st.number_input("Monto en 💎 a retirar", min_value=0.0, max_value=float(saldo_actual), value=float(min(1.0, saldo_actual)), step=0.1)
     
-    if st.button("📥 Enviar Solicitud de Retiro"):
+    if st.button("📥 Enviar Solicitud de Retiro", key="btn_retirar"):
         if saldo_actual <= 0:
             st.error("❌ No tienes saldo disponible para retirar.")
         elif not num_cuenta:
@@ -362,7 +366,6 @@ elif opcion == "💸 Conversor y Retiros (Nequi / PayPal)":
         elif monto_retirar > saldo_actual:
             st.error("❌ No puedes retirar más de tu saldo actual.")
         else:
-            # Descontar saldo y guardar
             st.session_state.usuarios_db[usuario]["saldo"] -= monto_retirar
             guardar_db(st.session_state.usuarios_db)
             st.success(f"🎉 ¡Solicitud de retiro por 💎 {monto_retirar:.4f} enviada con éxito a {metodo_pago}!")
