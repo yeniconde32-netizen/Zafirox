@@ -26,7 +26,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- CÓDIGO HTML PARA EL DISPLAY AD (OPTIMIZADO) ---
+# --- CÓDIGO HTML PARA EL DISPLAY AD ---
 banner_anuncio_html = """
 <div style="text-align: center; margin: 10px 0; background: #1a1c23; padding: 12px; border-radius: 8px; min-height: 90px;">
     <p style="color: #888; font-size: 11px; margin-bottom: 5px;">Publicidad Patrocinada</p>
@@ -98,7 +98,6 @@ if st.session_state.usuario_actual is None:
     
     st.stop()
 
-# Sincronizamos usuario activo y base de datos
 usuario = st.session_state.usuario_actual
 saldo_actual = st.session_state.usuarios_db[usuario]["saldo"]
 
@@ -212,10 +211,9 @@ elif opcion == "🎧 Música & Beats Recompensados":
     st.title("🎧 Estación de Música ZafiroX")
     st.write("Reproduce el beat oficial de la plataforma de forma estable sin cortes:")
     
-    # Reproductor HTML nativo robusto con controles directos para evitar bloqueos
     audio_html = """
     <div style="background: #1a1c23; padding: 15px; border-radius: 8px; text-align: center;">
-        <audio controls style="width: 100%;">
+        <audio controls preload="auto" style="width: 100%;">
             <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
             Tu navegador no soporta audio HTML5.
         </audio>
@@ -240,7 +238,6 @@ elif opcion == "Ranking Semanal Top 4":
     st.title("🏆 Competencia Semanal")
     st.write("¡Los mejores jugadores ganan premios en efectivo reales cada semana!")
     
-    # Temporizador robusto asegurado mediante contenedor seguro
     countdown_clock_html = """
     <div style="text-align: center; font-size: 16px; font-weight: bold; background: #1a1c23; padding: 12px; border-radius: 8px; color: white; border: 1px solid #333;">
         ⏱️ Cierre del ranking en: <span id="live-clock" style="color: #00ffcc;">Calculando...</span>
