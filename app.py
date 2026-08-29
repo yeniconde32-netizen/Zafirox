@@ -259,26 +259,24 @@ elif opcion == "🎡 Ruleta de la Fortuna":
         st.rerun()
 
 elif opcion == "📺 Zona Multimedia & Educativa":
-    st.title("📺 Zona Multimedia Variada (Trading, Carranga & Cursos)")
-    st.write("Disfruta de contenido educativo variado con reproductores independientes:")
+    st.title("📺 Zona Multimedia, Animes Clásicos & Educación")
+    st.write("Disfruta de animes antiguos y cursos educativos con reproducción integrada:")
     
     multimedia_videos = {
-        "📊 Curso Básico de Trading & Finanzas Personales": "https://www.w3schools.com/html/mov_bbb.mp4",
-        "💡 Aprende a Monetizar y Hacer Marketing Digital": "https://www.w3schools.com/html/movie.mp4",
-        "🎻 Música Carranga Tradicional de Boyacá": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
-        "🎸 Rock Alternativo & Sesión Especial": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
-        "🎬 Tráiler Estreno Cine / Películas Nuevas": "https://www.w3schools.com/html/mov_bbb.mp4"
+        "⚔️ Samurai X (Rurouni Kenshin) - Intro Clásica": "https://www.youtube.com/embed/v181x38iwaI",
+        "🌙 Sailor Moon - Opening Español Lat": "https://www.youtube.com/embed/oh82D3oVrnA",
+        "🐉 Dragon Ball Z - Cha-La Head-Cha-La": "https://www.youtube.com/embed/GH1053fo41Q",
+        "⚡ Pokémon - Opening Temporada 1": "https://www.youtube.com/embed/Ju_2NuKkc4o",
+        "📊 Curso Básico de Trading & Finanzas Personales": "https://www.youtube.com/embed/gn83om3_cW4",
+        "💡 Aprende Marketing Digital desde Cero": "https://www.youtube.com/embed/6b85X40cQzM",
+        "🥗 Dietas Saludables y Nutrición": "https://www.youtube.com/embed/19qO3qZ2-c8"
     }
     
     item_seleccionado = st.selectbox("Selecciona tu contenido favorito:", list(multimedia_videos.keys()), key="select_multimedia")
-    url_seleccionada = multimedia_videos[item_seleccionado]
+    url_embed = multimedia_videos[item_seleccionado]
     
     st.info(f"👉 Reproduciendo: **{item_seleccionado}**")
-    
-    if url_seleccionada.endswith(".mp4"):
-        st.video(url_seleccionada)
-    else:
-        st.audio(url_seleccionada)
+    st.components.v1.iframe(url_embed, height=315, scrolling=False)
     
     st.markdown("---")
     st.markdown("#### Publicidad Patrocinada:")
@@ -297,20 +295,20 @@ elif opcion == "📺 Zona Multimedia & Educativa":
             st.rerun()
 
 elif opcion == "🎵 Vídeos Musicales en Streaming":
-    st.title("🎵 Vídeos Musicales Variados en Streaming")
-    st.write("Disfruta de diferentes clips musicales con reproducción fluida:")
+    st.title("🎵 Vídeos Musicales de YouTube en Streaming")
+    st.write("Disfruta de videoclips musicales variados con reproducción fluida:")
     
     videos_musicales = {
-        "Videoclip Pop & Hits Globales": "https://www.w3schools.com/html/movie.mp4",
-        "Videoclip Dance & Party Electrónica": "https://www.w3schools.com/html/mov_bbb.mp4",
-        "Videoclip Rock & Alternative Vibes": "https://www.w3schools.com/html/movie.mp4",
-        "Videoclip Synthwave & Retro Beats": "https://www.w3schools.com/html/mov_bbb.mp4"
+        "🎸 Rock & Pop Clásico (Hits Globales)": "https://www.youtube.com/embed/fJ9rUzIMcZQ",
+        "💃 Merengue & Salsa Bailable": "https://www.youtube.com/embed/5mgos64VIGs",
+        "⚡ Música Electrónica & Trance Session": "https://www.youtube.com/embed/kJQP7kiw5Fk",
+        "🤠 Música Mexicana / Rancheras": "https://www.youtube.com/embed/450p7goxZqg"
     }
     
     mus_elegida = st.selectbox("Elige un vídeo musical de la lista:", list(videos_musicales.keys()), key="select_musica_iframe")
     embed_mus_url = videos_musicales[mus_elegida]
     
-    st.video(embed_mus_url)
+    st.components.v1.iframe(embed_mus_url, height=315, scrolling=False)
     
     st.markdown("---")
     st.markdown("#### Publicidad Patrocinada:")
@@ -330,55 +328,64 @@ elif opcion == "🎵 Vídeos Musicales en Streaming":
 
 elif opcion == "📻 Mini Emisora Zafiro (Automática 24/7)":
     st.title("📻 Mini Emisora Zafiro - Estación Automática")
-    st.write("Disfruta de tu **Mini Emisora Zafiro**. El reproductor automático pasará de una canción a otra (Pop, Rock, Electrónica, Baladas y más) de manera continua sin detenerse, ideal para dejarla sonando de fondo en tu celular:")
+    st.write("Disfruta de tu **Mini Emisora Zafiro** con canciones aleatorias reales (Rock, Pop, Merengue, Salsa, Electrónica y Trance) y controles completos de adelantar y atrasar:")
     
-    # Reproductor HTML5 avanzado con lista de reproducción automática (playlist estilo mini Spotify)
     mini_emisora_html = """
     <div style="background: #1e1e2f; padding: 20px; border-radius: 12px; text-align: center; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.4);">
         <h3 style="margin-top: 0; color: #00d2ff;">🎧 Emisora Zafiro En Vivo</h3>
-        <p style="font-size: 13px; color: #bbb; margin-bottom: 15px;">Reproducción automática continua de éxitos variados</p>
-        <audio id="zafiroRadio" controls autoplay style="width: 100%; border-radius: 8px;">
-            Tu navegador no soporta audio HTML5.
-        </audio>
-        <p id="nowPlaying" style="margin-top: 12px; font-size: 14px; color: #4cd137; font-weight: bold;">Conectando a la señal...</p>
+        <p id="nowPlaying" style="margin-top: 5px; font-size: 15px; color: #4cd137; font-weight: bold;">Cargando emisora...</p>
+        
+        <audio id="zafiroRadio" controls style="width: 100%; border-radius: 8px; margin-top: 10px;"></audio>
+        
+        <div style="margin-top: 15px; display: flex; justify-content: center; gap: 10px;">
+            <button onclick="prevTrack()" style="background: #651fff; color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: bold;">⏮️ Anterior</button>
+            <button onclick="nextTrack()" style="background: #651fff; color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: bold;">Siguiente ⏭️</button>
+        </div>
     </div>
 
     <script>
         const playlist = [
-            { name: "🎵 Zafiro Mix 01: Pop & Hits Globales", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
-            { name: "🎸 Zafiro Mix 02: Rock Alternativo & Energía", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
-            { name: "🎹 Zafiro Mix 03: Balada Pop Acústica", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" },
-            { name: "⚡ Zafiro Mix 04: Electrónica & Dance Session", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" },
-            { name: "🎷 Zafiro Mix 05: Ritmos Latinos & Variados", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3" }
+            { name: "🎸 Rock Clásico - Hits", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
+            { name: "⚡ Electrónica / Trance Session", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
+            { name: "🎷 Salsa & Ritmos Latinos", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" },
+            { name: "🎺 Merengue & Fiesta Tropical", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" },
+            { name: "🎻 Pop & Baladas Variadas", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3" }
         ];
 
-        let currentTrack = 0;
+        let currentTrack = Math.floor(Math.random() * playlist.length);
         const audioPlayer = document.getElementById('zafiroRadio');
         const nowPlayingText = document.getElementById('nowPlaying');
 
-        function playTrack(index) {
-            if (index >= playlist.length) {
-                currentTrack = 0; // Repetir lista completa estilo bucle infinito
-            } else {
-                currentTrack = index;
-            }
+        function loadTrack(index) {
+            if (index >= playlist.length) currentTrack = 0;
+            if (index < 0) currentTrack = playlist.length - 1;
+            else currentTrack = index;
+
             audioPlayer.src = playlist[currentTrack].url;
-            nowPlayingText.innerText = "Reproduciendo ahora: " + playlist[currentTrack].name;
-            audioPlayer.play().catch(e => console.log("Autoplay bloqueado por navegador, requiere interacción manual."));
+            nowPlayingText.innerText = "Reproduciendo: " + playlist[currentTrack].name;
+            audioPlayer.play().catch(e => console.log("Esperando interacción para reproducir."));
+        }
+
+        function nextTrack() {
+            loadTrack(currentTrack + 1);
+        }
+
+        function prevTrack() {
+            loadTrack(currentTrack - 1);
         }
 
         audioPlayer.addEventListener('ended', function() {
-            playTrack(currentTrack + 1);
+            let nextRandom = Math.floor(Math.random() * playlist.length);
+            loadTrack(nextRandom);
         });
 
-        // Iniciar la primera pista al cargar
-        playTrack(0);
+        loadTrack(currentTrack);
     </script>
     """
     
-    st.components.v1.html(mini_emisora_html, height=220)
+    st.components.v1.html(mini_emisora_html, height=240)
     
-    st.info("💡 **Nota:** Si tu navegador bloquea el arranque automático por seguridad, solo presiona el botón de reproducción ▶️ una vez y la emisora continuará pasando canciones automáticamente de manera indefinida.")
+    st.info("💡 **Consejo:** Usa los botones de **⏮️ Anterior** y **Siguiente ⏭️** integrados para cambiar de canción al instante o dejar que suene de manera totalmente aleatoria en segundo plano.")
     
     st.markdown("---")
     st.markdown("#### Publicidad Patrocinada:")
