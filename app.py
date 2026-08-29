@@ -27,7 +27,7 @@ importScripts('https://3nbf4.com/act/files/service-worker.min.js?r=sw')
 # Verificación de Monetag en cabecera
 st.markdown("""
     <head>
-        <meta name="monetag" content="6ba08c123fda0819816831b7ff2a2480">
+        <meta name="monetag" content="2a33ba0f516ac5e9a267fc7e784b8969">
     </head>
     <script>
         // Registrar el Service Worker automáticamente si el navegador lo soporta
