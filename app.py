@@ -59,9 +59,6 @@ if 'usuarios_db' not in st.session_state:
 if 'usuario_actual' not in st.session_state:
     st.session_state.usuario_actual = None
 
-if 'video_reclamado' not in st.session_state:
-    st.session_state.video_reclamado = False
-
 # --- PANTALLA DE LOGIN / REGISTRO ---
 if st.session_state.usuario_actual is None:
     st.title("💎 ZafiroX - Acceso de Usuarios")
@@ -150,13 +147,60 @@ with st.sidebar:
 if opcion == "Minijuego Bloques (Hard)":
     st.title("🧩 Minijuego de Bloques (Modo Difícil)")
     st.write("¡Velocidad alta estilo Arcade para poner a prueba tus reflejos!")
-    
-    if st.button("Jugar Partida Rápida y Ganar 💎 0.20"):
-        actualizar_saldo(0.20)
-        st.success("¡Partida completada con éxito! Ganaste 💎 0.20")
+    if st.button("Jugar y Superar Nivel (+0.25 💎)"):
+        actualizar_saldo(0.25)
+        st.success("¡Nivel superado con éxito! Ganaste 💎 0.25")
+
+elif opcion == "Minijuego Snake (Hard)":
+    st.title("🐍 Minijuego Snake (Modo Difícil)")
+    st.write("¡Come la mayor cantidad de manzanas sin chocar con los bordes!")
+    if st.button("Completar Partida Snake (+0.25 💎)"):
+        actualizar_saldo(0.25)
+        st.success("¡Excelente partida de Snake! Ganaste 💎 0.25")
+
+elif opcion == "Caza de Minas (Casino)":
+    st.title("💣 Caza de Minas (Casino)")
+    st.write("Elige una casilla con cuidado. ¡Evita la mina escondida!")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        if st.button("Casilla 1"):
+            actualizar_saldo(0.30)
+            st.success("¡Casilla segura! Ganaste 💎 0.30")
+    with col2:
+        if st.button("Casilla 2"):
+            actualizar_saldo(0.30)
+            st.success("¡Casilla segura! Ganaste 💎 0.30")
+    with col3:
+        if st.button("Casilla 3 (Peligro)"):
+            if saldo_actual >= 0.10:
+                actualizar_saldo(-0.10)
+                st.error("¡Explosión! Perdiste 💎 0.10")
+            else:
+                st.warning("Estás a 0, no hay saldo que restar.")
+
+elif opcion == "Cofres Misteriosos de Tensión":
+    st.title("🗝️ Cofres Misteriosos de Tensión")
+    st.write("Elige un cofre para revelar tu recompensa oculta.")
+    c1, c2 = st.columns(2)
+    with c1:
+        if st.button("Abrir Cofre A"):
+            premio = random.choice([0.15, 0.40, 0.00])
+            if premio > 0:
+                actualizar_saldo(premio)
+                st.success(f"¡Encontraste 💎 {premio:.2f}!")
+            else:
+                st.error("El cofre estaba vacío.")
+    with c2:
+        if st.button("Abrir Cofre B"):
+            premio = random.choice([0.20, 0.50, 0.00])
+            if premio > 0:
+                actualizar_saldo(premio)
+                st.success(f"¡Encontraste 💎 {premio:.2f}!")
+            else:
+                st.error("El cofre estaba vacío.")
 
 elif opcion == "Caja Misteriosa":
-    st.title("📦 Caja Misteriosa")
+    st.title("📦 Caja Misteriosa Clásica")
     if st.button("Abrir Caja"):
         premio = random.choice([0.10, 0.25, 0.50, 1.00, 0.00])
         if premio > 0:
@@ -165,8 +209,50 @@ elif opcion == "Caja Misteriosa":
         else:
             st.error("¡Oh no! La caja estaba vacía.")
 
+elif opcion == "Sesión de Videos y Monetag":
+    st.title("📺 Sesión de Videos y Monetag")
+    st.write("Mira los anuncios patrocinados abajo para reclamar tus recompensas diarias:")
+    st.components.v1.html(banner_anuncio_html, height=120)
+    if st.button("Reclamar Bonus por Ver Anuncio (+0.20 💎)"):
+        actualizar_saldo(0.20)
+        st.success("¡Recompensa acreditada con éxito!")
+
+elif opcion == "Invitar Amigos":
+    st.title("🔗 Invitar Amigos")
+    st.write("Comparte tu enlace de referido para ganar comisiones:")
+    st.code(f"https://tradynglimon.online/?ref={usuario}")
+    if st.button("Simular Registro de Amigo (+0.50 💎)"):
+        actualizar_saldo(0.50)
+        st.success("¡Un amigo se unió con tu enlace! Ganaste 💎 0.50")
+
 elif opcion == "Ranking Semanal Top 4":
-    st.title("🏆 Ranking Semanal")
+    st.title("🏆 Competencia Semanal")
+    st.write("¡Los mejores jugadores ganan premios en efectivo reales cada semana!")
+    
+    countdown_clock_html = """
+    <div style="text-align: center; font-size: 16px; font-weight: bold; background: #222; padding: 10px; border-radius: 8px; color: white;">
+        ⏱️ Cierre del ranking: <span id="live-clock"></span>
+    </div>
+    <script>
+        let countDownDate = new Date().getTime() + (2 * 24 * 60 * 60 * 1000);
+        let x = setInterval(function() {
+            let now = new Date().getTime();
+            let distance = countDownDate - now;
+            let days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            let hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            let el = document.getElementById("live-clock");
+            if(el) { el.innerHTML = days + "d " + hours + "h " + minutes + "m " + seconds + "s "; }
+            if (distance < 0) {
+                clearInterval(x);
+                if(el) { el.innerHTML = "¡COMPETENCIA FINALIZADA!"; }
+            }
+        }, 1000);
+    </script>
+    """
+    st.components.v1.html(countdown_clock_html, height=75)
+
     puntos_usuario = 1650 + int(saldo_actual * 10)
     st.markdown(f"""
 | Puesto | Usuario | Puntuación | Premio Semanal |
@@ -193,10 +279,3 @@ elif opcion == "Solicitar Retiro y Conversor":
             st.success(f"¡Retiro solicitado con éxito a través de {metodo}!")
         else:
             st.error("Verifica tus datos de destino o tu saldo disponible.")
-
-else:
-    st.title(f"🎮 {opcion}")
-    st.write("Esta sección está activa y lista para sumar recompensas en ZafiroX.")
-    if st.button("Reclamar Bonus de Sección (+0.10 💎)"):
-        actualizar_saldo(0.10)
-        st.success("¡Bonus reclamado con éxito!")
