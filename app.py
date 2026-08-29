@@ -19,7 +19,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- ARCHIVO DE PERSISTENCIA PARA QUE NO SE PIERDAN LAS CUENTAS ---
+# --- ARCHIVO DE PERSISTENCIA ---
 DB_FILE = "usuarios_db.json"
 
 def cargar_db():
@@ -52,7 +52,7 @@ query_params = st.query_params
 # --- PANTALLA DE LOGIN / REGISTRO ---
 if st.session_state.usuario_actual is None:
     st.title("💎 ZafiroX - Acceso de Usuarios")
-    st.write("Inicia sesión o regístrate. Tus datos ahora se guardan de forma permanente.")
+    st.write("Inicia sesión o regístrate para gestionar tu saldo y retiros.")
     
     tab1, tab2 = st.tabs(["Iniciar Sesión", "Registrarse"])
     
@@ -254,37 +254,32 @@ elif opcion == "Caza de Minas (Casino)":
         if st.button("Casilla 1"):
             res = random.choice([2.0, -1.0])
             actualizar_saldo(res)
-            if res > 0: st.success("¡Salvado! +2.0 💎")
-            else: st.error("¡Boom! -1.0 💎")
-            st.rerun()
+            if res > 0: st.success(f"¡Salvado! +{res} 💎")
+            else: st.error(f"¡Boom! {res} 💎")
     with col2:
         if st.button("Casilla 2"):
             res = random.choice([3.0, -1.5])
             actualizar_saldo(res)
-            if res > 0: st.success("¡Salvado! +3.0 💎")
-            else: st.error("¡Boom! -1.5 💎")
-            st.rerun()
+            if res > 0: st.success(f"¡Salvado! +{res} 💎")
+            else: st.error(f"¡Boom! {res} 💎")
     with col3:
         if st.button("Casilla 3"):
             res = random.choice([1.5, -2.0])
             actualizar_saldo(res)
-            if res > 0: st.success("¡Salvado! +1.5 💎")
-            else: st.error("¡Boom! -2.0 💎")
-            st.rerun()
+            if res > 0: st.success(f"¡Salvado! +{res} 💎")
+            else: st.error(f"¡Boom! {res} 💎")
     with col4:
         if st.button("Casilla 4"):
             res = random.choice([4.0, -2.5])
             actualizar_saldo(res)
-            if res > 0: st.success("¡Premio! +4.0 💎")
-            else: st.error("¡Boom! -2.5 💎")
-            st.rerun()
+            if res > 0: st.success(f"¡Premio! +{res} 💎")
+            else: st.error(f"¡Boom! {res} 💎")
     with col5:
         if st.button("Casilla 5"):
             res = random.choice([5.0, -3.0])
             actualizar_saldo(res)
-            if res > 0: st.success("¡Jackpot! +5.0 💎")
-            else: st.error("¡Boom! -3.0 💎")
-            st.rerun()
+            if res > 0: st.success(f"¡Jackpot! +{res} 💎")
+            else: st.error(f"¡Boom! {res} 💎")
 
 elif opcion == "Cofres Misteriosos de Tensión":
     st.title("🗝️ Cofres de Tensión ZafiroX")
@@ -296,22 +291,19 @@ elif opcion == "Cofres Misteriosos de Tensión":
             premio = random.choice([5.00, 2.00, -1.00])
             actualizar_saldo(premio)
             if premio > 0: st.success(f"¡Increíble! +{premio} 💎")
-            else: st.error("¡Cofre vacío! -1.00 💎")
-            st.rerun()
+            else: st.error(f"¡Cofre vacío! {premio} 💎")
     with col2:
         if st.button("🎁 Cofre 2"):
             premio = random.choice([10.00, 1.00, -2.00])
             actualizar_saldo(premio)
             if premio > 0: st.success(f"¡Premio gordo! +{premio} 💎")
-            else: st.error("¡Trampa en el cofre! -2.00 💎")
-            st.rerun()
+            else: st.error(f"¡Trampa en el cofre! {premio} 💎")
     with col3:
         if st.button("🎁 Cofre 3"):
             premio = random.choice([4.00, 3.00, -1.50])
             actualizar_saldo(premio)
             if premio > 0: st.success(f"¡Buen botín! +{premio} 💎")
-            else: st.error("¡Mala suerte! -1.50 💎")
-            st.rerun()
+            else: st.error(f"¡Mala suerte! {premio} 💎")
 
 elif opcion == "Caja Misteriosa":
     st.title("📦 Caja Misteriosa de Alto Riesgo")
@@ -320,10 +312,9 @@ elif opcion == "Caja Misteriosa":
         premio = random.choice([3.50, -1.50, 6.00])
         actualizar_saldo(premio)
         if premio > 0:
-            st.success(f"🎁 ¡Descubriste {premio} 💎!")
+            st.success(f"🎁 ¡Descubriste +{premio} 💎!")
         else:
             st.error(f"💀 ¡Era una trampa! Perdiste {abs(premio)} 💎.")
-        st.rerun()
 
 elif opcion == "Sesión de Videos y Monetag":
     st.title("🎬 Videos Publicitarios y Monetag")
@@ -376,7 +367,6 @@ elif opcion == "Sesión de Videos y Monetag":
         actualizar_saldo(1.50)
         st.session_state.video_reclamado = True
         st.success("🎉 ¡Video completado! +1.50 💎 añadidos.")
-        st.rerun()
         
     st.markdown("---")
     st.subheader("🚀 Enlace Directo Monetag")
@@ -395,7 +385,6 @@ elif opcion == "Sesión de Videos y Monetag":
     if st.button("Confirmar visualización de enlace"):
         actualizar_saldo(1.00)
         st.success("¡Visualización acreditada! +1.00 💎")
-        st.rerun()
 
 elif opcion == "Invitar Amigos":
     st.title("👥 Invitar Amigos con Recompensa")
@@ -418,10 +407,11 @@ elif opcion == "Ranking Semanal Top 4":
             let hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             let seconds = Math.floor((distance % (1000 * 60)) / 1000);
-            document.getElementById("live-clock").innerHTML = days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
+            let el = document.getElementById("live-clock");
+            if(el) { el.innerHTML = days + "d " + hours + "h " + minutes + "m " + seconds + "s "; }
             if (distance < 0) {
                 clearInterval(x);
-                document.getElementById("live-clock").innerHTML = "¡COMPETENCIA FINALIZADA!";
+                if(el) { el.innerHTML = "¡COMPETENCIA FINALIZADA!"; }
             }
         }, 1000);
     </script>
