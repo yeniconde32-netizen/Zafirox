@@ -30,7 +30,7 @@ st.markdown("""
 banner_anuncio_html = """
 <div style="text-align: center; margin: 15px 0; background: #1a1c23; padding: 10px; border-radius: 8px;">
     <p style="color: #888; font-size: 11px; margin-bottom: 5px;">Publicidad Patrocinada</p>
-    <script async src="https://alwingulla.com/act/files/tag.min.js" data-zone="TU_ZONA_AQUI" data-sdk="show_12345"></script>
+    <script async src="https://alwingulla.com/act/files/tag.min.js" data-zone="11679572" data-sdk="show_12345"></script>
 </div>
 """
 
@@ -51,166 +51,152 @@ def cargar_db():
 
 def guardar_db(db):
     with open(DB_FILE, "w") as f:
-        json.dump(db, f)
+        json.dump(db, f, indent=4)
 
-db_usuarios = cargar_db()
+if 'usuarios_db' not in st.session_state:
+    st.session_state.usuarios_db = cargar_db()
 
-# --- ESTADO DE SESIÓN ---
-if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
-    st.session_state.user = ""
+if 'usuario_actual' not in st.session_state:
+    st.session_state.usuario_actual = None
 
-# --- SISTEMA DE LOGIN / REGISTRO ---
-if not st.session_state.logged_in:
-    st.title("💎 ZafiroX - Iniciar Sesión")
+if 'video_reclamado' not in st.session_state:
+    st.session_state.video_reclamado = False
+
+# --- PANTALLA DE LOGIN / REGISTRO ---
+if st.session_state.usuario_actual is None:
+    st.title("💎 ZafiroX - Acceso de Usuarios")
+    st.write("Inicia sesión o regístrate para gestionar tu saldo y retiros.")
+    
     tab1, tab2 = st.tabs(["Iniciar Sesión", "Registrarse"])
     
     with tab1:
-        user_input = st.text_input("Usuario", key="login_user")
-        pass_input = st.text_input("Contraseña", type="password", key="login_pass")
-        if st.button("Entrar"):
-            if user_input in db_usuarios and db_usuarios[user_input]["password"] == pass_input:
-                st.session_state.logged_in = True
-                st.session_state.user = user_input
+        user_login = st.text_input("Usuario", key="login_user", placeholder="Tu nombre de usuario")
+        pass_login = st.text_input("Contraseña", type="password", key="login_pass", placeholder="Tu contraseña")
+        
+        if st.button("Entrar a ZafiroX"):
+            db = st.session_state.usuarios_db
+            if user_login in db and db[user_login]["password"] == pass_login:
+                st.session_state.usuario_actual = user_login
+                st.success(f"¡Bienvenido de nuevo, {user_login}!")
                 st.rerun()
             else:
-                st.error("Usuario o contraseña incorrectos")
+                st.error("Usuario o contraseña incorrectos.")
                 
     with tab2:
-        new_user = st.text_input("Nuevo Usuario", key="reg_user")
-        new_pass = st.text_input("Nueva Contraseña", type="password", key="reg_pass")
+        user_reg = st.text_input("Nuevo Usuario", key="reg_user", placeholder="Elige un usuario")
+        pass_reg = st.text_input("Nueva Contraseña", type="password", key="reg_pass", placeholder="Elige una contraseña")
         if st.button("Crear Cuenta"):
-            if new_user in db_usuarios:
-                st.warning("El usuario ya existe.")
-            elif new_user.strip() == "":
-                st.error("El usuario no puede estar vacío.")
+            if user_reg and pass_reg:
+                db = st.session_state.usuarios_db
+                if user_reg in db:
+                    st.error("El usuario ya existe.")
+                else:
+                    db[user_reg] = {"password": pass_reg, "saldo": 0.00}
+                    guardar_db(db)
+                    st.session_state.usuario_actual = user_reg
+                    st.success(f"¡Cuenta creada con éxito! Bienvenido, {user_reg}.")
+                    st.rerun()
             else:
-                db_usuarios[new_user] = {"password": new_pass, "saldo": 0.0}
-                guardar_db(db_usuarios)
-                st.success("¡Cuenta creada con éxito! Ve a la pestaña de Iniciar Sesión.")
-else:
-    usuario_actual = st.session_state.user
-    saldo_actual = db_usuarios[usuario_actual]["saldo"]
+                st.warning("Completa todos los campos.")
+    
+    st.stop()
 
-    def actualizar_saldo(cantidad):
-        db_usuarios[usuario_actual]["saldo"] += cantidad
-        guardar_db(db_usuarios)
+# Sincronizamos usuario activo y base de datos
+usuario = st.session_state.usuario_actual
+saldo_actual = st.session_state.usuarios_db[usuario]["saldo"]
 
-    st.sidebar.title(f"Bienvenido, {usuario_actual}")
-    st.sidebar.metric("Saldo Disponible", f"💎 {saldo_actual:.2f}")
+def actualizar_saldo(cantidad):
+    st.session_state.usuarios_db[usuario]["saldo"] = max(0.0, st.session_state.usuarios_db[usuario]["saldo"] + cantidad)
+    guardar_db(st.session_state.usuarios_db)
 
-    if st.sidebar.button("Cerrar Sesión"):
-        st.session_state.logged_in = False
-        st.session_state.user = ""
+# --- MENÚ LATERAL ---
+with st.sidebar:
+    st.image("https://img.icons8.com/color/96/controller.png", width=60)
+    st.title("ZafiroX")
+    st.write(f"Hola, **{usuario}** 👋")
+    
+    if st.button("🚪 Cerrar Sesión"):
+        st.session_state.usuario_actual = None
         st.rerun()
-
-    opcion = st.sidebar.radio("Menú Principal", ["Minijuegos", "Ranking Semanal", "Solicitar Retiro y Conversor"])
-
-    st.sidebar.markdown("---")
-    st.sidebar.markdown("### Patrocinador")
-    with st.sidebar:
-        st.components.v1.html(banner_anuncio_html, height=120)
-
-    if opcion == "Minijuegos":
-        st.title("🎮 Zona de Minijuegos")
-        st.write("¡Juega y gana recompensas para tu saldo!")
-
-        juego = st.selectbox("Elige un minijuego:", ["Caja Misteriosa", "Tragamonedas Zafiro", "Memoria Rápida"])
-
-        if juego == "Caja Misteriosa":
-            st.subheader("📦 Abre una Caja Misteriosa")
-            if st.button("Abrir Caja"):
-                premio = random.choice([0.10, 0.25, 0.50, 1.00, 0.00])
-                if premio > 0:
-                    actualizar_saldo(premio)
-                    st.success(f"¡Felicidades! Encontraste 💎 {premio:.2f} en la caja.")
-                else:
-                    st.error("¡Oh no! La caja estaba vacía.")
-
-        elif juego == "Tragamonedas Zafiro":
-            st.subheader("🎰 Gira los Rodillos")
-            if st.button("Girar Ruleta"):
-                simbolos = ["💎", "🍋", "⭐", "7️⃣", "🍒"]
-                res = [random.choice(simbolos) for _ in range(3)]
-                st.write(f"### {res[0]} | {res[1]} | {res[2]}")
-                if res[0] == res[1] == res[2]:
-                    actualizar_saldo(2.00)
-                    st.success("¡JACKPOT! Ganaste 💎 2.00")
-                elif res[0] == res[1] or res[1] == res[2]:
-                    actualizar_saldo(0.50)
-                    st.success("¡Buena combinación! Ganaste 💎 0.50")
-                else:
-                    st.error("Sigue intentando.")
-
-        elif juego == "Memoria Rápida":
-            st.subheader("🧠 Acierta el Número Secreto")
-            num_secreto = random.randint(1, 5)
-            intento = st.number_input("Adivina un número del 1 al 5:", min_value=1, max_value=5, step=1)
-            if st.button("Probar Suerte"):
-                if intento == num_secreto:
-                    actualizar_saldo(1.00)
-                    st.success(f"¡Adivinaste! El número era {num_secreto}. Ganaste 💎 1.00")
-                else:
-                    st.error(f"Fallaste. El número correcto era {num_secreto}.")
-
-    elif opcion == "Ranking Semanal":
-        st.title("🏆 Competencia Semanal")
-        st.write("¡Los mejores jugadores ganan premios en efectivo reales cada semana!")
         
-        countdown_clock_html = """
-        <div style="text-align: center; font-size: 20px; font-weight: bold; background: #222; padding: 10px; border-radius: 8px;">
-            ⏱️ Cierre del ranking en tiempo real: <span id="live-clock"></span>
-        </div>
-        <script>
-            let countDownDate = new Date().getTime() + (2 * 24 * 60 * 60 * 1000);
-            let x = setInterval(function() {
-                let now = new Date().getTime();
-                let distance = countDownDate - now;
-                let days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                let hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                let seconds = Math.floor((distance % (1000 * 60)) / 1000);
-                let el = document.getElementById("live-clock");
-                if(el) { el.innerHTML = days + "d " + hours + "h " + minutes + "m " + seconds + "s "; }
-                if (distance < 0) {
-                    clearInterval(x);
-                    if(el) { el.innerHTML = "¡COMPETENCIA FINALIZADA!"; }
-                }
-            }, 1000);
-        </script>
-        """
-        st.components.v1.html(countdown_clock_html, height=75)
+    st.markdown("---")
+    st.subheader("Menú Principal")
+    
+    opcion = st.selectbox(
+        "Selecciona una sección:",
+        [
+            "Minijuego Bloques (Hard)",
+            "Minijuego Snake (Hard)",
+            "Caza de Minas (Casino)",
+            "Cofres Misteriosos de Tensión",
+            "Caja Misteriosa",
+            "Sesión de Videos y Monetag",
+            "Invitar Amigos",
+            "Ranking Semanal Top 4",
+            "Solicitar Retiro y Conversor"
+        ]
+    )
+    
+    st.markdown("---")
+    st.write("💎 **Tu Saldo Actual:**")
+    st.metric(label="", value=f"{saldo_actual:.2f} 💎")
 
-        puntos_usuario = 1650 + int(saldo_actual * 10)
+    st.markdown("---")
+    st.markdown("### Patrocinador")
+    st.components.v1.html(banner_anuncio_html, height=120)
 
-        st.markdown(f"""
+# --- CONTENIDO DE SECCIONES ---
+
+if opcion == "Minijuego Bloques (Hard)":
+    st.title("🧩 Minijuego de Bloques (Modo Difícil)")
+    st.write("¡Velocidad alta estilo Arcade para poner a prueba tus reflejos!")
+    
+    if st.button("Jugar Partida Rápida y Ganar 💎 0.20"):
+        actualizar_saldo(0.20)
+        st.success("¡Partida completada con éxito! Ganaste 💎 0.20")
+
+elif opcion == "Caja Misteriosa":
+    st.title("📦 Caja Misteriosa")
+    if st.button("Abrir Caja"):
+        premio = random.choice([0.10, 0.25, 0.50, 1.00, 0.00])
+        if premio > 0:
+            actualizar_saldo(premio)
+            st.success(f"¡Felicidades! Encontraste 💎 {premio:.2f}")
+        else:
+            st.error("¡Oh no! La caja estaba vacía.")
+
+elif opcion == "Ranking Semanal Top 4":
+    st.title("🏆 Ranking Semanal")
+    puntos_usuario = 1650 + int(saldo_actual * 10)
+    st.markdown(f"""
 | Puesto | Usuario | Puntuación | Premio Semanal |
 | :--- | :--- | :--- | :--- |
-| 🥇 **1º** | **{usuario_actual} (Tú)** | {puntos_usuario:,} pts | $50.000 COP |
+| 🥇 **1º** | **{usuario} (Tú)** | {puntos_usuario:,} pts | $50.000 COP |
 | 🥈 **2º** | CyberKing_99 | 1,420 pts | $30.000 COP |
 | 🥉 **3º** | ZafiroQueen | 1,200 pts | $20.000 COP |
 | 🏅 **4º** | NeoGamer_X | 990 pts | $10.000 COP |
 """)
 
-    elif opcion == "Solicitar Retiro y Conversor":
-        st.title("💸 Conversor de Dinero y Retiro Real")
-        st.write(f"Tu saldo disponible es de **💎 {saldo_actual:.2f}**")
+elif opcion == "Solicitar Retiro y Conversor":
+    st.title("💸 Conversor de Dinero y Retiro Real")
+    tasa_conversion = 4000
+    valor_cop = saldo_actual * tasa_conversion
+    st.info(f"💡 Tus 💎 {saldo_actual:.2f} equivalen aproximadamente a **${valor_cop:,.0f} COP**")
+    
+    metodo = st.selectbox("Método de pago:", ["Nequi", "Daviplata", "PSE", "PayPal"])
+    cuenta_destino = st.text_input(f"Número de cuenta para {metodo}")
+    monto_retiro = st.number_input("Monto en 💎 a retirar", min_value=1.0, max_value=float(saldo_actual) if saldo_actual > 0 else 1.0, step=0.5)
+    
+    if st.button("📥 Enviar Solicitud de Retiro"):
+        if cuenta_destino and saldo_actual >= monto_retiro:
+            actualizar_saldo(-monto_retiro)
+            st.success(f"¡Retiro solicitado con éxito a través de {metodo}!")
+        else:
+            st.error("Verifica tus datos de destino o tu saldo disponible.")
 
-        tasa_conversion = 4000
-        valor_cop = saldo_actual * tasa_conversion
-        st.info(f"💡 **Conversor automático:** Tus 💎 {saldo_actual:.2f} equivalen aproximadamente a **${valor_cop:,.0f} COP**")
-
-        st.markdown("---")
-        metodo = st.selectbox("Selecciona tu método de pago:", ["Nequi", "Daviplata", "PSE", "PayPal"])
-        cuenta_destino = st.text_input(f"Número de celular / Cuenta para {metodo}")
-        monto_retiro = st.number_input("Monto en 💎 a retirar", min_value=1.0, max_value=float(saldo_actual) if saldo_actual > 0 else 1.0, step=0.5)
-
-        monto_cop_retiro = monto_retiro * tasa_conversion
-        st.write(f"Monto a recibir: **${monto_cop_retiro:,.0f} COP**")
-
-        if st.button("📥 Enviar Solicitud de Retiro"):
-            if cuenta_destino and saldo_actual >= monto_retiro:
-                actualizar_saldo(-monto_retiro)
-                st.success(f"¡Retiro de ${monto_cop_retiro:,.0f} COP solicitado con éxito a través de {metodo}! Procesando...")
-            else:
-                st.error("Completa los datos de destino o verifica que tengas suficiente saldo.")
+else:
+    st.title(f"🎮 {opcion}")
+    st.write("Esta sección está activa y lista para sumar recompensas en ZafiroX.")
+    if st.button("Reclamar Bonus de Sección (+0.10 💎)"):
+        actualizar_saldo(0.10)
+        st.success("¡Bonus reclamado con éxito!")
