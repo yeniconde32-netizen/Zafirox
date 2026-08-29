@@ -26,9 +26,9 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- CÓDIGO HTML PARA EL DISPLAY AD ---
+# --- CÓDIGO HTML PARA EL DISPLAY AD (OPTIMIZADO) ---
 banner_anuncio_html = """
-<div style="text-align: center; margin: 15px 0; background: #1a1c23; padding: 10px; border-radius: 8px;">
+<div style="text-align: center; margin: 10px 0; background: #1a1c23; padding: 12px; border-radius: 8px; min-height: 90px;">
     <p style="color: #888; font-size: 11px; margin-bottom: 5px;">Publicidad Patrocinada</p>
     <script async src="https://alwingulla.com/act/files/tag.min.js" data-zone="11679572" data-sdk="show_12345"></script>
 </div>
@@ -45,7 +45,7 @@ def cargar_db():
             except:
                 return {}
     return {
-        "Lud337": {"password": "123", "saldo": 31.60},
+        "Lud337": {"password": "123", "saldo": 38.15},
         "Carlos_99": {"password": "456", "saldo": 10.00}
     }
 
@@ -196,30 +196,37 @@ elif opcion == "Caja Misteriosa":
 
 elif opcion == "Sesión de Videos Reales (YouTube)":
     st.title("📺 Zona de Videos Patrocinados")
-    st.write("Mira el video completo en el reproductor de abajo para asegurar que lo ves, y luego reclama tu recompensa:")
+    st.write("Visualiza el video completo y reclama tu recompensa de saldo:")
     
-    # Reproductor oficial de YouTube integrado para obligar al usuario a visualizarlo
     st.video("https://www.youtube.com/watch?v=kJQP7kiw5Fk")
     
     st.markdown("---")
-    st.markdown("#### Publicidad Adicional Monetag:")
+    st.markdown("#### Publicidad Monetag:")
     st.components.v1.html(banner_anuncio_html, height=120)
     
     if st.button("🎁 Reclamar Recompensa por Ver el Video (+0.25 💎)"):
         actualizar_saldo(0.25)
-        st.success("¡Excelente! Has acreditado 💎 0.25 por visualizar el contenido multimedia.")
+        st.success("¡Recompensa acreditada con éxito!")
 
 elif opcion == "🎧 Música & Beats Recompensados":
     st.title("🎧 Estación de Música ZafiroX")
-    st.write("Disfruta de nuestros beats oficiales mientras acumulas saldo a tu cuenta:")
+    st.write("Reproduce el beat oficial de la plataforma de forma estable sin cortes:")
     
-    # Reproductor de audio embebido de muestra
-    st.audio("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3")
+    # Reproductor HTML nativo robusto con controles directos para evitar bloqueos
+    audio_html = """
+    <div style="background: #1a1c23; padding: 15px; border-radius: 8px; text-align: center;">
+        <audio controls style="width: 100%;">
+            <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+            Tu navegador no soporta audio HTML5.
+        </audio>
+    </div>
+    """
+    st.components.v1.html(audio_html, height=80)
     
     st.markdown("---")
     if st.button("🎵 Reclamar Bonus por Escucha Musical (+0.20 💎)"):
         actualizar_saldo(0.20)
-        st.success("¡Disfrutaste la sesión musical! Se han sumado 💎 0.20 a tu cuenta.")
+        st.success("¡Se han sumado 💎 0.20 a tu cuenta por escuchar los beats!")
 
 elif opcion == "Invitar Amigos":
     st.title("🔗 Invitar Amigos")
@@ -233,26 +240,31 @@ elif opcion == "Ranking Semanal Top 4":
     st.title("🏆 Competencia Semanal")
     st.write("¡Los mejores jugadores ganan premios en efectivo reales cada semana!")
     
+    # Temporizador robusto asegurado mediante contenedor seguro
     countdown_clock_html = """
-    <div style="text-align: center; font-size: 16px; font-weight: bold; background: #222; padding: 10px; border-radius: 8px; color: white;">
-        ⏱️ Cierre del ranking: <span id="live-clock"></span>
+    <div style="text-align: center; font-size: 16px; font-weight: bold; background: #1a1c23; padding: 12px; border-radius: 8px; color: white; border: 1px solid #333;">
+        ⏱️ Cierre del ranking en: <span id="live-clock" style="color: #00ffcc;">Calculando...</span>
     </div>
     <script>
-        let countDownDate = new Date().getTime() + (2 * 24 * 60 * 60 * 1000);
-        let x = setInterval(function() {
-            let now = new Date().getTime();
-            let distance = countDownDate - now;
-            let days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            let hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            let seconds = Math.floor((distance % (1000 * 60)) / 1000);
-            let el = document.getElementById("live-clock");
-            if(el) { el.innerHTML = days + "d " + hours + "h " + minutes + "m " + seconds + "s "; }
-            if (distance < 0) {
-                clearInterval(x);
-                if(el) { el.innerHTML = "¡COMPETENCIA FINALIZADA!"; }
-            }
-        }, 1000);
+        if (!window.myCountdownInterval) {
+            window.targetTime = new Date().getTime() + (2 * 24 * 60 * 60 * 1000);
+            window.myCountdownInterval = setInterval(function() {
+                let now = new Date().getTime();
+                let distance = window.targetTime - now;
+                let days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                let hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                let el = document.getElementById("live-clock");
+                if(el) { 
+                    el.innerHTML = days + "d " + hours + "h " + minutes + "m " + seconds + "s "; 
+                }
+                if (distance < 0) {
+                    clearInterval(window.myCountdownInterval);
+                    if(el) { el.innerHTML = "¡COMPETENCIA FINALIZADA!"; }
+                }
+            }, 1000);
+        }
     </script>
     """
     st.components.v1.html(countdown_clock_html, height=75)
