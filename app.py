@@ -128,7 +128,7 @@ with st.sidebar:
             "🎡 Ruleta de la Fortuna",
             "📺 Zona Multimedia & Educativa",
             "🎵 Vídeos Musicales en Streaming",
-            "📻 Emisora Zafiro (En Vivo 24/7 - Pop, Rock, Salsa & Más)",
+            "📻 Mini Emisora Zafiro (Automática 24/7)",
             "🔗 Invitar Amigos",
             "🏆 Competencia Semanal",
             "💸 Conversor y Retiros (Nequi / PayPal)"
@@ -259,14 +259,14 @@ elif opcion == "🎡 Ruleta de la Fortuna":
         st.rerun()
 
 elif opcion == "📺 Zona Multimedia & Educativa":
-    st.title("📺 Zona Multimedia Zafiro (Anime, Carranga & Trading)")
-    st.write("Disfruta de contenido multimedia seleccionado con reproducción fluida garantizada:")
+    st.title("📺 Zona Multimedia Variada (Trading, Carranga & Cursos)")
+    st.write("Disfruta de contenido educativo variado con reproductores independientes:")
     
     multimedia_videos = {
         "📊 Curso Básico de Trading & Finanzas Personales": "https://www.w3schools.com/html/mov_bbb.mp4",
-        "💡 Aprende a Monetizar y Hacer Marketing Digital": "https://www.w3schools.com/html/mov_bbb.mp4",
-        "🎻 Música Carranga Tradicional de Boyacá (Jorge Velosa Estilo)": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
-        "🎸 Rock Alternativo & Sesión Especial": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+        "💡 Aprende a Monetizar y Hacer Marketing Digital": "https://www.w3schools.com/html/movie.mp4",
+        "🎻 Música Carranga Tradicional de Boyacá": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+        "🎸 Rock Alternativo & Sesión Especial": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
         "🎬 Tráiler Estreno Cine / Películas Nuevas": "https://www.w3schools.com/html/mov_bbb.mp4"
     }
     
@@ -297,13 +297,13 @@ elif opcion == "📺 Zona Multimedia & Educativa":
             st.rerun()
 
 elif opcion == "🎵 Vídeos Musicales en Streaming":
-    st.title("🎵 Vídeos Musicales en Streaming")
-    st.write("Disfruta de tus videoclips musicales favoritos con reproducción fluida:")
+    st.title("🎵 Vídeos Musicales Variados en Streaming")
+    st.write("Disfruta de diferentes clips musicales con reproducción fluida:")
     
     videos_musicales = {
-        "Videoclip Pop & Hits Globales": "https://www.w3schools.com/html/mov_bbb.mp4",
+        "Videoclip Pop & Hits Globales": "https://www.w3schools.com/html/movie.mp4",
         "Videoclip Dance & Party Electrónica": "https://www.w3schools.com/html/mov_bbb.mp4",
-        "Videoclip Rock & Alternative Vibes": "https://www.w3schools.com/html/mov_bbb.mp4",
+        "Videoclip Rock & Alternative Vibes": "https://www.w3schools.com/html/movie.mp4",
         "Videoclip Synthwave & Retro Beats": "https://www.w3schools.com/html/mov_bbb.mp4"
     }
     
@@ -328,30 +328,71 @@ elif opcion == "🎵 Vídeos Musicales en Streaming":
             time.sleep(0.8)
             st.rerun()
 
-elif opcion == "📻 Emisora Zafiro (En Vivo 24/7 - Pop, Rock, Salsa & Más)":
-    st.title("📻 Emisora Zafiro - La Estación Única 24/7")
-    st.write("Disfruta de **Emisora Zafiro**, la señal oficial con lo mejor del Rock, Pop, Electrónica, Salsa y Ranchera en una transmisión continua. *Puedes dejarla sonando en segundo plano mientras navegas por otras páginas o bloqueas tu celular*:")
+elif opcion == "📻 Mini Emisora Zafiro (Automática 24/7)":
+    st.title("📻 Mini Emisora Zafiro - Estación Automática")
+    st.write("Disfruta de tu **Mini Emisora Zafiro**. El reproductor automático pasará de una canción a otra (Pop, Rock, Electrónica, Baladas y más) de manera continua sin detenerse, ideal para dejarla sonando de fondo en tu celular:")
     
-    # Emisora maestra global que transmite variedad musical continua
-    url_emisora_zafiro = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+    # Reproductor HTML5 avanzado con lista de reproducción automática (playlist estilo mini Spotify)
+    mini_emisora_html = """
+    <div style="background: #1e1e2f; padding: 20px; border-radius: 12px; text-align: center; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.4);">
+        <h3 style="margin-top: 0; color: #00d2ff;">🎧 Emisora Zafiro En Vivo</h3>
+        <p style="font-size: 13px; color: #bbb; margin-bottom: 15px;">Reproducción automática continua de éxitos variados</p>
+        <audio id="zafiroRadio" controls autoplay style="width: 100%; border-radius: 8px;">
+            Tu navegador no soporta audio HTML5.
+        </audio>
+        <p id="nowPlaying" style="margin-top: 12px; font-size: 14px; color: #4cd137; font-weight: bold;">Conectando a la señal...</p>
+    </div>
+
+    <script>
+        const playlist = [
+            { name: "🎵 Zafiro Mix 01: Pop & Hits Globales", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
+            { name: "🎸 Zafiro Mix 02: Rock Alternativo & Energía", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
+            { name: "🎹 Zafiro Mix 03: Balada Pop Acústica", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" },
+            { name: "⚡ Zafiro Mix 04: Electrónica & Dance Session", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" },
+            { name: "🎷 Zafiro Mix 05: Ritmos Latinos & Variados", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3" }
+        ];
+
+        let currentTrack = 0;
+        const audioPlayer = document.getElementById('zafiroRadio');
+        const nowPlayingText = document.getElementById('nowPlaying');
+
+        function playTrack(index) {
+            if (index >= playlist.length) {
+                currentTrack = 0; // Repetir lista completa estilo bucle infinito
+            } else {
+                currentTrack = index;
+            }
+            audioPlayer.src = playlist[currentTrack].url;
+            nowPlayingText.innerText = "Reproduciendo ahora: " + playlist[currentTrack].name;
+            audioPlayer.play().catch(e => console.log("Autoplay bloqueado por navegador, requiere interacción manual."));
+        }
+
+        audioPlayer.addEventListener('ended', function() {
+            playTrack(currentTrack + 1);
+        });
+
+        // Iniciar la primera pista al cargar
+        playTrack(0);
+    </script>
+    """
     
-    st.audio(url_emisora_zafiro, autoplay=False)
+    st.components.v1.html(mini_emisora_html, height=220)
     
-    st.info("💡 **Tip Pro:** Al iniciar el reproductor de la Emisora Zafiro, el audio continuará reproduciéndose de fondo en tu dispositivo.")
+    st.info("💡 **Nota:** Si tu navegador bloquea el arranque automático por seguridad, solo presiona el botón de reproducción ▶️ una vez y la emisora continuará pasando canciones automáticamente de manera indefinida.")
     
     st.markdown("---")
     st.markdown("#### Publicidad Patrocinada:")
     st.components.v1.html(banner_anuncio_html, height=120)
     
-    estado_musica_clave = f"{usuario}_emisora_zafiro_live"
+    estado_musica_clave = f"{usuario}_mini_emisora_zafiro_247"
     
     if estado_musica_clave in st.session_state.musica_escuchada:
         st.button("🎵 Bonus de Emisora ya reclamado hoy", disabled=True, key="btn_musica_disabled")
     else:
-        if st.button("🎵 Reclamar Bonus de Emisora Zafiro (+0.003 💎)", key="btn_musica_claim"):
+        if st.button("🎵 Reclamar Bonus Mini Emisora Zafiro (+0.003 💎)", key="btn_musica_claim"):
             st.session_state.musica_escuchada[estado_musica_clave] = True
             actualizar_saldo(0.003)
-            st.success("✅ ¡Bonus de Emisora Zafiro acreditado!")
+            st.success("✅ ¡Bonus de Mini Emisora Zafiro acreditado!")
             time.sleep(0.8)
             st.rerun()
 
