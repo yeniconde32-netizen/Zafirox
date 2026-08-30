@@ -12,6 +12,17 @@ st.set_page_config(
     layout="centered"
 )
 
+# --- OCULTAR MENÚ FLOTANTE Y BOTÓN DE STREAMLIT ---
+hide_streamlit_style = """
+<style>
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+.stAppDeployButton {display:none;}
+div[data-testid="stStatusWidget"] {visibility: hidden;}
+</style>
+"""
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+
 # --- CÓDIGO HTML PARA EL DISPLAY AD ---
 banner_anuncio_html = """
 <div style="text-align: center; margin: 10px 0; background: #1a1c23; padding: 12px; border-radius: 8px; min-height: 90px;">
@@ -119,15 +130,29 @@ if st.session_state.usuario_actual is None:
         user_reg = st.text_input("Nuevo Usuario", key="reg_user", placeholder="Elige un usuario")
         pass_reg = st.text_input("Nueva Contraseña", type="password", key="reg_pass", placeholder="Elige una contraseña")
         
+        # --- CAJA DE TEXTO PARA CÓDIGO DE REFERIDO MANUAL ---
+        ref_por_url = st.session_state.get("invitado_por", "")
+        codigo_invitado = st.text_input(
+            "Código de Invitado / Patrocinador (Opcional)", 
+            value=ref_por_url, 
+            key="reg_patrocinador", 
+            placeholder="Ej: Lud337"
+        )
+        
         if st.button("Crear Cuenta", key="btn_register"):
             if user_reg and pass_reg:
                 db = st.session_state.usuarios_db
                 if user_reg in db:
                     st.error("El usuario ya existe.")
                 else:
-                    patrocinador = st.session_state.get("invitado_por", None)
+                    patrocinador = codigo_invitado.strip() if codigo_invitado else None
                     
-                    # Bono de bienvenida para el nuevo usuario por usar enlace de referido
+                    # Validar que el patrocinador exista realmente
+                    if patrocinador and patrocinador not in db:
+                        st.warning("⚠️ El código de patrocinador ingresado no existe. Se creará la cuenta sin referido.")
+                        patrocinador = None
+
+                    # Bono de bienvenida para el nuevo usuario
                     bono_inicial = 0.005 if patrocinador else 0.0
                     
                     db[user_reg] = {
@@ -147,8 +172,9 @@ if st.session_state.usuario_actual is None:
                     if patrocinador and patrocinador in db:
                         if "referidos_propios" not in db[patrocinador]:
                             db[patrocinador]["referidos_propios"] = []
-                        db[patrocinador]["referidos_propios"].append(user_reg)
-                        db[patrocinador]["saldo"] += 0.002 # Comisión inmediata de 0.002 diamantes para ti
+                        if user_reg not in db[patrocinador]["referidos_propios"]:
+                            db[patrocinador]["referidos_propios"].append(user_reg)
+                        db[patrocinador]["saldo"] += 0.002 # Comisión inmediata
 
                     guardar_db(db)
                     st.session_state.usuario_actual = user_reg
@@ -208,7 +234,6 @@ with st.sidebar:
         "💸 Pasarela de Pagos (Nequi, Daviplata, PayPal, Bancos)"
     ]
     
-    # Si eres el admin (Lud337), agregamos la opción de administración
     if usuario == "Lud337":
         lista_opciones.append("👑 Panel de Administración (Pagos & Control)")
     
@@ -655,13 +680,11 @@ elif opcion == "💸 Pasarela de Pagos (Nequi, Daviplata, PayPal, Bancos)":
         elif not num_cuenta or not titular or not documento:
             st.warning("⚠️ Completa todos los campos de datos de destino.")
         else:
-            # Guardar datos en perfil del usuario
             st.session_state.usuarios_db[usuario]["telefono"] = num_cuenta
             st.session_state.usuarios_db[usuario]["documento"] = documento
             st.session_state.usuarios_db[usuario]["titular"] = titular
             st.session_state.usuarios_db[usuario]["metodo_favorito"] = metodo_pago
             
-            # Calcular monto final y descontar saldo inmediatamente del usuario (o dejarlo en garantía)
             if "Pesos" in tipo_retiro and "Combinado" not in tipo_retiro:
                 monto_final_cop = monto_cop_retirar
                 st.session_state.usuarios_db[usuario]["saldo_cop"] -= monto_cop_retirar
@@ -678,7 +701,6 @@ elif opcion == "💸 Pasarela de Pagos (Nequi, Daviplata, PayPal, Bancos)":
                 
             guardar_db(st.session_state.usuarios_db)
             
-            # Registrar la solicitud en la bandeja global del administrador
             solicitud_nueva = {
                 "usuario": usuario,
                 "metodo": metodo_pago,
@@ -693,62 +715,82 @@ elif opcion == "💸 Pasarela de Pagos (Nequi, Daviplata, PayPal, Bancos)":
             
             st.success(
                 f"✅ ¡Solicitud enviada con éxito!\n\n"
-                f"Tus fondos han sido descontados de tu saldo y puestos en cola de revisión para transferencia por `{metodo_pago}`. "
+                f"Tus fondos han sido descontados y puestos en cola de revisión para transferencia por `{metodo_pago}`. "
                 f"El administrador validará tu interacción publicitaria y despachará el pago a `{num_cuenta}`."
             )
             st.balloons()
 
-# --- PANEL DE ADMINISTRACIÓN EXCLUSIVO PARA LUD337 ---
+# --- PANEL DE ADMINISTRACIÓN SEGURO CON CONTRASEÑA ---
 if usuario == "Lud337" and opcion == "👑 Panel de Administración (Pagos & Control)":
     st.title("👑 Panel de Administración de Zafiro Vice")
-    st.write("Aquí puedes gestionar y aprobar los retiros solicitados por los usuarios, revisar cuentas registradas y controlar la economía real de la app.")
+    st.write("Zona restringida y blindada para el control financiero de la plataforma.")
     
-    st.subheader("📥 Bandeja de Solicitudes de Retiro Pendientes")
-    
-    if not st.session_state.retiros_globales:
-        st.info("No hay solicitudes de retiro pendientes en este momento.")
+    if "admin_autorizado" not in st.session_state:
+        st.session_state.admin_autorizado = False
+        
+    if not st.session_state.admin_autorizado:
+        st.warning("🔒 Esta sección requiere una Clave de Seguridad de Administrador.")
+        clave_admin_ingresada = st.text_input("Introduce la Clave de Admin", type="password", key="input_clave_admin")
+        
+        if st.button("Desbloquear Panel", key="btn_desbloquear_admin"):
+            # Puedes cambiar 'MiClaveSecreta123' por la contraseña que tú prefieras
+            if clave_admin_ingresada == "MiClaveSecreta123":
+                st.session_state.admin_autorizado = True
+                st.success("✅ ¡Acceso concedido al Panel de Administración!")
+                st.rerun()
+            else:
+                st.error("❌ Clave incorrecta. Acceso denegado.")
     else:
-        for idx, sol in enumerate(st.session_state.retiros_globales):
-            if sol["estado"] == "Pendiente de Aprobación":
-                with st.container():
-                    st.markdown(
-                        f"""
-                        <div style="background: #222530; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid #ffcc00;">
-                            <p style="margin: 0; font-weight: bold; color: #00d2ff;">Usuario: {sol['usuario']}</p>
-                            <p style="margin: 5px 0;"><b>Método:</b> {sol['metodo']} | <b>Cuenta/Celular:</b> {sol['cuenta']}</p>
-                            <p style="margin: 5px 0;"><b>Titular:</b> {sol['titular']} (Doc: {sol['documento']})</p>
-                            <p style="margin: 5px 0; color: #00ffcc;"><b>Monto a Pagar:</b> {sol['monto_texto']}</p>
-                        </div>
-                        """,
-                        unsafe_allow_html=True
-                    )
-                    col_aprob, col_rech = st.columns(2)
-                    with col_aprob:
-                        if st.button(f"✅ Aprobar Pago #{idx}", key=f"aprobar_{idx}"):
-                            st.session_state.retiros_globales[idx]["estado"] = "Aprobado y Pagado"
-                            st.success(f"¡Pago a {sol['usuario']} marcado como PAGADO!")
-                            time.sleep(1)
-                            st.rerun()
-                    with col_rech:
-                        if st.button(f"❌ Rechazar y Reintegrar #{idx}", key=f"rechazar_{idx}"):
-                            # Reintegrar saldo al usuario si se rechaza
-                            db = cargar_db()
-                            if sol['usuario'] in db:
-                                db[sol['usuario']]["saldo_cop"] += sol['monto_cop']
-                                guardar_db(db)
-                            st.session_state.retiros_globales[idx]["estado"] = "Rechazado"
-                            st.warning(f"Solicitud rechazada y fondos devueltos a {sol['usuario']}.")
-                            time.sleep(1)
-                            st.rerun()
-                            
-    st.markdown("---")
-    st.subheader("👥 Base de Datos General de Usuarios Registrados")
-    db_actual = cargar_db()
-    st.write(f"Total de usuarios registrados en la plataforma: **{len(db_actual)}**")
-    
-    for u_name, u_data in db_actual.items():
-        with st.expander(f"👤 {u_name} (Diamantes: {u_data.get('saldo', 0):.4f} | Pesos: ${u_data.get('saldo_cop', 0):,.0f})"):
-            st.write(f"- **Patrocinador / Referido por:** {u_data.get('invitado_por', 'Ninguno')}")
-            st.write(f"- **Referidos propios:** {len(u_data.get('referidos_propios', []))}")
-            st.write(f"- **Método favorito:** {u_data.get('metodo_favorito', 'N/A')}")
-            st.write(f"- **Teléfono / Cuenta guardada:** {u_data.get('telefono', 'No registrado')} (Doc: {u_data.get('documento', 'N/A')})")
+        if st.button("🔒 Bloquear Panel de Nuevo", key="btn_bloquear_admin"):
+            st.session_state.admin_autorizado = False
+            st.rerun()
+            
+        st.markdown("---")
+        st.subheader("📥 Bandeja de Solicitudes de Retiro Pendientes")
+        
+        if not st.session_state.retiros_globales:
+            st.info("No hay solicitudes de retiro pendientes en este momento.")
+        else:
+            for idx, sol in enumerate(st.session_state.retiros_globales):
+                if sol["estado"] == "Pendiente de Aprobación":
+                    with st.container():
+                        st.markdown(
+                            f"""
+                            <div style="background: #222530; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid #ffcc00;">
+                                <p style="margin: 0; font-weight: bold; color: #00d2ff;">Usuario: {sol['usuario']}</p>
+                                <p style="margin: 5px 0;"><b>Método:</b> {sol['metodo']} | <b>Cuenta/Celular:</b> {sol['cuenta']}</p>
+                                <p style="margin: 5px 0;"><b>Titular:</b> {sol['titular']} (Doc: {sol['documento']})</p>
+                                <p style="margin: 5px 0; color: #00ffcc;"><b>Monto a Pagar:</b> {sol['monto_texto']}</p>
+                            </div>
+                            """,
+                            unsafe_allow_html=True
+                        )
+                        col_aprob, col_rech = st.columns(2)
+                        with col_aprob:
+                            if st.button(f"✅ Aprobar Pago #{idx}", key=f"aprobar_{idx}"):
+                                st.session_state.retiros_globales[idx]["estado"] = "Aprobado y Pagado"
+                                st.success(f"¡Pago a {sol['usuario']} marcado como PAGADO!")
+                                time.sleep(1)
+                                st.rerun()
+                        with col_rech:
+                            if st.button(f"❌ Rechazar y Reintegrar #{idx}", key=f"rechazar_{idx}"):
+                                db = cargar_db()
+                                if sol['usuario'] in db:
+                                    db[sol['usuario']]["saldo_cop"] += sol['monto_cop']
+                                    guardar_db(db)
+                                st.session_state.retiros_globales[idx]["estado"] = "Rechazado"
+                                st.warning(f"Solicitud rechazada y fondos devueltos a {sol['usuario']}.")
+                                time.sleep(1)
+                                st.rerun()
+                                
+        st.markdown("---")
+        st.subheader("👥 Base de Datos General de Usuarios Registrados")
+        db_actual = cargar_db()
+        st.write(f"Total de usuarios registrados en la plataforma: **{len(db_actual)}**")
+        
+        for u_name, u_data in db_actual.items():
+            with st.expander(f"👤 {u_name} (Diamantes: {u_data.get('saldo', 0):.4f} | Pesos: ${u_data.get('saldo_cop', 0):,.0f})"):
+                st.write(f"- **Patrocinador / Referido por:** {u_data.get('invitado_por', 'Ninguno')}")
+                st.write(f"- **Referidos propios:** {len(u_data.get('referidos_propios', []))}")
+                st.write(f"- **Método favorito:** {u_data.get('metodo_favorito', 'N/A')}")
+                st.write(f"- **Teléfono / Cuenta guardada:** {u_data.get('telefono', 'No registrado')} (Doc: {u_data.get('documento', 'N/A')})")
