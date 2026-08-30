@@ -361,7 +361,7 @@ elif opcion == "📻 Radio Vice City (Emisoras 24/7)":
             unsafe_allow_html=True
         )
         
-    # HTML Interactivo con playlist y reproductor estilo Vice City
+    # HTML Interactivo con playlist y reproductor estilo Vice City (Audio de Catbox integrado en primera posición)
     mini_emisora_html = """
     <div style="background: #1e1e2f; padding: 20px; border-radius: 12px; text-align: center; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.4);">
         <h3 style="margin-top: 0; color: #00d2ff;">🎧 Transmisión en Vivo - Vice Waves</h3>
@@ -377,10 +377,10 @@ elif opcion == "📻 Radio Vice City (Emisoras 24/7)":
 
     <script>
         const playlist = [
+            { name: "📻 Grabación Personalizada / Emisora Oficial", url: "https://files.catbox.moe/lz5hd3.m4a" },
             { name: "📻 Emotion 98.3: Balada Ochentera & Neón", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
             { name: "🎺 Radio Espantoso: Ritmo Tropical & Salsa", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
-            { name: "🎷 Emotion 98.3: Sintes Románticos de Medianoche", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" },
-            { name: "🪗 Radio Espantoso: Sabor Caribeño & Percusión", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3" }
+            { name: "🎷 Emotion 98.3: Sintes Románticos de Medianoche", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" }
         ];
 
         let currentTrack = Math.floor(Math.random() * playlist.length);
