@@ -20,7 +20,7 @@ banner_anuncio_html = """
 </div>
 """
 
-# --- ARCHIVO DE PERSISTENCIA MEJORADO ---
+# --- ARCHIVO DE PERSISTENCIA ---
 DB_FILE = "usuarios_db.json"
 
 def cargar_db():
@@ -172,12 +172,25 @@ with st.sidebar:
 
 if opcion == "📻 Radio Vice City (Emisoras 24/7)":
     st.title("📻 Zafiro Radio - Transmisión en Vivo")
-    st.write("Disfruta de la emisora oficial estilo clásico con controles de reproducción interactivos y opción de descarga directa:")
+    st.write("Disfruta de la mejor música estilo clásico en streaming con controles interactivos y opción de descarga directa (compatible con segundo plano en celulares):")
     
+    # Emisoras con streams estables para segundo plano y enlaces directos de descarga / escucha
     lista_emisoras = [
-        {"nombre": "📻 Zafiro Radio (Oficial)", "url": "https://files.catbox.moe/lz5hd3.m4a", "desc": "Grabación personalizada con bloques comerciales de Vice City."},
-        {"nombre": "🌴 Emotion 98.3 (Baladas & Ochenteras)", "url": "https://files.catbox.moe/lz5hd3.m4a", "desc": "Siente el dolor y el amor con Fernando Martínez."},
-        {"nombre": "⚡ Radio Espantoso (Latin Groove)", "url": "https://files.catbox.moe/lz5hd3.m4a", "desc": "¡Sube el volumen de tu bólido con Ramón Daboia!"}
+        {
+            "nombre": "⚡ Zafiro Trance & Electronic 24/7", 
+            "url": "https://stream.zeno.fm/f3wvbbqmdg8uv", 
+            "desc": "Música electrónica y trance continua de alto rendimiento para segundo plano."
+        },
+        {
+            "nombre": "🌴 Vice City Synthwave & Chill", 
+            "url": "https://stream.zeno.fm/0r0xa792kwzuv", 
+            "desc": "Estilo retro ochentero, electrónico suave y relajante."
+        },
+        {
+            "nombre": "🔮 Global Club Beats (Dance / House)", 
+            "url": "https://stream.zeno.fm/3g63w7k44cwtv", 
+            "desc": "Ritmos de club y energía pura para acompañar tus ganancias."
+        }
     ]
     
     col_ant, col_info, col_sig = st.columns([1, 2, 1])
@@ -195,20 +208,21 @@ if opcion == "📻 Radio Vice City (Emisoras 24/7)":
     st.markdown(
         f"""
         <div style="background: linear-gradient(135deg, #1f1c2c, #4a3b6c); padding: 15px; border-radius: 10px; color: white; margin: 10px 0; text-align: center;">
-            <h4 style="margin: 0; color: #00d2ff;">{emisora_actual['nombre']}</h4>
-            <p style="font-style: italic; margin-top: 5px; font-size: 13px;">{emisora_actual['desc']}</p>
+            <h4 style="margin: 0; color: #00d2ff;">📻 {emisora_actual['nombre']}</h4>
+            <p style="font-style: italic; margin-top: 5px; font-size: 13px;">Grabación personalizada con bloques comerciales de Vice City.</p>
+            <p style="margin-top: 3px; font-size: 12px; opacity: 0.8;">{emisora_actual['desc']}</p>
         </div>
         """,
         unsafe_allow_html=True
     )
     
-    st.audio(emisora_actual["url"], format="audio/mp4")
+    st.audio(emisora_actual["url"], format="audio/mp3")
     
     st.markdown(
         f"""
         <div style="text-align: center; margin-top: 15px;">
-            <a href="{emisora_actual['url']}" download="Zafiro_Radio_Stream.m4a" target="_blank" style="display: inline-block; background: #00b0ff; color: white; text-decoration: none; padding: 10px 22px; border-radius: 6px; font-weight: bold; font-size: 14px; box-shadow: 0 3px 10px rgba(0,0,176,0.3);">
-                📥 Descargar Archivo de Audio Actual
+            <a href="{emisora_actual["url"]}" target="_blank" style="display: inline-block; background: #00b0ff; color: white; text-decoration: none; padding: 10px 22px; border-radius: 6px; font-weight: bold; font-size: 14px; box-shadow: 0 3px 10px rgba(0,0,176,0.3);">
+                📥 Descargar Archivo de Audio Actual / Stream
             </a>
         </div>
         """,
@@ -217,9 +231,11 @@ if opcion == "📻 Radio Vice City (Emisoras 24/7)":
     
     with st.expander("📢 Comerciales Falsos de Vice City"):
         st.write(
-            "**[SFX: Estática de radio y sonido de motores]**\n\n"
+            "**[SFX: Estática de radio y sonido de motores V8]**\n\n"
             "*Locutor:* ¿Te quedaste sin saldo en Zafiro Vice Club? Ven a "
-            "**Prendas y Rines 'El Chino'**. Cambiamos tu reloj de oro por fichas reales."
+            "**Prendas y Rines 'El Chino'** en Ocean Beach. Cambiamos tu reloj de oro por fichas reales al instante. ¡No hagas preguntas, nosotros tampoco!\n\n"
+            "**[SFX: Anuncio de Colas 'Spand Express']**\n"
+            "*Locutor:* Siente la explosión azucarada en tu garganta. Spand Express: porque la sed en Vice City nunca duerme, y las deudas tampoco."
         )
             
     st.markdown("---")
@@ -481,7 +497,6 @@ elif opcion == "💸 Pasarela de Pagos (Nequi, Daviplata, PayPal, Bancos)":
         "Convenio EPS / Subsidio de Salud"
     ]
     
-    # Mantener el método favorito guardado previamente si existe
     fav_guardado = datos_usuario.get("metodo_favorito", "Nequi (Colombia)")
     idx_fav = metodos_disponibles.index(fav_guardado) if fav_guardado in metodos_disponibles else 0
     
@@ -492,12 +507,10 @@ elif opcion == "💸 Pasarela de Pagos (Nequi, Daviplata, PayPal, Bancos)":
         key="select_metodopago_completo"
     )
     
-    # Cargar valores guardados en la base de datos para autocompletar
     val_tel_guardado = datos_usuario.get("telefono", "")
     val_doc_guardado = datos_usuario.get("documento", "")
     val_titular_guardado = datos_usuario.get("titular", "")
     
-    # Campos dinámicos según el método elegido (con persistencia automática)
     if "Nequi" in metodo_pago or "Daviplata" in metodo_pago:
         num_cuenta = st.text_input("Número de Celular (Cuenta Destino)", value=val_tel_guardado, placeholder="Ej: 3001234567", key="input_celular_wallet")
         titular = st.text_input("Nombre y Apellido del Titular", value=val_titular_guardado, placeholder="Ej: Carlos Andrés Pérez", key="input_titular_wallet")
@@ -539,13 +552,11 @@ elif opcion == "💸 Pasarela de Pagos (Nequi, Daviplata, PayPal, Bancos)":
         elif monto_retirar > saldo_actual:
             st.error("❌ No puedes retirar más de tu saldo actual.")
         else:
-            # Actualizar datos de pago permanentes del usuario en el JSON
             st.session_state.usuarios_db[usuario]["telefono"] = num_cuenta
             st.session_state.usuarios_db[usuario]["documento"] = documento
             st.session_state.usuarios_db[usuario]["titular"] = titular
             st.session_state.usuarios_db[usuario]["metodo_favorito"] = metodo_pago
             
-            # Procesar descuento de saldo y guardar
             st.session_state.usuarios_db[usuario]["saldo"] -= monto_retirar
             guardar_db(st.session_state.usuarios_db)
             
