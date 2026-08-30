@@ -36,6 +36,8 @@ def cargar_db():
             "saldo": 40.2505,
             "saldo_cop": 0.0,
             "premio_reclamado_semana": False,
+            "invitado_por": None,
+            "referidos_propios": [],
             "telefono": "",
             "documento": "",
             "titular": "",
@@ -46,6 +48,8 @@ def cargar_db():
             "saldo": 10.00,
             "saldo_cop": 0.0,
             "premio_reclamado_semana": False,
+            "invitado_por": "Lud337",
+            "referidos_propios": [],
             "telefono": "",
             "documento": "",
             "titular": "",
@@ -78,10 +82,23 @@ if 'videomusica_vista' not in st.session_state:
 if 'indice_emisora' not in st.session_state:
     st.session_state.indice_emisora = 0
 
+# Inicializar lista de solicitudes de retiro globales si no existe
+if 'retiros_globales' not in st.session_state:
+    st.session_state.retiros_globales = []
+
+# --- CAPTURAR REFERIDO DE LA URL ---
+params = st.query_params
+if "ref" in params and st.session_state.usuario_actual is None:
+    referidor = params["ref"]
+    st.session_state.invitado_por = referidor
+
 # --- PANTALLA DE LOGIN / REGISTRO ---
 if st.session_state.usuario_actual is None:
     st.title("💎 Zafiro Vice Club - Acceso")
     st.write("Inicia sesión o regístrate para gestionar tu saldo y retiros con memoria persistente.")
+    
+    if "invitado_por" in st.session_state:
+        st.info(f"🎁 Estás siendo invitado por el usuario: **{st.session_state.invitado_por}** (Recibirás un bono al registrarte).")
     
     tab1, tab2 = st.tabs(["Iniciar Sesión", "Registrarse"])
     
@@ -101,22 +118,38 @@ if st.session_state.usuario_actual is None:
     with tab2:
         user_reg = st.text_input("Nuevo Usuario", key="reg_user", placeholder="Elige un usuario")
         pass_reg = st.text_input("Nueva Contraseña", type="password", key="reg_pass", placeholder="Elige una contraseña")
+        
         if st.button("Crear Cuenta", key="btn_register"):
             if user_reg and pass_reg:
                 db = st.session_state.usuarios_db
                 if user_reg in db:
                     st.error("El usuario ya existe.")
                 else:
+                    patrocinador = st.session_state.get("invitado_por", None)
+                    
+                    # Bono de bienvenida para el nuevo usuario por usar enlace de referido
+                    bono_inicial = 0.005 if patrocinador else 0.0
+                    
                     db[user_reg] = {
                         "password": pass_reg, 
-                        "saldo": 0.00,
+                        "saldo": bono_inicial, 
                         "saldo_cop": 0.0,
                         "premio_reclamado_semana": False,
+                        "invitado_por": patrocinador,
+                        "referidos_propios": [],
                         "telefono": "",
                         "documento": "",
                         "titular": "",
                         "metodo_favorito": "Nequi (Colombia)"
                     }
+                    
+                    # Registrar en la lista del patrocinador y darle su comisión
+                    if patrocinador and patrocinador in db:
+                        if "referidos_propios" not in db[patrocinador]:
+                            db[patrocinador]["referidos_propios"] = []
+                        db[patrocinador]["referidos_propios"].append(user_reg)
+                        db[patrocinador]["saldo"] += 0.002 # Comisión inmediata de 0.002 diamantes para ti
+
                     guardar_db(db)
                     st.session_state.usuario_actual = user_reg
                     st.success(f"¡Cuenta creada con éxito! Bienvenido al club, {user_reg}.")
@@ -128,6 +161,12 @@ if st.session_state.usuario_actual is None:
 
 usuario = st.session_state.usuario_actual
 st.session_state.usuarios_db = cargar_db()
+
+# Seguridad por si el usuario actual fue borrado
+if usuario not in st.session_state.usuarios_db:
+    st.session_state.usuario_actual = None
+    st.rerun()
+
 datos_usuario = st.session_state.usuarios_db[usuario]
 saldo_actual = datos_usuario["saldo"]
 saldo_cop_actual = datos_usuario.get("saldo_cop", 0.0)
@@ -155,22 +194,25 @@ with st.sidebar:
     st.markdown("---")
     st.subheader("Menú Principal")
     
-    opcion = st.selectbox(
-        "Selecciona una sección:",
-        [
-            "📻 Radio Vice City (Emisoras 24/7)",
-            "💎 Resumen de Saldo",
-            "💣 Caza de Minas (Casino)",
-            "🗝️ Cofres Misteriosos",
-            "📦 Caja Misteriosa Clásica",
-            "🎡 Ruleta de la Fortuna",
-            "📺 Zona Multimedia & Educativa",
-            "🎵 Vídeos Musicales en Streaming",
-            "🔗 Invitar Amigos",
-            "🏆 Competencia Semanal",
-            "💸 Pasarela de Pagos (Nequi, Daviplata, PayPal, Bancos)"
-        ]
-    )
+    lista_opciones = [
+        "📻 Radio Vice City (Emisoras 24/7)",
+        "💎 Resumen de Saldo",
+        "💣 Caza de Minas (Casino)",
+        "🗝️ Cofres Misteriosos",
+        "📦 Caja Misteriosa Clásica",
+        "🎡 Ruleta de la Fortuna",
+        "📺 Zona Multimedia & Educativa",
+        "🎵 Vídeos Musicales en Streaming",
+        "🔗 Invitar Amigos",
+        "🏆 Competencia Semanal",
+        "💸 Pasarela de Pagos (Nequi, Daviplata, PayPal, Bancos)"
+    ]
+    
+    # Si eres el admin (Lud337), agregamos la opción de administración
+    if usuario == "Lud337":
+        lista_opciones.append("👑 Panel de Administración (Pagos & Control)")
+    
+    opcion = st.selectbox("Selecciona una sección:", lista_opciones)
     
     st.markdown("---")
     st.write("💎 **Tu Saldo Actual:**")
@@ -244,28 +286,8 @@ if opcion == "📻 Radio Vice City (Emisoras 24/7)":
     
     st.audio(emisora_actual["url"], format="audio/mp3")
     
-    st.markdown(
-        f"""
-        <div style="text-align: center; margin-top: 15px;">
-            <a href="{emisora_actual["url"]}" download="Zafiro_Stream_Audio" target="_blank" style="display: inline-block; background: #00b0ff; color: white; text-decoration: none; padding: 10px 22px; border-radius: 6px; font-weight: bold; font-size: 14px; box-shadow: 0 3px 10px rgba(0,0,176,0.3);">
-                📥 Descargar / Abrir Archivo de Audio
-            </a>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-    
-    if emisora_actual["tipo"] == "vice_original":
-        with st.expander("📢 Comerciales Falsos y Locución Original de Vice City"):
-            st.write(
-                "**[SFX: Estática de radio clásica y sonido de gaviotas]**\n\n"
-                "*Locutor:* ¿Cansado de que el banco te ponga peros para tus retiros? En **Banco de Vice City**, tu dinero está seguro... o al menos hasta que el director tome un vuelo privado a las Bahamas. ¡Invierte hoy!\n\n"
-                "**[SFX: Sonido de motores V8 acelerando en Ocean Drive]**\n"
-                "*Locutor:* ¿Buscas velocidad y discreción? Ven a **Prendas y Rines 'El Chino'** en Ocean Beach. Cambiamos tu reloj de oro por fichas reales al instante. ¡Sin preguntas, sin testigos!"
-            )
-            
     st.markdown("---")
-    st.markdown("#### Publicidad Patrocinada:")
+    st.markdown("#### 📢 Espacio Publicitario Patrocinado (Apoya los pagos reales):")
     st.components.v1.html(banner_anuncio_html, height=120)
     
     estado_musica_clave = f"{usuario}_radio_vice_city_247"
@@ -412,7 +434,7 @@ elif opcion == "📺 Zona Multimedia & Educativa":
     st.components.v1.iframe(url_embed, height=315, scrolling=False)
     
     st.markdown("---")
-    st.markdown("#### Publicidad Patrocinada:")
+    st.markdown("#### Patrocinador:")
     st.components.v1.html(banner_anuncio_html, height=120)
     
     estado_video_clave = f"{usuario}_multimedia_{item_seleccionado}"
@@ -466,7 +488,7 @@ elif opcion == "🎵 Vídeos Musicales en Streaming":
     )
     
     st.markdown("---")
-    st.markdown("#### Publicidad Patrocinada:")
+    st.markdown("#### Patrocinador:")
     st.components.v1.html(banner_anuncio_html, height=120)
     
     estado_vidmus_clave = f"{usuario}_vidmus_{mus_elegida}"
@@ -482,10 +504,17 @@ elif opcion == "🎵 Vídeos Musicales en Streaming":
 
 elif opcion == "🔗 Invitar Amigos":
     st.title("🔗 Invitar Amigos a Zafiro Vice Club")
-    st.write("Comparte tu enlace de referido único y gana comisiones:")
+    st.write("Comparte tu enlace de referido único y gana comisiones automáticas de **0.002 💎** por cada amigo registrado:")
+    
     link_ref = f"https://zafirox-app.streamlit.app/?ref={usuario}"
     st.code(link_ref)
-    st.info("¡Cada amigo activo te otorga un bono directo en tu saldo!")
+    st.info("¡Cada amigo que cree su cuenta con este enlace te sumará comisiones y engrosará tu comunidad!")
+    
+    mis_referidos = datos_usuario.get("referidos_propios", [])
+    st.markdown(f"👥 **Tus referidos registrados hasta ahora:** `{len(mis_referidos)}` usuarios")
+    if mis_referidos:
+        for r in mis_referidos:
+            st.write(f"- 👤 `{r}`")
 
 elif opcion == "🏆 Competencia Semanal":
     st.title("🏆 Competencia Semanal de Usuarios")
@@ -546,11 +575,9 @@ elif opcion == "🏆 Competencia Semanal":
 
 elif opcion == "💸 Pasarela de Pagos (Nequi, Daviplata, PayPal, Bancos)":
     st.title("💸 Pasarela de Pagos y Retiros Seguros")
-    st.write("Puedes retirar tus Diamantes (convertidos a su equivalente en pesos) y/o tu Saldo en Pesos acumulados por premios semanales de forma conjunta o independiente.")
+    st.write("Solicita el retiro de tus fondos. Las solicitudes pasan por un filtro de seguridad y revisión de administración antes de ser despachadas.")
     
     cop_por_usd = 4000
-    eur_por_usd = 0.92
-    
     total_diamantes_en_cop = saldo_actual * cop_por_usd
     saldo_total_disponible_cop = total_diamantes_en_cop + saldo_cop_actual
     
@@ -563,7 +590,7 @@ elif opcion == "💸 Pasarela de Pagos (Nequi, Daviplata, PayPal, Bancos)":
     )
     
     st.markdown("---")
-    st.subheader("🛡️ Formulario de Transacción Segura")
+    st.subheader("🛡️ Formulario de Solicitud de Retiro")
     
     metodos_disponibles = [
         "Nequi (Colombia)", 
@@ -576,12 +603,7 @@ elif opcion == "💸 Pasarela de Pagos (Nequi, Daviplata, PayPal, Bancos)":
     fav_guardado = datos_usuario.get("metodo_favorito", "Nequi (Colombia)")
     idx_fav = metodos_disponibles.index(fav_guardado) if fav_guardado in metodos_disponibles else 0
     
-    metodo_pago = st.selectbox(
-        "Selecciona el método de destino:", 
-        metodos_disponibles, 
-        index=idx_fav,
-        key="select_metodopago_completo"
-    )
+    metodo_pago = st.selectbox("Selecciona el método de destino:", metodos_disponibles, index=idx_fav, key="select_metodopago_completo")
     
     val_tel_guardado = datos_usuario.get("telefono", "")
     val_doc_guardado = datos_usuario.get("documento", "")
@@ -591,28 +613,19 @@ elif opcion == "💸 Pasarela de Pagos (Nequi, Daviplata, PayPal, Bancos)":
         num_cuenta = st.text_input("Número de Celular (Cuenta Destino)", value=val_tel_guardado, placeholder="Ej: 3001234567", key="input_celular_wallet")
         titular = st.text_input("Nombre y Apellido del Titular", value=val_titular_guardado, placeholder="Ej: Carlos Andrés Pérez", key="input_titular_wallet")
         documento = st.text_input("Número de Cédula / Documento de Identidad", value=val_doc_guardado, placeholder="Ej: 1020304050", key="input_doc_wallet")
-        tiempo_estimado = "10 a 20 minutos (Depósito directo en línea)"
-        
     elif "PayPal" in metodo_pago:
         num_cuenta = st.text_input("Correo Electrónico Asociado al PayPal", value=val_tel_guardado, placeholder="tucorreo@dominio.com", key="input_paypal_mail")
         titular = st.text_input("Nombre Completo del Titular PayPal", value=val_titular_guardado, placeholder="Ej: Carlos Andrés Pérez", key="input_titular_paypal")
-        documento = st.text_input("País de Residencia", value=val_doc_guardado, placeholder="Ej: Colombia / España / México", key="input_doc_paypal")
-        tiempo_estimado = "2 a 4 horas hábiles (Verificación antifraude)"
-        
+        documento = st.text_input("País de Residencia", value=val_doc_guardado, placeholder="Ej: Colombia / México", key="input_doc_paypal")
     elif "Transferencia Bancaria" in metodo_pago:
-        banco_elegido = st.selectbox("Selecciona tu Entidad Bancaria:", ["Bancolombia", "Davivienda", "BBVA Colombia", "Banco de Bogotá", "Nu Colombia"], key="select_banco")
-        tipo_cta = st.selectbox("Tipo de Cuenta:", ["Ahorros", "Corriente"], key="select_tipocta")
-        num_cuenta = st.text_input("Número de Cuenta Bancaria", value=val_tel_guardado, placeholder="Ej: 03129847120", key="input_numbanco")
+        banco_elegido = st.selectbox("Entidad Bancaria:", ["Bancolombia", "Davivienda", "BBVA Colombia", "Nu Colombia"], key="select_banco")
+        num_cuenta = st.text_input("Número de Cuenta", value=val_tel_guardado, placeholder="Ej: 03129847120", key="input_numbanco")
         titular = st.text_input("Titular de la Cuenta", value=val_titular_guardado, placeholder="Ej: Carlos Andrés Pérez", key="input_titular_banco")
-        documento = st.text_input("NIT o Cédula del Titular", value=val_doc_guardado, placeholder="Ej: 1020304050", key="input_doc_banco")
-        tiempo_estimado = "1 día hábil (Cámara de compensación interbancaria)"
-        
-    else:  # Convenio EPS
-        eps_elegida = st.selectbox("Selecciona tu EPS afiliada:", ["Sura", "Sanitas", "Nueva EPS", "Famisanar", "Salud Total"], key="select_eps")
-        num_cuenta = st.text_input("Número de Afiliación / Código de Usuario", value=val_tel_guardado, placeholder="Ej: EPS9988221", key="input_numeps")
-        titular = st.text_input("Nombre del Beneficiario Titular", value=val_titular_guardado, placeholder="Ej: Carlos Andrés Pérez", key="input_titular_eps")
+        documento = st.text_input("Cédula del Titular", value=val_doc_guardado, placeholder="Ej: 1020304050", key="input_doc_banco")
+    else:
+        num_cuenta = st.text_input("Código de Afiliación EPS", value=val_tel_guardado, placeholder="Ej: EPS9988221", key="input_numeps")
+        titular = st.text_input("Beneficiario Titular", value=val_titular_guardado, placeholder="Ej: Carlos Andrés Pérez", key="input_titular_eps")
         documento = st.text_input("Cédula de Ciudadanía", value=val_doc_guardado, placeholder="Ej: 1020304050", key="input_doc_eps")
-        tiempo_estimado = "24 a 48 horas (Validación de compensación EPS)"
         
     tipo_retiro = st.radio(
         "¿Qué deseas retirar?",
@@ -629,50 +642,113 @@ elif opcion == "💸 Pasarela de Pagos (Nequi, Daviplata, PayPal, Bancos)":
     elif "Diamantes" in tipo_retiro:
         monto_diamantes_retirar = st.number_input("Monto en 💎 a retirar", min_value=0.0, max_value=float(saldo_actual), value=float(min(1.0, saldo_actual)), step=0.1, key="input_monto_diamantes")
     else:
-        st.write(f"💼 **Se retirarán todos tus fondos disponibles:** ${saldo_total_disponible_cop:,.0f} COP en total.")
+        st.write(f"💼 **Se solicitará el retiro total:** ${saldo_total_disponible_cop:,.0f} COP")
         
-    st.markdown(f"⏱️ **Tiempo estimado de llegada del pago:** `{tiempo_estimado}`")
+    st.markdown("---")
+    st.markdown("#### 📢 Interacción Publicitaria Requerida para Procesar Solicitud:")
+    st.write("Para evitar spam y financiar la pasarela de pagos, por favor haz clic en el anuncio inferior antes de enviar tu solicitud:")
+    st.components.v1.html(banner_anuncio_html, height=120)
     
-    if st.button("🔒 Validar Datos y Ejecutar Transferencia Segura", key="btn_ejecutar_pago_total"):
+    if st.button("🔒 Enviar Solicitud de Retiro a Administración", key="btn_enviar_solicitud"):
         if saldo_total_disponible_cop <= 0:
             st.error("❌ No tienes fondos disponibles para retirar.")
         elif not num_cuenta or not titular or not documento:
-            st.warning("⚠️ Por favor completa todos los campos de seguridad requeridos para la transferencia.")
+            st.warning("⚠️ Completa todos los campos de datos de destino.")
         else:
-            # Guardar datos en perfil
+            # Guardar datos en perfil del usuario
             st.session_state.usuarios_db[usuario]["telefono"] = num_cuenta
             st.session_state.usuarios_db[usuario]["documento"] = documento
             st.session_state.usuarios_db[usuario]["titular"] = titular
             st.session_state.usuarios_db[usuario]["metodo_favorito"] = metodo_pago
             
-            # Descontar saldos según la opción elegida
+            # Calcular monto final y descontar saldo inmediatamente del usuario (o dejarlo en garantía)
             if "Pesos" in tipo_retiro and "Combinado" not in tipo_retiro:
-                if monto_cop_retirar <= 0 or monto_cop_retirar > saldo_cop_actual:
-                    st.error("❌ Monto inválido para retirar en pesos.")
-                    st.stop()
+                monto_final_cop = monto_cop_retirar
                 st.session_state.usuarios_db[usuario]["saldo_cop"] -= monto_cop_retirar
-                monto_descrito_txt = f"${monto_cop_retirar:,.0f} COP (Saldo en Pesos)"
+                desc_monto = f"${monto_cop_retirar:,.0f} COP"
             elif "Diamantes" in tipo_retiro:
-                if monto_diamantes_retirar <= 0 or monto_diamantes_retirar > saldo_actual:
-                    st.error("❌ Monto inválido para retirar en diamantes.")
-                    st.stop()
+                monto_final_cop = monto_diamantes_retirar * cop_por_usd
                 st.session_state.usuarios_db[usuario]["saldo"] -= monto_diamantes_retirar
-                monto_descrito_txt = f"💎 {monto_diamantes_retirar:.4f} (Equiv. a ~${monto_diamantes_retirar * cop_por_usd:,.0f} COP)"
+                desc_monto = f"💎 {monto_diamantes_retirar:.4f} (~${monto_final_cop:,.0f} COP)"
             else:
-                monto_descrito_txt = f"TODO: ${saldo_total_disponible_cop:,.0f} COP (Incluye Pesos y Diamantes)"
+                monto_final_cop = saldo_total_disponible_cop
                 st.session_state.usuarios_db[usuario]["saldo"] = 0.0
                 st.session_state.usuarios_db[usuario]["saldo_cop"] = 0.0
+                desc_monto = f"TOTAL: ${monto_final_cop:,.0f} COP"
                 
             guardar_db(st.session_state.usuarios_db)
             
+            # Registrar la solicitud en la bandeja global del administrador
+            solicitud_nueva = {
+                "usuario": usuario,
+                "metodo": metodo_pago,
+                "cuenta": num_cuenta,
+                "titular": titular,
+                "documento": documento,
+                "monto_texto": desc_monto,
+                "monto_cop": monto_final_cop,
+                "estado": "Pendiente de Aprobación"
+            }
+            st.session_state.retiros_globales.append(solicitud_nueva)
+            
             st.success(
-                f"🛡️ ¡Transacción cifrada procesada con éxito y guardada en tu perfil!\n\n"
-                f"• **Método:** {metodo_pago}\n"
-                f"• **Destino / Cuenta:** {num_cuenta}\n"
-                f"• **Titular:** {titular} (Doc: {documento})\n"
-                f"• **Monto Retirado:** {monto_descrito_txt}\n\n"
-                f"El pago ha sido encolado de forma segura y llegará a su destino en un tiempo estimado de: *{tiempo_estimado}*."
+                f"✅ ¡Solicitud enviada con éxito!\n\n"
+                f"Tus fondos han sido descontados de tu saldo y puestos en cola de revisión para transferencia por `{metodo_pago}`. "
+                f"El administrador validará tu interacción publicitaria y despachará el pago a `{num_cuenta}`."
             )
             st.balloons()
-            time.sleep(3)
-            st.rerun()
+
+# --- PANEL DE ADMINISTRACIÓN EXCLUSIVO PARA LUD337 ---
+if usuario == "Lud337" and opcion == "👑 Panel de Administración (Pagos & Control)":
+    st.title("👑 Panel de Administración de Zafiro Vice")
+    st.write("Aquí puedes gestionar y aprobar los retiros solicitados por los usuarios, revisar cuentas registradas y controlar la economía real de la app.")
+    
+    st.subheader("📥 Bandeja de Solicitudes de Retiro Pendientes")
+    
+    if not st.session_state.retiros_globales:
+        st.info("No hay solicitudes de retiro pendientes en este momento.")
+    else:
+        for idx, sol in enumerate(st.session_state.retiros_globales):
+            if sol["estado"] == "Pendiente de Aprobación":
+                with st.container():
+                    st.markdown(
+                        f"""
+                        <div style="background: #222530; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid #ffcc00;">
+                            <p style="margin: 0; font-weight: bold; color: #00d2ff;">Usuario: {sol['usuario']}</p>
+                            <p style="margin: 5px 0;"><b>Método:</b> {sol['metodo']} | <b>Cuenta/Celular:</b> {sol['cuenta']}</p>
+                            <p style="margin: 5px 0;"><b>Titular:</b> {sol['titular']} (Doc: {sol['documento']})</p>
+                            <p style="margin: 5px 0; color: #00ffcc;"><b>Monto a Pagar:</b> {sol['monto_texto']}</p>
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
+                    col_aprob, col_rech = st.columns(2)
+                    with col_aprob:
+                        if st.button(f"✅ Aprobar Pago #{idx}", key=f"aprobar_{idx}"):
+                            st.session_state.retiros_globales[idx]["estado"] = "Aprobado y Pagado"
+                            st.success(f"¡Pago a {sol['usuario']} marcado como PAGADO!")
+                            time.sleep(1)
+                            st.rerun()
+                    with col_rech:
+                        if st.button(f"❌ Rechazar y Reintegrar #{idx}", key=f"rechazar_{idx}"):
+                            # Reintegrar saldo al usuario si se rechaza
+                            db = cargar_db()
+                            if sol['usuario'] in db:
+                                db[sol['usuario']]["saldo_cop"] += sol['monto_cop']
+                                guardar_db(db)
+                            st.session_state.retiros_globales[idx]["estado"] = "Rechazado"
+                            st.warning(f"Solicitud rechazada y fondos devueltos a {sol['usuario']}.")
+                            time.sleep(1)
+                            st.rerun()
+                            
+    st.markdown("---")
+    st.subheader("👥 Base de Datos General de Usuarios Registrados")
+    db_actual = cargar_db()
+    st.write(f"Total de usuarios registrados en la plataforma: **{len(db_actual)}**")
+    
+    for u_name, u_data in db_actual.items():
+        with st.expander(f"👤 {u_name} (Diamantes: {u_data.get('saldo', 0):.4f} | Pesos: ${u_data.get('saldo_cop', 0):,.0f})"):
+            st.write(f"- **Patrocinador / Referido por:** {u_data.get('invitado_por', 'Ninguno')}")
+            st.write(f"- **Referidos propios:** {len(u_data.get('referidos_propios', []))}")
+            st.write(f"- **Método favorito:** {u_data.get('metodo_favorito', 'N/A')}")
+            st.write(f"- **Teléfono / Cuenta guardada:** {u_data.get('telefono', 'No registrado')} (Doc: {u_data.get('documento', 'N/A')})")
