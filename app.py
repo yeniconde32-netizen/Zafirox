@@ -182,19 +182,26 @@ if opcion == "📻 Radio Vice City (Emisoras 24/7)":
             unsafe_allow_html=True
         )
         
-    # HTML Interactivo con playlist optimizada y reproductor seguro anti-bloqueos
+    # HTML Interactivo con reproductor y botón de descarga integrado
     mini_emisora_html = """
     <div style="background: #1e1e2f; padding: 20px; border-radius: 12px; text-align: center; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.4);">
         <h3 style="margin-top: 0; color: #00d2ff;">🎧 Transmisión en Vivo - Vice Waves</h3>
         <p id="nowPlaying" style="margin-top: 5px; font-size: 15px; color: #4cd137; font-weight: bold;">Cargando señal de Vice City...</p>
         
         <audio id="zafiroRadio" controls preload="auto" style="width: 100%; border-radius: 8px; margin-top: 10px;">
+            <source id="audioSource" src="https://files.catbox.moe/lz5hd3.m4a" type="audio/mp4">
             Tu navegador no soporta el elemento de audio.
         </audio>
         
-        <div style="margin-top: 15px; display: flex; justify-content: center; gap: 15px;">
+        <div style="margin-top: 15px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
             <button onclick="prevTrack()" style="background: #651fff; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px;">⏮️ Anterior</button>
             <button onclick="nextTrack()" style="background: #651fff; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px;">Siguiente ⏭️</button>
+        </div>
+
+        <div style="margin-top: 15px;">
+            <a id="downloadBtn" href="https://files.catbox.moe/lz5hd3.m4a" download="Zafiro_Vice_Emisora.m4a" target="_blank" style="display: inline-block; background: #00b0ff; color: white; text-decoration: none; padding: 10px 22px; border-radius: 6px; font-weight: bold; font-size: 14px; box-shadow: 0 3px 10px rgba(0,0,176,0.3);">
+                📥 Descargar Audio Actual
+            </a>
         </div>
     </div>
 
@@ -208,15 +215,20 @@ if opcion == "📻 Radio Vice City (Emisoras 24/7)":
 
         let currentTrack = 0;
         const audioPlayer = document.getElementById('zafiroRadio');
+        const audioSource = document.getElementById('audioSource');
         const nowPlayingText = document.getElementById('nowPlaying');
+        const downloadBtn = document.getElementById('downloadBtn');
 
         function loadTrack(index) {
             if (index >= playlist.length) currentTrack = 0;
             if (index < 0) currentTrack = playlist.length - 1;
             else currentTrack = index;
 
-            audioPlayer.src = playlist[currentTrack].url;
-            nowPlayingText.innerText = "Reproduciendo: " + playlist[currentTrack].name;
+            const currentItem = playlist[currentTrack];
+            audioSource.src = currentItem.url;
+            nowPlayingText.innerText = "Reproduciendo: " + currentItem.name;
+            downloadBtn.href = currentItem.url;
+            
             audioPlayer.load();
         }
 
@@ -236,11 +248,12 @@ if opcion == "📻 Radio Vice City (Emisoras 24/7)":
             audioPlayer.play();
         });
 
-        loadTrack(currentTrack);
+        nowPlayingText.innerText = "Reproduciendo: " + playlist[currentTrack].name;
+        downloadBtn.href = playlist[currentTrack].url;
     </script>
     """
     
-    st.components.v1.html(mini_emisora_html, height=240)
+    st.components.v1.html(mini_emisora_html, height=290)
     
     with st.expander("📢 Comerciales Falsos de Vice City (Bloque Comercial)"):
         if "Emotion" in estacion_emisora:
@@ -422,19 +435,42 @@ elif opcion == "📺 Zona Multimedia & Educativa":
 
 elif opcion == "🎵 Vídeos Musicales en Streaming":
     st.title("🎵 Vídeos Musicales en Streaming")
-    st.write("Disfruta de videoclips musicales variados con reproducción fluida:")
+    st.write("Disfruta de videoclips musicales variados con reproducción fluida y opción de descarga:")
     
     videos_musicales = {
-        "🎸 Rock & Pop Clásico (Hits Globales)": "https://www.youtube.com/embed/kJQP7kiw5Fk",
-        "💃 Ritmos Latinos & Bailables": "https://www.youtube.com/embed/5mgos64VIGs",
-        "⚡ Música Electrónica & Session": "https://www.youtube.com/embed/fJ9rUzIMcZQ",
-        "🎵 Éxitos Variados del Momento": "https://www.youtube.com/embed/450p7goxZqg"
+        "🎸 Rock & Pop Clásico (Hits Globales)": {
+            "embed": "https://www.youtube.com/embed/kJQP7kiw5Fk",
+            "download": "https://www.youtube.com/watch?v=kJQP7kiw5Fk"
+        },
+        "💃 Ritmos Latinos & Bailables": {
+            "embed": "https://www.youtube.com/embed/5mgos64VIGs",
+            "download": "https://www.youtube.com/watch?v=5mgos64VIGs"
+        },
+        "⚡ Música Electrónica & Session": {
+            "embed": "https://www.youtube.com/embed/fJ9rUzIMcZQ",
+            "download": "https://www.youtube.com/watch?v=fJ9rUzIMcZQ"
+        },
+        "🎵 Éxitos Variados del Momento": {
+            "embed": "https://www.youtube.com/embed/450p7goxZqg",
+            "download": "https://www.youtube.com/watch?v=450p7goxZqg"
+        }
     }
     
     mus_elegida = st.selectbox("Elige un vídeo musical de la lista:", list(videos_musicales.keys()), key="select_musica_iframe")
-    embed_mus_url = videos_musicales[mus_elegida]
+    datos_video = videos_musicales[mus_elegida]
     
-    st.components.v1.iframe(embed_mus_url, height=315, scrolling=False)
+    st.components.v1.iframe(datos_video["embed"], height=315, scrolling=False)
+    
+    st.markdown(
+        f"""
+        <div style="text-align: center; margin-top: 10px;">
+            <a href="{datos_video["download"]}" target="_blank" style="display: inline-block; background: #ff0055; color: white; text-decoration: none; padding: 10px 22px; border-radius: 6px; font-weight: bold; font-size: 14px; box-shadow: 0 3px 10px rgba(255,0,85,0.3);">
+                📥 Descargar / Ver Fuente del Vídeo
+            </a>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
     
     st.markdown("---")
     st.markdown("#### Publicidad Patrocinada:")
