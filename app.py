@@ -149,7 +149,6 @@ if opcion == "📻 Radio Vice City (Emisoras 24/7)":
     st.title("📻 Radio Vice City - Zafiro Vice Club")
     st.write("Sintoniza las emisoras oficiales con locutores inspirados en Vice City (**Emotion 98.3** y **Radio Espantoso**), comerciales falsos y música en vivo:")
     
-    # Selector de emisora estilo Vice City
     estacion_emisora = st.selectbox(
         "Elige tu estación:",
         [
@@ -183,13 +182,15 @@ if opcion == "📻 Radio Vice City (Emisoras 24/7)":
             unsafe_allow_html=True
         )
         
-    # HTML Interactivo con playlist y reproductor seguro anti-bloqueos (Tu enlace oficial de primero)
+    # HTML Interactivo con playlist optimizada y reproductor seguro anti-bloqueos
     mini_emisora_html = """
     <div style="background: #1e1e2f; padding: 20px; border-radius: 12px; text-align: center; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.4);">
         <h3 style="margin-top: 0; color: #00d2ff;">🎧 Transmisión en Vivo - Vice Waves</h3>
-        <p id="nowPlaying" style="margin-top: 5px; font-size: 15px; color: #4cd137; font-weight: bold;">Selecciona una pista o dale Play</p>
+        <p id="nowPlaying" style="margin-top: 5px; font-size: 15px; color: #4cd137; font-weight: bold;">Cargando señal de Vice City...</p>
         
-        <audio id="zafiroRadio" controls style="width: 100%; border-radius: 8px; margin-top: 10px;"></audio>
+        <audio id="zafiroRadio" controls preload="auto" style="width: 100%; border-radius: 8px; margin-top: 10px;">
+            Tu navegador no soporta el elemento de audio.
+        </audio>
         
         <div style="margin-top: 15px; display: flex; justify-content: center; gap: 15px;">
             <button onclick="prevTrack()" style="background: #651fff; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px;">⏮️ Anterior</button>
@@ -200,9 +201,9 @@ if opcion == "📻 Radio Vice City (Emisoras 24/7)":
     <script>
         const playlist = [
             { name: "📻 Grabación Oficial Personalizada (Zafiro Vice)", url: "https://files.catbox.moe/lz5hd3.m4a" },
-            { name: "📻 Emotion 98.3: Balada Ochentera & Neón", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
-            { name: "🎺 Radio Espantoso: Ritmo Tropical & Salsa", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
-            { name: "🎷 Emotion 98.3: Sintes Románticos de Medianoche", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" }
+            { name: "📻 Emotion 98.3: Balada Ochentera & Neón", url: "https://actions.google.com/sounds/v1/ambiences/coffee_shop.ogg" },
+            { name: "🎺 Radio Espantoso: Ritmo Tropical & Salsa", url: "https://actions.google.com/sounds/v1/relaxing/ocean_waves.ogg" },
+            { name: "🎷 Emotion 98.3: Sintes Románticos de Medianoche", url: "https://actions.google.com/sounds/v1/science_fiction/teleportation.ogg" }
         ];
 
         let currentTrack = 0;
@@ -216,16 +217,17 @@ if opcion == "📻 Radio Vice City (Emisoras 24/7)":
 
             audioPlayer.src = playlist[currentTrack].url;
             nowPlayingText.innerText = "Reproduciendo: " + playlist[currentTrack].name;
+            audioPlayer.load();
         }
 
         function nextTrack() {
             loadTrack(currentTrack + 1);
-            audioPlayer.play();
+            audioPlayer.play().catch(e => console.log("Reproducción automática bloqueada por el navegador"));
         }
 
         function prevTrack() {
             loadTrack(currentTrack - 1);
-            audioPlayer.play();
+            audioPlayer.play().catch(e => console.log("Reproducción automática bloqueada por el navegador"));
         }
 
         audioPlayer.addEventListener('ended', function() {
