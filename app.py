@@ -20,6 +20,9 @@ footer {visibility: hidden;}
 .stAppDeployButton {display:none;}
 div[data-testid="stStatusWidget"] {visibility: hidden;}
 header {visibility: hidden;}
+[data-testid="stToolbar"] {display: none;}
+.viewerBadge_container__1QSob {display: none;}
+#stDecoration {display: none;}
 </style>
 """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
