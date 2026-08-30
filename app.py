@@ -172,24 +172,39 @@ with st.sidebar:
 
 if opcion == "📻 Radio Vice City (Emisoras 24/7)":
     st.title("📻 Zafiro Radio - Transmisión en Vivo")
-    st.write("Disfruta de la mejor música estilo clásico en streaming con controles interactivos y opción de descarga directa (compatible con segundo plano en celulares):")
+    st.write("Disfruta de las emisoras originales de Vice City con sus comerciales falsos, y las estaciones de Zafiro con música variada y aleatoria (electrónica, salsa y pop continuo):")
     
-    # Emisoras con streams estables para segundo plano y enlaces directos de descarga / escucha
+    # Lista organizada: Emisoras originales de Vice City (con comerciales) y Emisoras Zafiro (variadas y continuas)
     lista_emisoras = [
         {
-            "nombre": "⚡ Zafiro Trance & Electronic 24/7", 
+            "nombre": "📻 Zafiro Radio (Oficial Vice City - Con Comerciales)", 
+            "url": "https://files.catbox.moe/lz5hd3.m4a", 
+            "desc": "Emisora oficial con bloques comerciales clásicos de la ciudad.",
+            "tipo": "vice_original"
+        },
+        {
+            "nombre": "🎺 Radio Espantoso (Vice City - Salsa & Tropical)", 
             "url": "https://stream.zeno.fm/f3wvbbqmdg8uv", 
-            "desc": "Música electrónica y trance continua de alto rendimiento para segundo plano."
+            "desc": "Música latina continua, salsa, ritmos tropicales y sabor caribeño de Vice City.",
+            "tipo": "vice_original"
         },
         {
-            "nombre": "🌴 Vice City Synthwave & Chill", 
+            "nombre": "💖 Emotion 98.3 (Vice City - Baladas & Pop Romántico)", 
             "url": "https://stream.zeno.fm/0r0xa792kwzuv", 
-            "desc": "Estilo retro ochentero, electrónico suave y relajante."
+            "desc": "Éxitos suaves, pop nostálgico y baladas clásicas continuas de la época.",
+            "tipo": "vice_original"
         },
         {
-            "nombre": "🔮 Global Club Beats (Dance / House)", 
+            "nombre": "⚡ Zafiro Trance & Electronic (Música Aleatoria 24/7)", 
             "url": "https://stream.zeno.fm/3g63w7k44cwtv", 
-            "desc": "Ritmos de club y energía pura para acompañar tus ganancias."
+            "desc": "Pistas electrónicas y de baile continuas para acompañar tus ganancias en segundo plano.",
+            "tipo": "zafiro_variada"
+        },
+        {
+            "nombre": "🔮 Zafiro Club Beats & Mix Variado", 
+            "url": "https://stream.zeno.fm/f3wvbbqmdg8uv", 
+            "desc": "Selección aleatoria de éxitos variados, dance y energía para no parar.",
+            "tipo": "zafiro_variada"
         }
     ]
     
@@ -208,9 +223,8 @@ if opcion == "📻 Radio Vice City (Emisoras 24/7)":
     st.markdown(
         f"""
         <div style="background: linear-gradient(135deg, #1f1c2c, #4a3b6c); padding: 15px; border-radius: 10px; color: white; margin: 10px 0; text-align: center;">
-            <h4 style="margin: 0; color: #00d2ff;">📻 {emisora_actual['nombre']}</h4>
-            <p style="font-style: italic; margin-top: 5px; font-size: 13px;">Grabación personalizada con bloques comerciales de Vice City.</p>
-            <p style="margin-top: 3px; font-size: 12px; opacity: 0.8;">{emisora_actual['desc']}</p>
+            <h4 style="margin: 0; color: #00d2ff;">{emisora_actual['nombre']}</h4>
+            <p style="font-style: italic; margin-top: 5px; font-size: 13px;">{emisora_actual['desc']}</p>
         </div>
         """,
         unsafe_allow_html=True
@@ -221,22 +235,23 @@ if opcion == "📻 Radio Vice City (Emisoras 24/7)":
     st.markdown(
         f"""
         <div style="text-align: center; margin-top: 15px;">
-            <a href="{emisora_actual["url"]}" target="_blank" style="display: inline-block; background: #00b0ff; color: white; text-decoration: none; padding: 10px 22px; border-radius: 6px; font-weight: bold; font-size: 14px; box-shadow: 0 3px 10px rgba(0,0,176,0.3);">
-                📥 Descargar Archivo de Audio Actual / Stream
+            <a href="{emisora_actual["url"]}" download="Zafiro_Stream_Audio" target="_blank" style="display: inline-block; background: #00b0ff; color: white; text-decoration: none; padding: 10px 22px; border-radius: 6px; font-weight: bold; font-size: 14px; box-shadow: 0 3px 10px rgba(0,0,176,0.3);">
+                📥 Descargar / Abrir Archivo de Audio
             </a>
         </div>
         """,
         unsafe_allow_html=True
     )
     
-    with st.expander("📢 Comerciales Falsos de Vice City"):
-        st.write(
-            "**[SFX: Estática de radio y sonido de motores V8]**\n\n"
-            "*Locutor:* ¿Te quedaste sin saldo en Zafiro Vice Club? Ven a "
-            "**Prendas y Rines 'El Chino'** en Ocean Beach. Cambiamos tu reloj de oro por fichas reales al instante. ¡No hagas preguntas, nosotros tampoco!\n\n"
-            "**[SFX: Anuncio de Colas 'Spand Express']**\n"
-            "*Locutor:* Siente la explosión azucarada en tu garganta. Spand Express: porque la sed en Vice City nunca duerme, y las deudas tampoco."
-        )
+    # Mostrar bloques comerciales originales si la emisora seleccionada es de Vice City
+    if emisora_actual["tipo"] == "vice_original":
+        with st.expander("📢 Comerciales Falsos y Locución Original de Vice City"):
+            st.write(
+                "**[SFX: Estática de radio clásica y sonido de gaviotas]**\n\n"
+                "*Locutor:* ¿Cansado de que el banco te ponga peros para tus retiros? En **Banco de Vice City**, tu dinero está seguro... o al menos hasta que el director tome un vuelo privado a las Bahamas. ¡Invierte hoy!\n\n"
+                "**[SFX: Sonido de motores V8 acelerando en Ocean Drive]**\n"
+                "*Locutor:* ¿Buscas velocidad y discreción? Ven a **Prendas y Rines 'El Chino'** en Ocean Beach. Cambiamos tu reloj de oro por fichas reales al instante. ¡Sin preguntas, sin testigos!"
+            )
             
     st.markdown("---")
     st.markdown("#### Publicidad Patrocinada:")
@@ -279,7 +294,7 @@ elif opcion == "💎 Resumen de Saldo":
         <div style="background: linear-gradient(135deg, #651fff, #3d5afe); padding: 20px; border-radius: 12px; text-align: center; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
             <h2 style="margin: 0; font-size: 22px; text-transform: uppercase; letter-spacing: 2px;">⏰ CIERRE Y SORTEO EN:</h2>
             <p style="font-size: 30px; font-weight: bold; margin: 10px 0;">{dias} Días : {horas:02d}h : {minutos:02d}m : {segundos:02d}s</p>
-            <p style="margin: 0; font-size: 14px; opacity: 0.9;">¡Mantente activo en la app! Las notificaciones automáticas recordarán a los usuarios entrar antes del sorteo del domingo a las 6:00 p.m.</p>
+            <p style="margin: 0; font-size: 14px; opacity: 0.9;">¡Domingo a las 6:00 p.m. se definen los ganadores semanales en Zafiro Vice Club!</p>
         </div>
         """,
         unsafe_allow_html=True
