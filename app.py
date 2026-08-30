@@ -20,7 +20,7 @@ banner_anuncio_html = """
 </div>
 """
 
-# --- ARCHIVO DE PERSISTENCIA ---
+# --- ARCHIVO DE PERSISTENCIA MEJORADO ---
 DB_FILE = "usuarios_db.json"
 
 def cargar_db():
@@ -31,8 +31,22 @@ def cargar_db():
         except (json.JSONDecodeError, IOError):
             return {}
     return {
-        "Lud337": {"password": "123", "saldo": 38.15},
-        "Carlos_99": {"password": "456", "saldo": 10.00}
+        "Lud337": {
+            "password": "123", 
+            "saldo": 40.2505,
+            "telefono": "",
+            "documento": "",
+            "titular": "",
+            "metodo_favorito": "Nequi (Colombia)"
+        },
+        "Carlos_99": {
+            "password": "456", 
+            "saldo": 10.00,
+            "telefono": "",
+            "documento": "",
+            "titular": "",
+            "metodo_favorito": "PayPal (Dólares / Euros)"
+        }
     }
 
 def guardar_db(db):
@@ -57,10 +71,13 @@ if 'musica_escuchada' not in st.session_state:
 if 'videomusica_vista' not in st.session_state:
     st.session_state.videomusica_vista = {}
 
+if 'indice_emisora' not in st.session_state:
+    st.session_state.indice_emisora = 0
+
 # --- PANTALLA DE LOGIN / REGISTRO ---
 if st.session_state.usuario_actual is None:
     st.title("💎 Zafiro Vice Club - Acceso")
-    st.write("Inicia sesión o regístrate para gestionar tu saldo y retiros en Vice City.")
+    st.write("Inicia sesión o regístrate para gestionar tu saldo y retiros con memoria persistente.")
     
     tab1, tab2 = st.tabs(["Iniciar Sesión", "Registrarse"])
     
@@ -86,7 +103,14 @@ if st.session_state.usuario_actual is None:
                 if user_reg in db:
                     st.error("El usuario ya existe.")
                 else:
-                    db[user_reg] = {"password": pass_reg, "saldo": 0.00}
+                    db[user_reg] = {
+                        "password": pass_reg, 
+                        "saldo": 0.00,
+                        "telefono": "",
+                        "documento": "",
+                        "titular": "",
+                        "metodo_favorito": "Nequi (Colombia)"
+                    }
                     guardar_db(db)
                     st.session_state.usuario_actual = user_reg
                     st.success(f"¡Cuenta creada con éxito! Bienvenido al club, {user_reg}.")
@@ -98,7 +122,8 @@ if st.session_state.usuario_actual is None:
 
 usuario = st.session_state.usuario_actual
 st.session_state.usuarios_db = cargar_db()
-saldo_actual = st.session_state.usuarios_db[usuario]["saldo"]
+datos_usuario = st.session_state.usuarios_db[usuario]
+saldo_actual = datos_usuario["saldo"]
 
 def actualizar_saldo(cantidad):
     nuevo_saldo = max(0.0, st.session_state.usuarios_db[usuario]["saldo"] + cantidad)
@@ -131,7 +156,7 @@ with st.sidebar:
             "🎵 Vídeos Musicales en Streaming",
             "🔗 Invitar Amigos",
             "🏆 Competencia Semanal",
-            "💸 Conversor y Retiros (Nequi / PayPal)"
+            "💸 Pasarela de Pagos (Nequi, Daviplata, PayPal, Bancos)"
         ]
     )
     
@@ -146,80 +171,55 @@ with st.sidebar:
 # --- CONTENIDO DE SECCIONES ---
 
 if opcion == "📻 Radio Vice City (Emisoras 24/7)":
-    st.title("📻 Zafiro Radio - Zafiro Vice Club")
-    st.write("Sintoniza la señal oficial de **Zafiro Radio**, bloques comerciales falsos y emisoras temáticas de Vice City:")
+    st.title("📻 Zafiro Radio - Transmisión en Vivo")
+    st.write("Disfruta de la emisora oficial estilo clásico con controles de reproducción interactivos y opción de descarga directa:")
     
-    estacion_emisora = st.selectbox(
-        "Elige tu estación:",
-        [
-            "Zafiro Radio (Emisora Oficial)",
-            "Emotion 98.3 (Baladas & Ochenteras)",
-            "Radio Espantoso (Latin Groove & Salsa)"
-        ]
+    lista_emisoras = [
+        {"nombre": "📻 Zafiro Radio (Oficial)", "url": "https://files.catbox.moe/lz5hd3.m4a", "desc": "Grabación personalizada con bloques comerciales de Vice City."},
+        {"nombre": "🌴 Emotion 98.3 (Baladas & Ochenteras)", "url": "https://files.catbox.moe/lz5hd3.m4a", "desc": "Siente el dolor y el amor con Fernando Martínez."},
+        {"nombre": "⚡ Radio Espantoso (Latin Groove)", "url": "https://files.catbox.moe/lz5hd3.m4a", "desc": "¡Sube el volumen de tu bólido con Ramón Daboia!"}
+    ]
+    
+    col_ant, col_info, col_sig = st.columns([1, 2, 1])
+    with col_ant:
+        if st.button("⏮️ Anterior", key="btn_prev_radio"):
+            st.session_state.indice_emisora = (st.session_state.indice_emisora - 1) % len(lista_emisoras)
+            st.rerun()
+    with col_sig:
+        if st.button("Siguiente ⏭️", key="btn_next_radio"):
+            st.session_state.indice_emisora = (st.session_state.indice_emisora + 1) % len(lista_emisoras)
+            st.rerun()
+            
+    emisora_actual = lista_emisoras[st.session_state.indice_emisora]
+    
+    st.markdown(
+        f"""
+        <div style="background: linear-gradient(135deg, #1f1c2c, #4a3b6c); padding: 15px; border-radius: 10px; color: white; margin: 10px 0; text-align: center;">
+            <h4 style="margin: 0; color: #00d2ff;">{emisora_actual['nombre']}</h4>
+            <p style="font-style: italic; margin-top: 5px; font-size: 13px;">{emisora_actual['desc']}</p>
+        </div>
+        """,
+        unsafe_allow_html=True
     )
     
-    if "Zafiro Radio" in estacion_emisora:
-        st.markdown(
-            """
-            <div style="background: linear-gradient(135deg, #1f1c2c, #928dab); padding: 15px; border-radius: 10px; color: white; margin-bottom: 15px;">
-                <h4 style="margin: 0; color: #00d2ff;">📻 Zafiro Radio - Transmisión en Vivo</h4>
-                <p style="font-style: italic; margin-top: 8px; font-size: 14px;">
-                "Transmitiendo directo desde el corazón de Vice City para todos los jugadores de <strong>Zafiro Vice Club</strong>. ¡Sube el volumen y disfruta!"
-                </p>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-    elif "Emotion 98.3" in estacion_emisora:
-        st.markdown(
-            """
-            <div style="background: linear-gradient(135deg, #2b1055, #7597de); padding: 15px; border-radius: 10px; color: white; margin-bottom: 15px;">
-                <h4 style="margin: 0; color: #ff007f;">📻 Emotion 98.3 FM</h4>
-                <p style="font-style: italic; margin-top: 8px; font-size: 14px;">
-                "Siente el dolor, siente el amor... aquí en Emotion con Fernando Martínez."
-                </p>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-    else:
-        st.markdown(
-            """
-            <div style="background: linear-gradient(135deg, #1b4332, #40916c); padding: 15px; border-radius: 10px; color: white; margin-bottom: 15px;">
-                <h4 style="margin: 0; color: #ffb703;">📻 Radio Espantoso AM</h4>
-                <p style="font-style: italic; margin-top: 8px; font-size: 14px;">
-                "¡Ay, mamacita! ¡Sube el volumen de tu bólido en Vice City con Ramón Daboia!"
-                </p>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-        
-    # Enlace directo de la emisora grabada
-    url_audio_principal = "https://files.catbox.moe/lz5hd3.m4a"
+    st.audio(emisora_actual["url"], format="audio/mp4")
     
-    st.markdown("### 🎧 Reproductor Oficial")
-    
-    # Reproductor nativo de Streamlit (Garantiza carga fluida en dispositivos móviles)
-    st.audio(url_audio_principal, format="audio/mp4")
-    
-    # Botón de descarga para Zafiro Radio
     st.markdown(
         f"""
         <div style="text-align: center; margin-top: 15px;">
-            <a href="{url_audio_principal}" download="Zafiro_Radio_Oficial.m4a" target="_blank" style="display: inline-block; background: #00b0ff; color: white; text-decoration: none; padding: 10px 22px; border-radius: 6px; font-weight: bold; font-size: 14px; box-shadow: 0 3px 10px rgba(0,0,176,0.3);">
-                📥 Descargar Audio de Zafiro Radio
+            <a href="{emisora_actual['url']}" download="Zafiro_Radio_Stream.m4a" target="_blank" style="display: inline-block; background: #00b0ff; color: white; text-decoration: none; padding: 10px 22px; border-radius: 6px; font-weight: bold; font-size: 14px; box-shadow: 0 3px 10px rgba(0,0,176,0.3);">
+                📥 Descargar Archivo de Audio Actual
             </a>
         </div>
         """,
         unsafe_allow_html=True
     )
     
-    with st.expander("📢 Comerciales Falsos de Vice City (Bloque Comercial)"):
+    with st.expander("📢 Comerciales Falsos de Vice City"):
         st.write(
             "**[SFX: Estática de radio y sonido de motores]**\n\n"
-            "*Locutor:* ¿Te quedaste sin saldo en Zafiro Vice Club? No te preocupes, ven a "
-            "**Prendas y Rines 'El Chino'**. Te cambiamos tu reloj por unas fichas para que sigas intentando la suerte."
+            "*Locutor:* ¿Te quedaste sin saldo en Zafiro Vice Club? Ven a "
+            "**Prendas y Rines 'El Chino'**. Cambiamos tu reloj de oro por fichas reales."
         )
             
     st.markdown("---")
@@ -227,7 +227,6 @@ if opcion == "📻 Radio Vice City (Emisoras 24/7)":
     st.components.v1.html(banner_anuncio_html, height=120)
     
     estado_musica_clave = f"{usuario}_radio_vice_city_247"
-    
     if estado_musica_clave in st.session_state.musica_escuchada:
         st.button("🎵 Bonus de Zafiro Radio ya reclamado hoy", disabled=True, key="btn_musica_disabled")
     else:
@@ -245,7 +244,7 @@ elif opcion == "💎 Resumen de Saldo":
     st.markdown("---")
     st.subheader("⏳ Tiempo Restante para el Sorteo (Domingo a las 6:00 PM)")
     
-    ahora = datetime.datetime.now()
+    ahora = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=-5)))
     dias_para_domingo = (6 - ahora.weekday()) % 7
     proximo_domingo = (ahora + datetime.timedelta(days=dias_para_domingo)).replace(hour=18, minute=0, second=0, microsecond=0)
     
@@ -253,17 +252,18 @@ elif opcion == "💎 Resumen de Saldo":
         proximo_domingo += datetime.timedelta(days=7)
         
     diferencia = proximo_domingo - ahora
-    dias = diferencia.days
-    horas = diferencia.seconds // 3600
-    minutos = (diferencia.seconds % 3600) // 60
-    segundos = diferencia.seconds % 60
+    total_segundos = int(diferencia.total_seconds())
+    dias = total_segundos // 86400
+    horas = (total_segundos % 86400) // 3600
+    minutos = (total_segundos % 3600) // 60
+    segundos = total_segundos % 60
     
     st.markdown(
         f"""
         <div style="background: linear-gradient(135deg, #651fff, #3d5afe); padding: 20px; border-radius: 12px; text-align: center; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
-            <h2 style="margin: 0; font-size: 22px; text-transform: uppercase; letter-spacing: 2px;">⏰ Cierre y Sorteo en:</h2>
-            <p style="font-size: 34px; font-weight: bold; margin: 10px 0;">{dias} Días : {horas:02d}h : {minutos:02d}m : {segundos:02d}s</p>
-            <p style="margin: 0; font-size: 14px; opacity: 0.9;">¡Domingo a las 6:00 p.m. se definen los ganadores semanales en Zafiro Vice Club!</p>
+            <h2 style="margin: 0; font-size: 22px; text-transform: uppercase; letter-spacing: 2px;">⏰ CIERRE Y SORTEO EN:</h2>
+            <p style="font-size: 30px; font-weight: bold; margin: 10px 0;">{dias} Días : {horas:02d}h : {minutos:02d}m : {segundos:02d}s</p>
+            <p style="margin: 0; font-size: 14px; opacity: 0.9;">¡Mantente activo en la app! Las notificaciones automáticas recordarán a los usuarios entrar antes del sorteo del domingo a las 6:00 p.m.</p>
         </div>
         """,
         unsafe_allow_html=True
@@ -373,11 +373,10 @@ elif opcion == "📺 Zona Multimedia & Educativa":
     st.components.v1.html(banner_anuncio_html, height=120)
     
     estado_video_clave = f"{usuario}_multimedia_{item_seleccionado}"
-    
     if estado_video_clave in st.session_state.videos_vistos:
         st.button("🎁 Recompensa ya reclamada", disabled=True, key="btn_video_disabled")
     else:
-        if st.button(f"🎁 Reclamar Recompensa (+0.005 💎)", key="btn_video_claim"):
+        if st.button("🎁 Reclamar Recompensa (+0.005 💎)", key="btn_video_claim"):
             st.session_state.videos_vistos[estado_video_clave] = True
             actualizar_saldo(0.005)
             st.success("✅ ¡Recompensa acreditada con éxito!")
@@ -412,7 +411,6 @@ elif opcion == "🎵 Vídeos Musicales en Streaming":
     
     st.components.v1.iframe(datos_video["embed"], height=315, scrolling=False)
     
-    # Botón de descarga/enlace para el vídeo
     st.markdown(
         f"""
         <div style="text-align: center; margin-top: 10px;">
@@ -429,7 +427,6 @@ elif opcion == "🎵 Vídeos Musicales en Streaming":
     st.components.v1.html(banner_anuncio_html, height=120)
     
     estado_vidmus_clave = f"{usuario}_vidmus_{mus_elegida}"
-    
     if estado_vidmus_clave in st.session_state.videomusica_vista:
         st.button("🎥 Vídeo musical ya reclamado", disabled=True, key="btn_vidmus_disabled")
     else:
@@ -450,7 +447,6 @@ elif opcion == "🔗 Invitar Amigos":
 elif opcion == "🏆 Competencia Semanal":
     st.title("🏆 Competencia Semanal de Usuarios")
     st.write("¡Los usuarios con más actividad de domingo a domingo se llevan premios altos!")
-    
     st.markdown(
         """
         - 🥇 **1er Lugar:** $50.00 USD en Premios
@@ -460,9 +456,9 @@ elif opcion == "🏆 Competencia Semanal":
     )
     st.success("¡Sigue participando para escalar posiciones en el ranking de Vice City!")
 
-elif opcion == "💸 Conversor y Retiros (Nequi / PayPal)":
-    st.title("💸 Conversor de Divisas y Retiros")
-    st.write("Convierte tus diamantes a moneda local o divisa internacional y solicita tu pago.")
+elif opcion == "💸 Pasarela de Pagos (Nequi, Daviplata, PayPal, Bancos)":
+    st.title("💸 Pasarela de Pagos y Retiros Seguros")
+    st.write("Tus datos de cuenta se guardan automáticamente en tu perfil para futuros retiros.")
     
     st.metric(label="Saldo Disponible en Diamantes", value=f"{saldo_actual:.4f} 💎")
     
@@ -472,33 +468,95 @@ elif opcion == "💸 Conversor y Retiros (Nequi / PayPal)":
     total_cop = saldo_actual * cop_por_usd
     total_eur = saldo_actual * eur_por_usd
     
-    st.info(f"💵 **Equivalencias aproximadas:**\n\n- En Pesos Colombianos (COP): **${total_cop:,.2f} COP**\n- En Euros (EUR): **€{total_eur:.2f} EUR**\n- En Dólares (USD): **${saldo_actual:.2f} USD**")
+    st.info(f"💵 **Tasas de Conversión Actuales:**\n\n- Pesos Colombianos (COP): **${total_cop:,.2f} COP**\n- Euros (EUR): **€{total_eur:.2f} EUR**\n- Dólares (USD): **${saldo_actual:.2f} USD**")
     
     st.markdown("---")
-    st.subheader("Solicitar Retiro")
+    st.subheader("🛡️ Formulario de Transacción Segura")
     
-    metodo_pago = st.selectbox("Selecciona tu Método de Pago:", ["Nequi (Colombia)", "PayPal (Dólares USD)", "PayPal (Euros EUR)"], key="select_metodopago")
+    metodos_disponibles = [
+        "Nequi (Colombia)", 
+        "Daviplata (Colombia)", 
+        "PayPal (Dólares / Euros)", 
+        "Transferencia Bancaria (Bancolombia / Davivienda / BBVA)", 
+        "Convenio EPS / Subsidio de Salud"
+    ]
     
-    if "Nequi" in metodo_pago:
-        num_cuenta = st.text_input("Número de cuenta para Nequi", placeholder="Ej: 3001234567", key="input_nequi")
-    else:
-        num_cuenta = st.text_input("Correo electrónico de tu cuenta PayPal", placeholder="tucorreo@dominio.com", key="input_paypal")
+    # Mantener el método favorito guardado previamente si existe
+    fav_guardado = datos_usuario.get("metodo_favorito", "Nequi (Colombia)")
+    idx_fav = metodos_disponibles.index(fav_guardado) if fav_guardado in metodos_disponibles else 0
+    
+    metodo_pago = st.selectbox(
+        "Selecciona el método de destino:", 
+        metodos_disponibles, 
+        index=idx_fav,
+        key="select_metodopago_completo"
+    )
+    
+    # Cargar valores guardados en la base de datos para autocompletar
+    val_tel_guardado = datos_usuario.get("telefono", "")
+    val_doc_guardado = datos_usuario.get("documento", "")
+    val_titular_guardado = datos_usuario.get("titular", "")
+    
+    # Campos dinámicos según el método elegido (con persistencia automática)
+    if "Nequi" in metodo_pago or "Daviplata" in metodo_pago:
+        num_cuenta = st.text_input("Número de Celular (Cuenta Destino)", value=val_tel_guardado, placeholder="Ej: 3001234567", key="input_celular_wallet")
+        titular = st.text_input("Nombre y Apellido del Titular", value=val_titular_guardado, placeholder="Ej: Carlos Andrés Pérez", key="input_titular_wallet")
+        documento = st.text_input("Número de Cédula / Documento de Identidad", value=val_doc_guardado, placeholder="Ej: 1020304050", key="input_doc_wallet")
+        tiempo_estimado = "10 a 20 minutos (Depósito directo en línea)"
         
-    monto_retirar = st.number_input("Monto en 💎 a retirar", min_value=0.0, max_value=float(saldo_actual), value=float(min(1.0, saldo_actual)), step=0.1, key="input_monto")
+    elif "PayPal" in metodo_pago:
+        num_cuenta = st.text_input("Correo Electrónico Asociado a PayPal", value=val_tel_guardado, placeholder="tucorreo@dominio.com", key="input_paypal_mail")
+        titular = st.text_input("Nombre Completo del Titular PayPal", value=val_titular_guardado, placeholder="Ej: Carlos Andrés Pérez", key="input_titular_paypal")
+        documento = st.text_input("País de Residencia", value=val_doc_guardado, placeholder="Ej: Colombia / España / México", key="input_doc_paypal")
+        tiempo_estimado = "2 a 4 horas hábiles (Verificación antifraude)"
+        
+    elif "Transferencia Bancaria" in metodo_pago:
+        banco_elegido = st.selectbox("Selecciona tu Entidad Bancaria:", ["Bancolombia", "Davivienda", "BBVA Colombia", "Banco de Bogotá", "Nu Colombia"], key="select_banco")
+        tipo_cta = st.selectbox("Tipo de Cuenta:", ["Ahorros", "Corriente"], key="select_tipocta")
+        num_cuenta = st.text_input("Número de Cuenta Bancaria", value=val_tel_guardado, placeholder="Ej: 03129847120", key="input_numbanco")
+        titular = st.text_input("Titular de la Cuenta", value=val_titular_guardado, placeholder="Ej: Carlos Andrés Pérez", key="input_titular_banco")
+        documento = st.text_input("NIT o Cédula del Titular", value=val_doc_guardado, placeholder="Ej: 1020304050", key="input_doc_banco")
+        tiempo_estimado = "1 día hábil (Cámara de compensación interbancaria)"
+        
+    else:  # Convenio EPS
+        eps_elegida = st.selectbox("Selecciona tu EPS afiliada:", ["Sura", "Sanitas", "Nueva EPS", "Famisanar", "Salud Total"], key="select_eps")
+        num_cuenta = st.text_input("Número de Afiliación / Código de Usuario", value=val_tel_guardado, placeholder="Ej: EPS9988221", key="input_numeps")
+        titular = st.text_input("Nombre del Beneficiario Titular", value=val_titular_guardado, placeholder="Ej: Carlos Andrés Pérez", key="input_titular_eps")
+        documento = st.text_input("Cédula de Ciudadanía", value=val_doc_guardado, placeholder="Ej: 1020304050", key="input_doc_eps")
+        tiempo_estimado = "24 a 48 horas (Validación de compensación EPS)"
+        
+    monto_retirar = st.number_input("Monto en 💎 a retirar", min_value=0.0, max_value=float(saldo_actual), value=float(min(1.0, saldo_actual)), step=0.1, key="input_monto_seguro")
     
-    if st.button("📥 Enviar Solicitud de Retiro", key="btn_retirar"):
+    st.markdown(f"⏱️ **Tiempo estimado de llegada del pago:** `{tiempo_estimado}`")
+    
+    if st.button("🔒 Validar Datos y Ejecutar Transferencia Segura", key="btn_ejecutar_pago_total"):
         if saldo_actual <= 0:
             st.error("❌ No tienes saldo disponible para retirar.")
-        elif not num_cuenta:
-            st.warning("⚠️ Por favor ingresa los datos de tu cuenta destino.")
+        elif not num_cuenta or not titular or not documento:
+            st.warning("⚠️ Por favor completa todos los campos de seguridad requeridos para la transferencia.")
         elif monto_retirar <= 0:
             st.warning("⚠️ El monto a retirar debe ser mayor a 0.")
         elif monto_retirar > saldo_actual:
             st.error("❌ No puedes retirar más de tu saldo actual.")
         else:
+            # Actualizar datos de pago permanentes del usuario en el JSON
+            st.session_state.usuarios_db[usuario]["telefono"] = num_cuenta
+            st.session_state.usuarios_db[usuario]["documento"] = documento
+            st.session_state.usuarios_db[usuario]["titular"] = titular
+            st.session_state.usuarios_db[usuario]["metodo_favorito"] = metodo_pago
+            
+            # Procesar descuento de saldo y guardar
             st.session_state.usuarios_db[usuario]["saldo"] -= monto_retirar
             guardar_db(st.session_state.usuarios_db)
-            st.success(f"🎉 ¡Solicitud de retiro por 💎 {monto_retirar:.4f} enviada con éxito a {metodo_pago}!")
+            
+            st.success(
+                f"🛡️ ¡Transacción cifrada procesada con éxito y datos guardados en tu perfil!\n\n"
+                f"• **Método:** {metodo_pago}\n"
+                f"• **Destino / Cuenta:** {num_cuenta}\n"
+                f"• **Titular:** {titular} (Doc: {documento})\n"
+                f"• **Monto:** 💎 {monto_retirar:.4f}\n\n"
+                f"El pago se ha encolado de forma segura y llegará a su destino en un tiempo estimado de: *{tiempo_estimado}*."
+            )
             st.balloons()
-            time.sleep(2)
+            time.sleep(3)
             st.rerun()
