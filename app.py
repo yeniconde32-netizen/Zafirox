@@ -7,7 +7,7 @@ import time
 
 # Configuración de la página
 st.set_page_config(
-    page_title="ZafiroX - Economía Real",
+    page_title="Zafiro Vice Club - Economía Real",
     page_icon="💎",
     layout="centered"
 )
@@ -59,8 +59,8 @@ if 'videomusica_vista' not in st.session_state:
 
 # --- PANTALLA DE LOGIN / REGISTRO ---
 if st.session_state.usuario_actual is None:
-    st.title("💎 ZafiroX - Acceso de Usuarios")
-    st.write("Inicia sesión o regístrate para gestionar tu saldo y retiros.")
+    st.title("💎 Zafiro Vice Club - Acceso")
+    st.write("Inicia sesión o regístrate para gestionar tu saldo y retiros en Vice City.")
     
     tab1, tab2 = st.tabs(["Iniciar Sesión", "Registrarse"])
     
@@ -68,11 +68,11 @@ if st.session_state.usuario_actual is None:
         user_login = st.text_input("Usuario", key="login_user", placeholder="Tu nombre de usuario")
         pass_login = st.text_input("Contraseña", type="password", key="login_pass", placeholder="Tu contraseña")
         
-        if st.button("Entrar a ZafiroX", key="btn_login"):
+        if st.button("Entrar a Zafiro Vice", key="btn_login"):
             db = st.session_state.usuarios_db
             if user_login in db and db[user_login]["password"] == pass_login:
                 st.session_state.usuario_actual = user_login
-                st.success(f"¡Bienvenido de nuevo, {user_login}!")
+                st.success(f"¡Bienvenido de nuevo a Vice City, {user_login}!")
                 st.rerun()
             else:
                 st.error("Usuario o contraseña incorrectos.")
@@ -89,7 +89,7 @@ if st.session_state.usuario_actual is None:
                     db[user_reg] = {"password": pass_reg, "saldo": 0.00}
                     guardar_db(db)
                     st.session_state.usuario_actual = user_reg
-                    st.success(f"¡Cuenta creada con éxito! Bienvenido, {user_reg}.")
+                    st.success(f"¡Cuenta creada con éxito! Bienvenido al club, {user_reg}.")
                     st.rerun()
             else:
                 st.warning("Completa todos los campos.")
@@ -108,7 +108,7 @@ def actualizar_saldo(cantidad):
 # --- MENÚ LATERAL ---
 with st.sidebar:
     st.image("https://img.icons8.com/color/96/controller.png", width=60)
-    st.title("ZafiroX")
+    st.title("Zafiro Vice Club")
     st.write(f"Hola, **{usuario}** 👋")
     
     if st.button("🚪 Cerrar Sesión", key="btn_logout"):
@@ -128,7 +128,7 @@ with st.sidebar:
             "🎡 Ruleta de la Fortuna",
             "📺 Zona Multimedia & Educativa",
             "🎵 Vídeos Musicales en Streaming",
-            "📻 Mini Emisora Zafiro (Automática 24/7)",
+            "📻 Radio Vice City (Emisoras 24/7)",
             "🔗 Invitar Amigos",
             "🏆 Competencia Semanal",
             "💸 Conversor y Retiros (Nequi / PayPal)"
@@ -170,7 +170,7 @@ if opcion == "💎 Resumen de Saldo":
         <div style="background: linear-gradient(135deg, #651fff, #3d5afe); padding: 20px; border-radius: 12px; text-align: center; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
             <h2 style="margin: 0; font-size: 22px; text-transform: uppercase; letter-spacing: 2px;">⏰ Cierre y Sorteo en:</h2>
             <p style="font-size: 34px; font-weight: bold; margin: 10px 0;">{dias} Días : {horas:02d}h : {minutos:02d}m : {segundos:02d}s</p>
-            <p style="margin: 0; font-size: 14px; opacity: 0.9;">¡Domingo a las 6:00 p.m. se definen los ganadores semanales!</p>
+            <p style="margin: 0; font-size: 14px; opacity: 0.9;">¡Domingo a las 6:00 p.m. se definen los ganadores semanales en Zafiro Vice Club!</p>
         </div>
         """,
         unsafe_allow_html=True
@@ -180,8 +180,8 @@ if opcion == "💎 Resumen de Saldo":
     st.rerun()
 
 elif opcion == "💣 Caza de Minas (Casino)":
-    st.title("💣 Caza de Minas (Casino)")
-    st.write("Elige una casilla con cuidado. ¡Evita la mina escondida!")
+    st.title("💣 Caza de Minas (Casino Vice)")
+    st.write("Elige una casilla con cuidado. ¡Evita la mina escondida en Ocean Beach!")
     
     col1, col2, col3 = st.columns(3)
     with col1:
@@ -245,7 +245,7 @@ elif opcion == "📦 Caja Misteriosa Clásica":
         st.rerun()
 
 elif opcion == "🎡 Ruleta de la Fortuna":
-    st.title("🎡 Ruleta de la Fortuna ZafiroX")
+    st.title("🎡 Ruleta de la Fortuna Zafiro Vice")
     st.write("¡Gira la ruleta mágica y prueba tu suerte para ganar premios instantáneos!")
     
     if st.button("🎲 ¡Girar Ruleta Ahora!", key="girar_ruleta"):
@@ -259,7 +259,7 @@ elif opcion == "🎡 Ruleta de la Fortuna":
         st.rerun()
 
 elif opcion == "📺 Zona Multimedia & Educativa":
-    st.title("📺 Zona Multimedia, Animes & Educación")
+    st.title("📺 Zona Multimedia & Educación")
     st.write("Disfruta de contenido clásico y cursos educativos con reproducción integrada:")
     
     multimedia_videos = {
@@ -292,7 +292,7 @@ elif opcion == "📺 Zona Multimedia & Educativa":
             st.rerun()
 
 elif opcion == "🎵 Vídeos Musicales en Streaming":
-    st.title("🎵 Vídeos Musicales de YouTube en Streaming")
+    st.title("🎵 Vídeos Musicales en Streaming")
     st.write("Disfruta de videoclips musicales variados con reproducción fluida:")
     
     videos_musicales = {
@@ -323,15 +323,49 @@ elif opcion == "🎵 Vídeos Musicales en Streaming":
             time.sleep(0.8)
             st.rerun()
 
-elif opcion == "📻 Mini Emisora Zafiro (Automática 24/7)":
-    st.title("📻 Mini Emisora Zafiro - Estación Automática")
-    st.write("Disfruta de tu **Mini Emisora Zafiro** oficial con canciones dinámicas variadas (Pop, Rock, Electrónica, Ranchera, Salsa y Merengue) y botones de control interactivos:")
+elif opcion == "📻 Radio Vice City (Emisoras 24/7)":
+    st.title("📻 Radio Vice City - Zafiro Vice Club")
+    st.write("Sintoniza las emisoras oficiales con locutores inspirados en Vice City (**Emotion 98.3** y **Radio Espantoso**), comerciales falsos y música en vivo:")
     
-    # HTML Interactivo con playlist variada y botones de control
+    # Selector de emisora estilo Vice City
+    estacion_emisora = st.selectbox(
+        "Elige tu estación:",
+        [
+            "Emotion 98.3 (Baladas & Ochenteras)",
+            "Radio Espantoso (Latin Groove & Salsa)"
+        ]
+    )
+    
+    if "Emotion 98.3" in estacion_emisora:
+        st.markdown(
+            """
+            <div style="background: linear-gradient(135deg, #2b1055, #7597de); padding: 15px; border-radius: 10px; color: white; margin-bottom: 15px;">
+                <h4 style="margin: 0; color: #ff007f;">📻 Emotion 98.3 FM</h4>
+                <p style="font-style: italic; margin-top: 8px; font-size: 14px;">
+                "Siente el dolor, siente el amor... aquí en Emotion con Fernando Martínez. Para todos los apostadores de <strong>Zafiro Vice Club</strong> que perdieron la cabeza (y el saldo) en las tragamonedas, pero que siguen bailando bajo la lluvia de neón."
+                </p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+    else:
+        st.markdown(
+            """
+            <div style="background: linear-gradient(135deg, #1b4332, #40916c); padding: 15px; border-radius: 10px; color: white; margin-bottom: 15px;">
+                <h4 style="margin: 0; color: #ffb703;">📻 Radio Espantoso AM</h4>
+                <p style="font-style: italic; margin-top: 8px; font-size: 14px;">
+                "¡Ay, mamacita! ¡Sube el volumen de tu bólido en Vice City y muévete con Ramón Daboia! Si vas a retirar tus ganancias de <strong>Zafiro Vice Club</strong> por Nequi o PayPal, hazlo con sabor tropical, ¡qué caramba!"
+                </p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+        
+    # HTML Interactivo con playlist y reproductor estilo Vice City
     mini_emisora_html = """
     <div style="background: #1e1e2f; padding: 20px; border-radius: 12px; text-align: center; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.4);">
-        <h3 style="margin-top: 0; color: #00d2ff;">🎧 Emisora Zafiro En Vivo (Variada)</h3>
-        <p id="nowPlaying" style="margin-top: 5px; font-size: 15px; color: #4cd137; font-weight: bold;">Cargando emisora...</p>
+        <h3 style="margin-top: 0; color: #00d2ff;">🎧 Transmisión en Vivo - Vice Waves</h3>
+        <p id="nowPlaying" style="margin-top: 5px; font-size: 15px; color: #4cd137; font-weight: bold;">Cargando frecuencia...</p>
         
         <audio id="zafiroRadio" controls style="width: 100%; border-radius: 8px; margin-top: 10px;"></audio>
         
@@ -342,15 +376,11 @@ elif opcion == "📻 Mini Emisora Zafiro (Automática 24/7)":
     </div>
 
     <script>
-        // Playlist ampliada con múltiples géneros musicales reales y voz
         const playlist = [
-            { name: "🎤 Zafiro Pop: Vocals & Modern Hits", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
-            { name: "🎸 Zafiro Rock: Guitars & Energy", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" },
-            { name: "⚡ Zafiro Electrónica: Club & Bass", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3" },
-            { name: "🪗 Zafiro Ranchera: Acústica & Sentimiento", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
-            { name: "🎺 Zafiro Salsa & Tropical Rhythms", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3" },
-            { name: "🥁 Zafiro Merengue & Dance Session", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3" },
-            { name: "🎷 Zafiro Jazz & Lounge Melodies", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" }
+            { name: "📻 Emotion 98.3: Balada Ochentera & Neón", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
+            { name: "🎺 Radio Espantoso: Ritmo Tropical & Salsa", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
+            { name: "🎷 Emotion 98.3: Sintes Románticos de Medianoche", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" },
+            { name: "🪗 Radio Espantoso: Sabor Caribeño & Percusión", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3" }
         ];
 
         let currentTrack = Math.floor(Math.random() * playlist.length);
@@ -384,28 +414,42 @@ elif opcion == "📻 Mini Emisora Zafiro (Automática 24/7)":
     </script>
     """
     
-    st.components.v1.html(mini_emisora_html, height=250)
+    st.components.v1.html(mini_emisora_html, height=240)
     
-    st.info("💡 **Consejo:** Usa los botones de **⏮️ Anterior** y **Siguiente ⏭️** para cambiar de género al instante. También puedes hacer clic en los tres puntos **(⋮)** del reproductor para **descargar** la pista actual a tu dispositivo.")
-    
+    with st.expander("📢 Comerciales Falsos de Vice City (Bloque Comercial)"):
+        if "Emotion" in estacion_emisora:
+            st.write(
+                "**[SFX: Estática de radio y sonido de gaviotas de fondo]**\n\n"
+                "*Locutor serio:* ¿Cansado de que el banco te ponga peros para tus retiros? "
+                "En **Banco de Vice City**, tu dinero está seguro... o al menos hasta que el director tome un vuelo privado a las Bahamas. "
+                "¡Invierta hoy, sufra mañana!"
+            )
+        else:
+            st.write(
+                "**[SFX: Sonido de bocina de camión y bongos tropicales]**\n\n"
+                "*Locutor alegre:* ¡Amigo contrabandista y fan de las cajitas sorpresa! ¿Tu bólido quedó hecho un colador? "
+                "Ven a **Chota-Repuestos**. Enderezamos chasis a punta de martillo y cinta de aislar. "
+                "¡Pregunta por la garantía de una cuadra!"
+            )
+            
     st.markdown("---")
     st.markdown("#### Publicidad Patrocinada:")
     st.components.v1.html(banner_anuncio_html, height=120)
     
-    estado_musica_clave = f"{usuario}_mini_emisora_zafiro_247"
+    estado_musica_clave = f"{usuario}_radio_vice_city_247"
     
     if estado_musica_clave in st.session_state.musica_escuchada:
         st.button("🎵 Bonus de Emisora ya reclamado hoy", disabled=True, key="btn_musica_disabled")
     else:
-        if st.button("🎵 Reclamar Bonus Mini Emisora Zafiro (+0.003 💎)", key="btn_musica_claim"):
+        if st.button("🎵 Reclamar Bonus Radio Vice City (+0.003 💎)", key="btn_musica_claim"):
             st.session_state.musica_escuchada[estado_musica_clave] = True
             actualizar_saldo(0.003)
-            st.success("✅ ¡Bonus de Mini Emisora Zafiro acreditado!")
+            st.success("✅ ¡Bonus de Radio Vice City acreditado!")
             time.sleep(0.8)
             st.rerun()
 
 elif opcion == "🔗 Invitar Amigos":
-    st.title("🔗 Invitar Amigos")
+    st.title("🔗 Invitar Amigos a Zafiro Vice Club")
     st.write("Comparte tu enlace de referido único y gana comisiones:")
     link_ref = f"https://zafirox-app.streamlit.app/?ref={usuario}"
     st.code(link_ref)
@@ -422,7 +466,7 @@ elif opcion == "🏆 Competencia Semanal":
         - 🥉 **3er Lugar:** $15.00 USD en Premios
         """
     )
-    st.success("¡Sigue participando para escalar posiciones!")
+    st.success("¡Sigue participando para escalar posiciones en el ranking de Vice City!")
 
 elif opcion == "💸 Conversor y Retiros (Nequi / PayPal)":
     st.title("💸 Conversor de Divisas y Retiros")
