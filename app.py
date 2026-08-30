@@ -146,24 +146,37 @@ with st.sidebar:
 # --- CONTENIDO DE SECCIONES ---
 
 if opcion == "📻 Radio Vice City (Emisoras 24/7)":
-    st.title("📻 Radio Vice City - Zafiro Vice Club")
-    st.write("Sintoniza las emisoras oficiales con locutores inspirados en Vice City (**Emotion 98.3** y **Radio Espantoso**), comerciales falsos y música en vivo:")
+    st.title("📻 Zafiro Radio - Zafiro Vice Club")
+    st.write("Sintoniza la señal oficial de **Zafiro Radio**, bloques comerciales falsos y emisoras temáticas de Vice City:")
     
     estacion_emisora = st.selectbox(
         "Elige tu estación:",
         [
+            "Zafiro Radio (Emisora Oficial)",
             "Emotion 98.3 (Baladas & Ochenteras)",
             "Radio Espantoso (Latin Groove & Salsa)"
         ]
     )
     
-    if "Emotion 98.3" in estacion_emisora:
+    if "Zafiro Radio" in estacion_emisora:
+        st.markdown(
+            """
+            <div style="background: linear-gradient(135deg, #1f1c2c, #928dab); padding: 15px; border-radius: 10px; color: white; margin-bottom: 15px;">
+                <h4 style="margin: 0; color: #00d2ff;">📻 Zafiro Radio - Transmisión en Vivo</h4>
+                <p style="font-style: italic; margin-top: 8px; font-size: 14px;">
+                "Transmitiendo directo desde el corazón de Vice City para todos los jugadores de <strong>Zafiro Vice Club</strong>. ¡Sube el volumen y disfruta!"
+                </p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+    elif "Emotion 98.3" in estacion_emisora:
         st.markdown(
             """
             <div style="background: linear-gradient(135deg, #2b1055, #7597de); padding: 15px; border-radius: 10px; color: white; margin-bottom: 15px;">
                 <h4 style="margin: 0; color: #ff007f;">📻 Emotion 98.3 FM</h4>
                 <p style="font-style: italic; margin-top: 8px; font-size: 14px;">
-                "Siente el dolor, siente el amor... aquí en Emotion con Fernando Martínez. Para todos los apostadores de <strong>Zafiro Vice Club</strong> que perdieron la cabeza (y el saldo) en las tragamonedas, pero que siguen bailando bajo la lluvia de neón."
+                "Siente el dolor, siente el amor... aquí en Emotion con Fernando Martínez."
                 </p>
             </div>
             """,
@@ -175,101 +188,39 @@ if opcion == "📻 Radio Vice City (Emisoras 24/7)":
             <div style="background: linear-gradient(135deg, #1b4332, #40916c); padding: 15px; border-radius: 10px; color: white; margin-bottom: 15px;">
                 <h4 style="margin: 0; color: #ffb703;">📻 Radio Espantoso AM</h4>
                 <p style="font-style: italic; margin-top: 8px; font-size: 14px;">
-                "¡Ay, mamacita! ¡Sube el volumen de tu bólido en Vice City y muévete con Ramón Daboia! Si vas a retirar tus ganancias de <strong>Zafiro Vice Club</strong> por Nequi o PayPal, hazlo con sabor tropical, ¡qué caramba!"
+                "¡Ay, mamacita! ¡Sube el volumen de tu bólido en Vice City con Ramón Daboia!"
                 </p>
             </div>
             """,
             unsafe_allow_html=True
         )
         
-    # HTML Interactivo con reproductor y botón de descarga integrado
-    mini_emisora_html = """
-    <div style="background: #1e1e2f; padding: 20px; border-radius: 12px; text-align: center; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.4);">
-        <h3 style="margin-top: 0; color: #00d2ff;">🎧 Transmisión en Vivo - Vice Waves</h3>
-        <p id="nowPlaying" style="margin-top: 5px; font-size: 15px; color: #4cd137; font-weight: bold;">Cargando señal de Vice City...</p>
-        
-        <audio id="zafiroRadio" controls preload="auto" style="width: 100%; border-radius: 8px; margin-top: 10px;">
-            <source id="audioSource" src="https://files.catbox.moe/lz5hd3.m4a" type="audio/mp4">
-            Tu navegador no soporta el elemento de audio.
-        </audio>
-        
-        <div style="margin-top: 15px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
-            <button onclick="prevTrack()" style="background: #651fff; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px;">⏮️ Anterior</button>
-            <button onclick="nextTrack()" style="background: #651fff; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px;">Siguiente ⏭️</button>
-        </div>
-
-        <div style="margin-top: 15px;">
-            <a id="downloadBtn" href="https://files.catbox.moe/lz5hd3.m4a" download="Zafiro_Vice_Emisora.m4a" target="_blank" style="display: inline-block; background: #00b0ff; color: white; text-decoration: none; padding: 10px 22px; border-radius: 6px; font-weight: bold; font-size: 14px; box-shadow: 0 3px 10px rgba(0,0,176,0.3);">
-                📥 Descargar Audio Actual
+    # Enlace directo de la emisora grabada
+    url_audio_principal = "https://files.catbox.moe/lz5hd3.m4a"
+    
+    st.markdown("### 🎧 Reproductor Oficial")
+    
+    # Reproductor nativo de Streamlit (Garantiza carga fluida en dispositivos móviles)
+    st.audio(url_audio_principal, format="audio/mp4")
+    
+    # Botón de descarga para Zafiro Radio
+    st.markdown(
+        f"""
+        <div style="text-align: center; margin-top: 15px;">
+            <a href="{url_audio_principal}" download="Zafiro_Radio_Oficial.m4a" target="_blank" style="display: inline-block; background: #00b0ff; color: white; text-decoration: none; padding: 10px 22px; border-radius: 6px; font-weight: bold; font-size: 14px; box-shadow: 0 3px 10px rgba(0,0,176,0.3);">
+                📥 Descargar Audio de Zafiro Radio
             </a>
         </div>
-    </div>
-
-    <script>
-        const playlist = [
-            { name: "📻 Grabación Oficial Personalizada (Zafiro Vice)", url: "https://files.catbox.moe/lz5hd3.m4a" },
-            { name: "📻 Emotion 98.3: Balada Ochentera & Neón", url: "https://actions.google.com/sounds/v1/ambiences/coffee_shop.ogg" },
-            { name: "🎺 Radio Espantoso: Ritmo Tropical & Salsa", url: "https://actions.google.com/sounds/v1/relaxing/ocean_waves.ogg" },
-            { name: "🎷 Emotion 98.3: Sintes Románticos de Medianoche", url: "https://actions.google.com/sounds/v1/science_fiction/teleportation.ogg" }
-        ];
-
-        let currentTrack = 0;
-        const audioPlayer = document.getElementById('zafiroRadio');
-        const audioSource = document.getElementById('audioSource');
-        const nowPlayingText = document.getElementById('nowPlaying');
-        const downloadBtn = document.getElementById('downloadBtn');
-
-        function loadTrack(index) {
-            if (index >= playlist.length) currentTrack = 0;
-            if (index < 0) currentTrack = playlist.length - 1;
-            else currentTrack = index;
-
-            const currentItem = playlist[currentTrack];
-            audioSource.src = currentItem.url;
-            nowPlayingText.innerText = "Reproduciendo: " + currentItem.name;
-            downloadBtn.href = currentItem.url;
-            
-            audioPlayer.load();
-        }
-
-        function nextTrack() {
-            loadTrack(currentTrack + 1);
-            audioPlayer.play().catch(e => console.log("Reproducción automática bloqueada por el navegador"));
-        }
-
-        function prevTrack() {
-            loadTrack(currentTrack - 1);
-            audioPlayer.play().catch(e => console.log("Reproducción automática bloqueada por el navegador"));
-        }
-
-        audioPlayer.addEventListener('ended', function() {
-            currentTrack = (currentTrack + 1) % playlist.length;
-            loadTrack(currentTrack);
-            audioPlayer.play();
-        });
-
-        nowPlayingText.innerText = "Reproduciendo: " + playlist[currentTrack].name;
-        downloadBtn.href = playlist[currentTrack].url;
-    </script>
-    """
-    
-    st.components.v1.html(mini_emisora_html, height=290)
+        """,
+        unsafe_allow_html=True
+    )
     
     with st.expander("📢 Comerciales Falsos de Vice City (Bloque Comercial)"):
-        if "Emotion" in estacion_emisora:
-            st.write(
-                "**[SFX: Estática de radio y sonido de gaviotas de fondo]**\n\n"
-                "*Locutor serio:* ¿Cansado de que el banco te ponga peros para tus retiros? "
-                "En **Banco de Vice City**, tu dinero está seguro... o al menos hasta que el director tome un vuelo privado a las Bahamas. "
-                "¡Invierta hoy, sufra mañana!"
-            )
-        else:
-            st.write(
-                "**[SFX: Sonido de bocina de camión y bongos tropicales]**\n\n"
-                "*Locutor alegre:* ¡Amigo contrabandista y fan de las cajitas sorpresa! ¿Tu bólido quedó hecho un colador? "
-                "Ven a **Chota-Repuestos**. Enderezamos chasis a punta de martillo y cinta de aislar. "
-                "¡Pregunta por la garantía de una cuadra!"
-            )
+        st.write(
+            "**[SFX: Estática de radio y sonido de motores]**\n\n"
+            "*Locutor:* ¿Te quedaste sin saldo en Zafiro Vice Club? No te preocupes, ven a "
+            "**Prendas y Rines 'El Chino'**. Te cambiamos tu reloj por unas fichas para que sigas intentando la suerte."
+        )
             
     st.markdown("---")
     st.markdown("#### Publicidad Patrocinada:")
@@ -278,12 +229,12 @@ if opcion == "📻 Radio Vice City (Emisoras 24/7)":
     estado_musica_clave = f"{usuario}_radio_vice_city_247"
     
     if estado_musica_clave in st.session_state.musica_escuchada:
-        st.button("🎵 Bonus de Emisora ya reclamado hoy", disabled=True, key="btn_musica_disabled")
+        st.button("🎵 Bonus de Zafiro Radio ya reclamado hoy", disabled=True, key="btn_musica_disabled")
     else:
-        if st.button("🎵 Reclamar Bonus Radio Vice City (+0.003 💎)", key="btn_musica_claim"):
+        if st.button("🎵 Reclamar Bonus Zafiro Radio (+0.003 💎)", key="btn_musica_claim"):
             st.session_state.musica_escuchada[estado_musica_clave] = True
             actualizar_saldo(0.003)
-            st.success("✅ ¡Bonus de Radio Vice City acreditado!")
+            st.success("✅ ¡Bonus de Zafiro Radio acreditado!")
             time.sleep(0.8)
             st.rerun()
 
@@ -461,6 +412,7 @@ elif opcion == "🎵 Vídeos Musicales en Streaming":
     
     st.components.v1.iframe(datos_video["embed"], height=315, scrolling=False)
     
+    # Botón de descarga/enlace para el vídeo
     st.markdown(
         f"""
         <div style="text-align: center; margin-top: 10px;">
