@@ -34,6 +34,8 @@ def cargar_db():
         "Lud337": {
             "password": "123", 
             "saldo": 40.2505,
+            "saldo_cop": 0.0,
+            "premio_reclamado_semana": False,
             "telefono": "",
             "documento": "",
             "titular": "",
@@ -42,6 +44,8 @@ def cargar_db():
         "Carlos_99": {
             "password": "456", 
             "saldo": 10.00,
+            "saldo_cop": 0.0,
+            "premio_reclamado_semana": False,
             "telefono": "",
             "documento": "",
             "titular": "",
@@ -106,6 +110,8 @@ if st.session_state.usuario_actual is None:
                     db[user_reg] = {
                         "password": pass_reg, 
                         "saldo": 0.00,
+                        "saldo_cop": 0.0,
+                        "premio_reclamado_semana": False,
                         "telefono": "",
                         "documento": "",
                         "titular": "",
@@ -124,10 +130,16 @@ usuario = st.session_state.usuario_actual
 st.session_state.usuarios_db = cargar_db()
 datos_usuario = st.session_state.usuarios_db[usuario]
 saldo_actual = datos_usuario["saldo"]
+saldo_cop_actual = datos_usuario.get("saldo_cop", 0.0)
 
 def actualizar_saldo(cantidad):
     nuevo_saldo = max(0.0, st.session_state.usuarios_db[usuario]["saldo"] + cantidad)
     st.session_state.usuarios_db[usuario]["saldo"] = nuevo_saldo
+    guardar_db(st.session_state.usuarios_db)
+
+def actualizar_saldo_cop(cantidad_cop):
+    nuevo_saldo_cop = max(0.0, st.session_state.usuarios_db[usuario].get("saldo_cop", 0.0) + cantidad_cop)
+    st.session_state.usuarios_db[usuario]["saldo_cop"] = nuevo_saldo_cop
     guardar_db(st.session_state.usuarios_db)
 
 # --- MENÚ LATERAL ---
@@ -162,7 +174,8 @@ with st.sidebar:
     
     st.markdown("---")
     st.write("💎 **Tu Saldo Actual:**")
-    st.metric(label="", value=f"{saldo_actual:.4f} 💎")
+    st.metric(label="Diamantes", value=f"{saldo_actual:.4f} 💎")
+    st.metric(label="Pesos Acumulados", value=f"${saldo_cop_actual:,.0f} COP")
 
     st.markdown("---")
     st.markdown("### Patrocinador")
@@ -268,7 +281,8 @@ if opcion == "📻 Radio Vice City (Emisoras 24/7)":
 
 elif opcion == "💎 Resumen de Saldo":
     st.title("💎 Resumen de Saldo y Actividad")
-    st.metric(label="Saldo Disponible", value=f"{saldo_actual:.4f} 💎")
+    st.metric(label="Saldo Disponible en Diamantes", value=f"{saldo_actual:.4f} 💎")
+    st.metric(label="Saldo Disponible en Pesos", value=f"${saldo_cop_actual:,.0f} COP")
     
     st.markdown("---")
     st.subheader("⏳ Tiempo Restante para el Sorteo (Domingo a las 6:00 PM)")
@@ -475,29 +489,78 @@ elif opcion == "🔗 Invitar Amigos":
 
 elif opcion == "🏆 Competencia Semanal":
     st.title("🏆 Competencia Semanal de Usuarios")
-    st.write("¡Los usuarios con más actividad de domingo a domingo se llevan premios altos!")
+    st.write("¡Los usuarios con más actividad de domingo a domingo se llevan premios directos en pesos colombianos (COP)! Además de tus ganancias diarias en actividades, puedes reclamar tu premio semanal aquí según tu posición:")
+    
     st.markdown(
         """
-        - 🥇 **1er Lugar:** $50.00 USD en Premios
-        - 🥈 **2do Lugar:** $30.00 USD en Premios
-        - 🥉 **3er Lugar:** $15.00 USD en Premios
+        - 🥇 **1er Lugar:** $50,000 COP
+        - 🥈 **2do Lugar:** $30,000 COP
+        - 🥉 **3er Lugar:** $15,000 COP
+        - 🏅 **Del 3er lugar hacia abajo (Participantes Activos):** Premios variables de **$1,000 COP**, **$500 COP** o **$100 COP**
         """
     )
-    st.success("¡Sigue participando para escalar posiciones en el ranking de Vice City!")
+    
+    st.markdown("---")
+    st.subheader("🎯 Reclamar Premio Semanal")
+    
+    premio_ya_reclamado = datos_usuario.get("premio_reclamado_semana", False)
+    
+    if premio_ya_reclamado:
+        st.info("✅ Ya has reclamado tu recompensa de la competencia semanal en este ciclo. ¡Sigue activo para el siguiente!")
+    else:
+        puesto_seleccionado = st.selectbox(
+            "Selecciona tu posición o categoría en el ranking semanal:",
+            [
+                "1er Lugar ($50,000 COP)",
+                "2do Lugar ($30,000 COP)",
+                "3er Lugar ($15,000 COP)",
+                "Participante Activo ($1,000 COP)",
+                "Participante Activo ($500 COP)",
+                "Participante Activo ($100 COP)"
+            ],
+            key="select_puesto_semanal"
+        )
+        
+        if st.button("🎁 Acreditar Mi Premio Semanal a Pesos", key="btn_reclamar_premio_semanal"):
+            if "1er" in puesto_seleccionado:
+                premio_monto = 50000.0
+            elif "2do" in puesto_seleccionado:
+                premio_monto = 30000.0
+            elif "3er" in puesto_seleccionado:
+                premio_monto = 15000.0
+            elif "1,000" in puesto_seleccionado:
+                premio_monto = 1000.0
+            elif "500" in puesto_seleccionado:
+                premio_monto = 500.0
+            else:
+                premio_monto = 100.0
+                
+            actualizar_saldo_cop(premio_monto)
+            st.session_state.usuarios_db[usuario]["premio_reclamado_semana"] = True
+            guardar_db(st.session_state.usuarios_db)
+            
+            st.success(f"🎉 ¡Felicidades! Se han sumado **${premio_monto:,.0f} COP** a tu saldo en pesos de manera persistente.")
+            st.balloons()
+            time.sleep(1.5)
+            st.rerun()
 
 elif opcion == "💸 Pasarela de Pagos (Nequi, Daviplata, PayPal, Bancos)":
     st.title("💸 Pasarela de Pagos y Retiros Seguros")
-    st.write("Tus datos de cuenta se guardan automáticamente en tu perfil para futuros retiros.")
-    
-    st.metric(label="Saldo Disponible en Diamantes", value=f"{saldo_actual:.4f} 💎")
+    st.write("Puedes retirar tus Diamantes (convertidos a su equivalente en pesos) y/o tu Saldo en Pesos acumulados por premios semanales de forma conjunta o independiente.")
     
     cop_por_usd = 4000
     eur_por_usd = 0.92
     
-    total_cop = saldo_actual * cop_por_usd
-    total_eur = saldo_actual * eur_por_usd
+    total_diamantes_en_cop = saldo_actual * cop_por_usd
+    saldo_total_disponible_cop = total_diamantes_en_cop + saldo_cop_actual
     
-    st.info(f"💵 **Tasas de Conversión Actuales:**\n\n- Pesos Colombianos (COP): **${total_cop:,.2f} COP**\n- Euros (EUR): **€{total_eur:.2f} EUR**\n- Dólares (USD): **${saldo_actual:.2f} USD**")
+    st.info(
+        f"💵 **Resumen de Fondos Disponibles:**\n\n"
+        f"- Diamantes: **{saldo_actual:.4f} 💎** (Equivalente a ~${total_diamantes_en_cop:,.0f} COP)\n"
+        f"- Saldo en Pesos (Premios): **${saldo_cop_actual:,.0f} COP**\n"
+        f"--------------------------------------------------\n"
+        f"- **Saldo Total Global Disponible:** **${saldo_total_disponible_cop:,.0f} COP**"
+    )
     
     st.markdown("---")
     st.subheader("🛡️ Formulario de Transacción Segura")
@@ -531,7 +594,7 @@ elif opcion == "💸 Pasarela de Pagos (Nequi, Daviplata, PayPal, Bancos)":
         tiempo_estimado = "10 a 20 minutos (Depósito directo en línea)"
         
     elif "PayPal" in metodo_pago:
-        num_cuenta = st.text_input("Correo Electrónico Asociado a PayPal", value=val_tel_guardado, placeholder="tucorreo@dominio.com", key="input_paypal_mail")
+        num_cuenta = st.text_input("Correo Electrónico Asociado al PayPal", value=val_tel_guardado, placeholder="tucorreo@dominio.com", key="input_paypal_mail")
         titular = st.text_input("Nombre Completo del Titular PayPal", value=val_titular_guardado, placeholder="Ej: Carlos Andrés Pérez", key="input_titular_paypal")
         documento = st.text_input("País de Residencia", value=val_doc_guardado, placeholder="Ej: Colombia / España / México", key="input_doc_paypal")
         tiempo_estimado = "2 a 4 horas hábiles (Verificación antifraude)"
@@ -551,35 +614,64 @@ elif opcion == "💸 Pasarela de Pagos (Nequi, Daviplata, PayPal, Bancos)":
         documento = st.text_input("Cédula de Ciudadanía", value=val_doc_guardado, placeholder="Ej: 1020304050", key="input_doc_eps")
         tiempo_estimado = "24 a 48 horas (Validación de compensación EPS)"
         
-    monto_retirar = st.number_input("Monto en 💎 a retirar", min_value=0.0, max_value=float(saldo_actual), value=float(min(1.0, saldo_actual)), step=0.1, key="input_monto_seguro")
+    tipo_retiro = st.radio(
+        "¿Qué deseas retirar?",
+        [
+            "Retirar Saldo en Pesos (Premios Semanales)",
+            "Retirar Diamantes (Convertidos a COP)",
+            "Retirar TODO el saldo combinado (Pesos + Diamantes)"
+        ],
+        key="radio_tipo_retiro"
+    )
     
+    if "Pesos" in tipo_retiro and "Combinado" not in tipo_retiro:
+        monto_cop_retirar = st.number_input("Monto en Pesos (COP) a retirar", min_value=0.0, max_value=float(saldo_cop_actual), value=float(min(1000.0, saldo_cop_actual)), step=100.0, key="input_monto_cop")
+    elif "Diamantes" in tipo_retiro:
+        monto_diamantes_retirar = st.number_input("Monto en 💎 a retirar", min_value=0.0, max_value=float(saldo_actual), value=float(min(1.0, saldo_actual)), step=0.1, key="input_monto_diamantes")
+    else:
+        st.write(f"💼 **Se retirarán todos tus fondos disponibles:** ${saldo_total_disponible_cop:,.0f} COP en total.")
+        
     st.markdown(f"⏱️ **Tiempo estimado de llegada del pago:** `{tiempo_estimado}`")
     
     if st.button("🔒 Validar Datos y Ejecutar Transferencia Segura", key="btn_ejecutar_pago_total"):
-        if saldo_actual <= 0:
-            st.error("❌ No tienes saldo disponible para retirar.")
+        if saldo_total_disponible_cop <= 0:
+            st.error("❌ No tienes fondos disponibles para retirar.")
         elif not num_cuenta or not titular or not documento:
             st.warning("⚠️ Por favor completa todos los campos de seguridad requeridos para la transferencia.")
-        elif monto_retirar <= 0:
-            st.warning("⚠️ El monto a retirar debe ser mayor a 0.")
-        elif monto_retirar > saldo_actual:
-            st.error("❌ No puedes retirar más de tu saldo actual.")
         else:
+            # Guardar datos en perfil
             st.session_state.usuarios_db[usuario]["telefono"] = num_cuenta
             st.session_state.usuarios_db[usuario]["documento"] = documento
             st.session_state.usuarios_db[usuario]["titular"] = titular
             st.session_state.usuarios_db[usuario]["metodo_favorito"] = metodo_pago
             
-            st.session_state.usuarios_db[usuario]["saldo"] -= monto_retirar
+            # Descontar saldos según la opción elegida
+            if "Pesos" in tipo_retiro and "Combinado" not in tipo_retiro:
+                if monto_cop_retirar <= 0 or monto_cop_retirar > saldo_cop_actual:
+                    st.error("❌ Monto inválido para retirar en pesos.")
+                    st.stop()
+                st.session_state.usuarios_db[usuario]["saldo_cop"] -= monto_cop_retirar
+                monto_descrito_txt = f"${monto_cop_retirar:,.0f} COP (Saldo en Pesos)"
+            elif "Diamantes" in tipo_retiro:
+                if monto_diamantes_retirar <= 0 or monto_diamantes_retirar > saldo_actual:
+                    st.error("❌ Monto inválido para retirar en diamantes.")
+                    st.stop()
+                st.session_state.usuarios_db[usuario]["saldo"] -= monto_diamantes_retirar
+                monto_descrito_txt = f"💎 {monto_diamantes_retirar:.4f} (Equiv. a ~${monto_diamantes_retirar * cop_por_usd:,.0f} COP)"
+            else:
+                monto_descrito_txt = f"TODO: ${saldo_total_disponible_cop:,.0f} COP (Incluye Pesos y Diamantes)"
+                st.session_state.usuarios_db[usuario]["saldo"] = 0.0
+                st.session_state.usuarios_db[usuario]["saldo_cop"] = 0.0
+                
             guardar_db(st.session_state.usuarios_db)
             
             st.success(
-                f"🛡️ ¡Transacción cifrada procesada con éxito y datos guardados en tu perfil!\n\n"
+                f"🛡️ ¡Transacción cifrada procesada con éxito y guardada en tu perfil!\n\n"
                 f"• **Método:** {metodo_pago}\n"
                 f"• **Destino / Cuenta:** {num_cuenta}\n"
                 f"• **Titular:** {titular} (Doc: {documento})\n"
-                f"• **Monto:** 💎 {monto_retirar:.4f}\n\n"
-                f"El pago se ha encolado de forma segura y llegará a su destino en un tiempo estimado de: *{tiempo_estimado}*."
+                f"• **Monto Retirado:** {monto_descrito_txt}\n\n"
+                f"El pago ha sido encolado de forma segura y llegará a su destino en un tiempo estimado de: *{tiempo_estimado}*."
             )
             st.balloons()
             time.sleep(3)
