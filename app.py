@@ -12,13 +12,14 @@ st.set_page_config(
     layout="centered"
 )
 
-# --- OCULTAR MENÚ FLOTANTE Y BOTÓN DE STREAMLIT ---
+# --- OCULTAR MENÚ FLOTANTE, BARRA SUPERIOR Y BOTÓN DE STREAMLIT ---
 hide_streamlit_style = """
 <style>
 #MainMenu {visibility: hidden;}
 footer {visibility: hidden;}
 .stAppDeployButton {display:none;}
 div[data-testid="stStatusWidget"] {visibility: hidden;}
+header {visibility: hidden;}
 </style>
 """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
@@ -93,7 +94,6 @@ if 'videomusica_vista' not in st.session_state:
 if 'indice_emisora' not in st.session_state:
     st.session_state.indice_emisora = 0
 
-# Inicializar lista de solicitudes de retiro globales si no existe
 if 'retiros_globales' not in st.session_state:
     st.session_state.retiros_globales = []
 
@@ -147,12 +147,10 @@ if st.session_state.usuario_actual is None:
                 else:
                     patrocinador = codigo_invitado.strip() if codigo_invitado else None
                     
-                    # Validar que el patrocinador exista realmente
                     if patrocinador and patrocinador not in db:
                         st.warning("⚠️ El código de patrocinador ingresado no existe. Se creará la cuenta sin referido.")
                         patrocinador = None
 
-                    # Bono de bienvenida para el nuevo usuario
                     bono_inicial = 0.005 if patrocinador else 0.0
                     
                     db[user_reg] = {
@@ -168,13 +166,12 @@ if st.session_state.usuario_actual is None:
                         "metodo_favorito": "Nequi (Colombia)"
                     }
                     
-                    # Registrar en la lista del patrocinador y darle su comisión
                     if patrocinador and patrocinador in db:
                         if "referidos_propios" not in db[patrocinador]:
                             db[patrocinador]["referidos_propios"] = []
                         if user_reg not in db[patrocinador]["referidos_propios"]:
                             db[patrocinador]["referidos_propios"].append(user_reg)
-                        db[patrocinador]["saldo"] += 0.002 # Comisión inmediata
+                        db[patrocinador]["saldo"] += 0.002
 
                     guardar_db(db)
                     st.session_state.usuario_actual = user_reg
@@ -188,7 +185,6 @@ if st.session_state.usuario_actual is None:
 usuario = st.session_state.usuario_actual
 st.session_state.usuarios_db = cargar_db()
 
-# Seguridad por si el usuario actual fue borrado
 if usuario not in st.session_state.usuarios_db:
     st.session_state.usuario_actual = None
     st.rerun()
@@ -733,7 +729,6 @@ if usuario == "Lud337" and opcion == "👑 Panel de Administración (Pagos & Con
         clave_admin_ingresada = st.text_input("Introduce la Clave de Admin", type="password", key="input_clave_admin")
         
         if st.button("Desbloquear Panel", key="btn_desbloquear_admin"):
-            # Puedes cambiar 'MiClaveSecreta123' por la contraseña que tú prefieras
             if clave_admin_ingresada == "MiClaveSecreta123":
                 st.session_state.admin_autorizado = True
                 st.success("✅ ¡Acceso concedido al Panel de Administración!")
